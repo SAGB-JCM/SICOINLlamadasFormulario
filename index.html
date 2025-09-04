@@ -2503,9 +2503,61 @@
             });
         }
 
+        // =============================================
+        // INICIO: Bloque de código para preservar estado del formulario
+        // Colocar este bloque ANTES de la función findAndReplaceInDatabase
+        // =============================================
+        
+        // Nuevo helper function: getFormState
+        function getFormState(formId) {
+            const form = document.getElementById(formId);
+            if (!form) return null;
+            const state = {};
+            
+            $(form).find('select').each(function() {
+                const select = $(this);
+                const selectName = select.attr('name');
+                if (selectName) {
+                    const select2Data = select.select2('data') || [];
+                    state[selectName] = {
+                        value: select.val(),
+                        // Guardamos las etiquetas temporales que el usuario haya creado
+                        tags: select2Data.filter(item => item.element === undefined || $(item.element).data('select2-tag') === true)
+                    };
+                }
+            });
+            
+            return state;
+        }
+
+        // Nuevo helper function: restoreFormState
+        function restoreFormState(formId, state) {
+            const form = document.getElementById(formId);
+            if (!form || !state) return;
+            
+            Object.entries(state).forEach(([fieldName, fieldState]) => {
+                const select = $(form).find(`[name="${fieldName}"]`);
+                if (select.length > 0) {
+                    // Restaurar etiquetas temporales primero para que estén disponibles para la selección
+                    if (fieldState.tags) {
+                        fieldState.tags.forEach(tag => {
+                            if (!select.find(`option[value="${tag.id}"]`).length) {
+                                select.append(new Option(tag.text, tag.id));
+                            }
+                        });
+                    }
+                    // Restaurar valor seleccionado
+                    select.val(fieldState.value).trigger('change.select2');
+                }
+            });
+        }
+        // =============================================
+        // FIN: Bloque de código para preservar estado del formulario
+        // =============================================
 
 
-        // Bloque corregido: findAndReplaceInDatabase
+
+
         async function findAndReplaceInDatabase(field, oldValue, newValue) {
             const fieldToDbFieldMap = {
                 'instituciones': 'institucion', 
@@ -2524,67 +2576,27 @@
             if (!dbField) return;
             
             try {
-                // Preservar estado de modales abiertos
-                const activeModalStates = preserveOpenModalsState();
-                
                 // Actualización de registros (existente)
                 const callsQuery = query(callsCollectionRef, where(dbField, '==', oldValue));
                 const callsSnapshot = await getDocs(callsQuery);
                 
                 const batch = writeBatch(db);
                 callsSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
-                
                 const historicalQuery = query(historicalCallsCollectionRef, where(dbField, '==', oldValue));
                 const historicalSnapshot = await getDocs(historicalQuery);
-                
                 historicalSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
-                
                 await batch.commit();
                 
-                // Actualización no destructiva de opciones
-                await updateSelectOptionsPreservingState(field, newValue, activeModalStates);
+                // Actualizar las opciones globales en fieldOptions
+                fieldOptions[field] = [...new Set([...fieldOptions[field].filter(opt => opt !== oldValue), newValue])].sort();
+                // Redibujar los selects con la lista actualizada
+                updateSelectOptions(field, fieldOptions[field]);
                 
                 showAlert(`Se actualizaron ${callsSnapshot.size + historicalSnapshot.size} registros.`, "success");
             } catch (error) {
                 console.error("Error al actualizar registros:", error);
                 showAlert("Error al actualizar registros existentes", "error");
             }
-        }
-
-        // Nuevo helper function: preserveOpenModalsState
-        function preserveOpenModalsState() {
-            const states = {
-                editModal: null,
-                callModal: null
-            };
-            
-            // Preservar estado del modal de edición si está abierto
-            if (!document.getElementById('edit-modal').classList.contains('hidden')) {
-                states.editModal = getFormState('edit-form');
-            }
-            
-            // Preservar estado del modal de nueva llamada si está abierto
-            if (!document.getElementById('call-modal').classList.contains('hidden')) {
-                states.callModal = getFormState('call-form');
-            }
-            
-            return states;
-        }
-
-        // Nuevo helper function: getFormState
-        function getFormState(formId) {
-            const form = document.getElementById(formId);
-            const state = {};
-            
-            $(form).find('select').each(function() {
-                const select = $(this);
-                state[select.attr('name')] = {
-                    value: select.val(),
-                    tags: select.select2('data').filter(item => item._isTag) // Preservar tags temporales
-                };
-            });
-            
-            return state;
         }
 
         // Nuevo helper function: updateSelectOptionsPreservingState
@@ -2615,28 +2627,6 @@
             }
         }
 
-        // Nuevo helper function: restoreFormState
-        function restoreFormState(formId, state) {
-            const form = document.getElementById(formId);
-            
-            Object.entries(state).forEach(([fieldName, fieldState]) => {
-                const select = $(form).find('[name="' + fieldName + '"]');
-                
-                // Restaurar tags temporales primero
-                fieldState.tags.forEach(tag => {
-                    if (!select.find('option[value="' + tag.id + '"]').length) {
-                        select.append(new Option(tag.text, tag.id, false, false));
-                    }
-                });
-                
-                // Restaurar valor seleccionado
-                select.val(fieldState.value).trigger('change');
-            });
-        }
-
-
-
-
         
         //Añadir o Editar (Botones)
 
@@ -2651,110 +2641,93 @@
          * de los campos de formulario. Implementa la lógica para autoseleccionar la opción
          * recién creada o modificada.
          */
+
+
         function setupAddEditButtons() {
-            const buttonToFieldMap = {
-                'edit-institution-btn': 'instituciones',
-                'edit-area-btn': 'areas',
-                'edit-subject-btn': 'asuntos',
-                'edit-query-btn': 'consultas',
-                'edit-name-btn': 'nombres',
-                'edit-cargo-btn': 'cargos',
-                'edit-email-btn': 'correos',
-                'edit-phone-btn': 'telefonos',
-                'edit-comments-btn': 'comentarios',
-                'edit-atendio-btn': 'atendioUsers',
-                'edit-institution-edit-btn': 'instituciones',
-                'edit-area-edit-btn': 'areas',
-                'edit-subject-edit-btn': 'asuntos',
-                'edit-query-edit-btn': 'consultas',
-                'edit-name-edit-btn': 'nombres',
-                'edit-cargo-edit-btn': 'cargos',
-                'edit-email-edit-btn': 'correos',
-                'edit-phone-edit-btn': 'telefonos',
-                'edit-comments-edit-btn': 'comentarios',
-                'edit-atendio-edit-btn': 'atendioUsers'
-            };
+             const buttonToFieldMap = {
+                 'edit-institution-btn': 'instituciones',
+                 'edit-area-btn': 'areas',
+                 'edit-subject-btn': 'asuntos',
+                 'edit-query-btn': 'consultas',
+                 'edit-name-btn': 'nombres',
+                 'edit-cargo-btn': 'cargos',
+                 'edit-email-btn': 'correos',
+                 'edit-phone-btn': 'telefonos',
+                 'edit-comments-btn': 'comentarios',
+                 'edit-atendio-btn': 'atendioUsers',
+                 'edit-institution-edit-btn': 'instituciones',
+                 'edit-area-edit-btn': 'areas',
+                 'edit-subject-edit-btn': 'asuntos',
+                 'edit-query-edit-btn': 'consultas',
+                 'edit-name-edit-btn': 'nombres',
+                 'edit-cargo-edit-btn': 'cargos',
+                 'edit-email-edit-btn': 'correos',
+                 'edit-phone-edit-btn': 'telefonos',
+                 'edit-comments-edit-btn': 'comentarios',
+                 'edit-atendio-edit-btn': 'atendioUsers'
+             };
             
-            // 1. ASIGNACIÓN DE EVENTOS A LOS BOTONES (+) Y (lápiz)
-            Object.entries(buttonToFieldMap).forEach(([buttonId, field]) => {
-                const button = document.getElementById(buttonId);
-                if (!button) return;
-
-                button.addEventListener('click', (e) => {
-                    // Se guarda la referencia y el valor actual del <select> hermano.
-                    activeSelectElement = e.currentTarget.parentElement.querySelector('select');
-                    const currentValue = $(activeSelectElement).val();
+             // 1. ASIGNACIÓN DE EVENTOS A LOS BOTONES (lápiz)
+             Object.entries(buttonToFieldMap).forEach(([buttonId, field]) => {
+                 const button = document.getElementById(buttonId);
+                 if (!button) return;
+ 
+                 button.addEventListener('click', (e) => {
+                     activeSelectElement = e.currentTarget.parentElement.querySelector('select');
+                     const currentValue = $(activeSelectElement).val();
+                         
+                     if (!currentValue) {
+                         return showAlert("Por favor, seleccione una opción para editar.", "warning");
+                     }
                         
-                    if (!currentValue) {
-                        return showAlert("Por favor, seleccione una opción para editar.", "warning");
-                    }
-                       
-                    currentEditingField = field;
-                    currentEditingValue = currentValue;
-                    editOptionInput.value = currentValue;
-                    editOptionInput.placeholder = `Edite la opción para ${field}`;
-                    openModal(editOptionModal);
-                });
-            });
+                     currentEditingField = field;
+                     currentEditingValue = currentValue;
+                     editOptionInput.value = currentValue;
+                     editOptionInput.placeholder = `Edite la opción para ${field}`;
+                     openModal(editOptionModal);
+                 });
+             });
             
-
-            // 2. LÓGICA DE CONFIRMACIÓN PARA EDITAR OPCIÓN EXISTENTE
-
-            confirmEditOptionBtn.addEventListener('click', () => {
-                const newValue = editOptionInput.value.trim();
-
-                if (!newValue || !currentEditingField || !currentEditingValue) {
-                    return;
-                }
-
-                closeModal(editOptionModal);
-                
-                requirePassword(async () => {
-                    try {
-                        await findAndReplaceInDatabase(currentEditingField, currentEditingValue, newValue);
-                        
-                        // Actualizar la opción en la interfaz sin disparar eventos de cambio
-                        isProgrammaticChange = true;
-                        
-                        if (activeSelectElement) {
-                            $(activeSelectElement).val(newValue).trigger('change.select2');
-                        }
-                        
-                        // También actualizar la opción en todas las listas desplegables del mismo campo
-                        $(`select[name="${currentEditingField}"]`).each(function() {
-                            if (this !== activeSelectElement) {
-                                const $select = $(this);
-                                // Buscar y actualizar la opción en este select
-                                $select.find('option').each(function() {
-                                    if (this.value === currentEditingValue) {
-                                        this.value = newValue;
-                                        this.textContent = newValue;
-                                    }
-                                });
-                            }
-                        });
-                        
-                        // Reactivar los eventos después de un breve delay
-                        setTimeout(() => {
-                            isProgrammaticChange = false;
-                        }, 100);
-                        
-                    } catch (dbErr) {
-                        console.error('Error al actualizar la base de datos:', dbErr);
-                        showAlert("Error al actualizar la opción en la base de datos", "error");
-                    } finally {
-                        activeSelectElement = null;
-                    }
-                });
-            });
-
-
-            
-            // 4. LIMPIEZA DE ESTADO EN CASO DE CANCELACIÓN
-            cancelEditOptionBtn.addEventListener('click', () => {
-                closeModal(editOptionModal);
-                activeSelectElement = null; // Limpia la referencia para evitar efectos secundarios.
-            });
+             // 2. LÓGICA DE CONFIRMACIÓN PARA EDITAR OPCIÓN EXISTENTE
+             confirmEditOptionBtn.addEventListener('click', () => {
+                 const newValue = editOptionInput.value.trim();
+ 
+                 if (!newValue || !currentEditingField || !currentEditingValue) {
+                     return;
+                 }
+ 
+                 closeModal(editOptionModal);
+                 
+                 const activeFormId = !callModal.classList.contains('hidden') ? 'call-form' : 
+                                      !editModal.classList.contains('hidden') ? 'edit-form' : null;
+                 
+                 const formStateBeforeEdit = activeFormId ? getFormState(activeFormId) : null;
+ 
+                 requirePassword(async () => {
+                     try {
+                         await findAndReplaceInDatabase(currentEditingField, currentEditingValue, newValue);
+                         
+                         if (formStateBeforeEdit) {
+                             restoreFormState(activeFormId, formStateBeforeEdit);
+                         }
+ 
+                         if (activeSelectElement) {
+                             $(activeSelectElement).val(newValue).trigger('change.select2');
+                         }
+                     } catch (dbErr) {
+                         console.error('Error al actualizar la base de datos:', dbErr);
+                         showAlert("Error al actualizar la opción en la base de datos", "error");
+                     } finally {
+                         activeSelectElement = null;
+                     }
+                 });
+             });
+             
+             // 3. LIMPIEZA DE ESTADO EN CASO DE CANCELACIÓN
+             cancelEditOptionBtn.addEventListener('click', () => {
+                 closeModal(editOptionModal);
+                 activeSelectElement = null;
+             });
         }
 
 
