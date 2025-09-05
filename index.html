@@ -107,6 +107,14 @@
             background: #a8a8a8;
         }
         
+        /* Mejora para encabezados de tabla fijos */
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f1f5f9; /* Color de bg-slate-100 para evitar transparencia */
+        }
+
         .status-button {
             transition: background-color 0.3s ease, transform 0.2s ease;
             cursor: pointer; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem;
