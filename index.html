@@ -1605,6 +1605,32 @@
             });
         }
 
+        /**
+         * Obtiene los datos pre-filtrados por todas las columnas excepto la especificada.
+         * Esto es crucial para que los dropdowns de filtro muestren solo opciones relevantes.
+         * @param {function} dataProvider - Función que devuelve el conjunto de datos completo.
+         * @param {string} filterKey - 'main' o 'historical'.
+         * @param {string} excludeColumn - La clave de la columna a excluir del filtrado.
+         * @returns {Array} - Los datos filtrados.
+         */
+        function getPreFilteredData(dataProvider, filterKey, excludeColumn) {
+            const allData = dataProvider();
+            const searchInput = document.getElementById(`filter-input-${filterKey}`);
+            const searchText = searchInput ? searchInput.value.toLowerCase() : '';
+            const columnFilters = activeFilters[filterKey];
+
+            return allData.filter(item => {
+                const matchesSearch = searchText === '' || Object.values(item).some(value => String(value).toLowerCase().includes(searchText));
+                if (!matchesSearch) return false;
+
+                return Object.entries(columnFilters).every(([col, values]) => {
+                    if (col === excludeColumn || values.length === 0) return true;
+                    const itemValue = col === 'duracion' ? formatDuration(item[col]) : (col === 'inicio' || col === 'fin' ? formatTimeWithAmPm(item[col]) : (item[col] || 'N/A'));
+                    return values.includes(itemValue);
+                });
+            });
+        }
+
         function setupColumnFilters(headerId, dataProvider, renderFunc, filterKey) {
             const headerRow = document.getElementById(headerId);
             headerRow.addEventListener('click', e => {
@@ -1617,8 +1643,11 @@
                 }
 
                 const filterBy = header.dataset.filterBy;
-                const allData = dataProvider();
-                const uniqueValues = [...new Set(allData.map(item => {
+                
+                // Usar los datos pre-filtrados para generar las opciones del dropdown.
+                const preFilteredData = getPreFilteredData(dataProvider, filterKey, filterBy);
+
+                const uniqueValues = [...new Set(preFilteredData.map(item => {
                     if (filterBy === 'duracion') return formatDuration(item[filterBy]);
                     if (filterBy === 'inicio' || filterBy === 'fin') return formatTimeWithAmPm(item[filterBy]);
                     return item[filterBy] || 'N/A';
@@ -2562,6 +2591,61 @@
                 const name = $(this).val();
                 const institution = $('#edit-caller-institution').val();
                 loadContactDetails(name, institution, true);
+            });
+
+            // --- NUEVA FUNCIONALIDAD: FILTRADO DE CONSULTA POR ASUNTO ---
+
+            /**
+             * Filtra las opciones del select de 'Consulta' basándose en el 'Asunto' seleccionado.
+             * @param {jQuery} subjectSelect - El elemento select de asunto que disparó el evento.
+             * @param {jQuery} querySelect - El elemento select de consulta que debe ser actualizado.
+             */
+            function filterQueriesBySubject(subjectSelect, querySelect) {
+                if (isProgrammaticChange) return;
+
+                const subject = subjectSelect.val();
+                const allData = [...calls, ...historicalCalls];
+
+                // Si no hay un asunto seleccionado, no hacemos nada (o podríamos mostrar todas las consultas)
+                if (!subject) {
+                    // Opcional: resetear el select de consulta para mostrar todas las opciones de nuevo.
+                    // Por ahora, lo dejamos como está para no perder la selección si el usuario se equivoca.
+                    return;
+                }
+
+                // Obtenemos el valor actual de la consulta para intentar preservarlo si sigue siendo válido.
+                const currentQuery = querySelect.val();
+
+                // Filtramos las consultas únicas asociadas al asunto seleccionado.
+                const queriesForSubject = [...new Set(allData
+                    .filter(c => c.asunto === subject)
+                    .map(c => c.consulta)
+                    .filter(Boolean) // Elimina valores nulos o vacíos
+                )].sort();
+
+                // Actualizamos las opciones del select de consulta.
+                querySelect.empty(); // Limpiamos las opciones existentes.
+                queriesForSubject.forEach(query => {
+                    querySelect.append(new Option(query, query));
+                });
+
+                // Si el valor previo de consulta existe en la nueva lista, lo restauramos.
+                if (queriesForSubject.includes(currentQuery)) {
+                    querySelect.val(currentQuery);
+                }
+
+                // Disparamos el evento 'change' para que Select2 actualice su visualización.
+                querySelect.trigger('change.select2');
+            }
+
+            // Evento para asunto (formulario principal)
+            $('#call-subject').on('change', function() {
+                filterQueriesBySubject($(this), $('#call-query'));
+            });
+
+            // Evento para asunto (formulario de edición)
+            $('#edit-call-subject').on('change', function() {
+                filterQueriesBySubject($(this), $('#edit-call-query'));
             });
         }
 
