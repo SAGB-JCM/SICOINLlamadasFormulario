@@ -1671,14 +1671,19 @@
                 const activeColumnFilters = activeFilters[filterKey][filterBy] || [];
 
                 dropdown.innerHTML = `
-                    <div class="p-1"><button class="clear-filter-btn text-blue-500 hover:underline text-xs" data-filter-by="${filterBy}">Limpiar filtro</button></div>
+                    <div class="p-1 border-b border-gray-200">
+                        <input type="text" placeholder="Buscar opciones..." class="filter-search-input w-full text-xs p-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div class="filter-options-container max-h-48 overflow-y-auto">
+                        ${uniqueValues.map(value => `
+                            <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer filter-option-label">
+                                <input type="checkbox" class="filter-checkbox" value="${value}" ${activeColumnFilters.includes(value) ? 'checked' : ''}>
+                                <span class="text-sm text-gray-700">${value}</span>
+                            </label>
+                        `).join('')}
+                    </div>
                     <div class="border-t my-1"></div>
-                    ${uniqueValues.map(value => `
-                        <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
-                            <input type="checkbox" class="filter-checkbox" value="${value}" ${activeColumnFilters.includes(value) ? 'checked' : ''}>
-                            <span class="text-sm text-gray-700">${value}</span>
-                        </label>
-                    `).join('')}
+                    <div class="p-1"><button class="clear-filter-btn text-blue-500 hover:underline text-xs" data-filter-by="${filterBy}">Limpiar filtro</button></div>
                 `;
 
                 document.body.appendChild(dropdown);
@@ -1686,6 +1691,18 @@
                 dropdown.style.top = `${rect.bottom + window.scrollY}px`;
                 dropdown.style.left = `${rect.left + window.scrollX}px`;
                 currentFilterDropdown = dropdown;
+
+                // Lógica para el buscador dentro del filtro
+                const searchInput = dropdown.querySelector('.filter-search-input');
+                const labels = dropdown.querySelectorAll('.filter-option-label');
+                searchInput.addEventListener('input', () => {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    labels.forEach(label => {
+                        const text = label.textContent.toLowerCase();
+                        const isVisible = text.includes(searchTerm);
+                        label.style.display = isVisible ? 'flex' : 'none';
+                    });
+                });
 
                 dropdown.addEventListener('change', e => {
                     if (e.target.classList.contains('filter-checkbox')) {
