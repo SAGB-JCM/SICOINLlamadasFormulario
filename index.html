@@ -770,7 +770,7 @@
 
                 <!----------------- HISTÓRICO DE LLAMADAS - TABLA - LOG ---------------->
                 <section id="historical-log" class="mt-8">
-                    <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-primary">Registro Histórico</h2><div class="flex items-center space-x-2"><div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div><button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2"><i class="fa-solid fa-file-excel"></i><span>Descargar Histórico</span></button></div></div>
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-primary">Registro Histórico</h2><div class="flex items-center space-x-2"><div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div><button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button></div></div>
                     <div class="bg-white rounded-xl shadow-md table-container">
                         <table class="w-full text-sm text-left text-slate-500">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-100">
@@ -1648,10 +1648,22 @@
                 const preFilteredData = getPreFilteredData(dataProvider, filterKey, filterBy);
 
                 const uniqueValues = [...new Set(preFilteredData.map(item => {
-                    if (filterBy === 'duracion') return formatDuration(item[filterBy]);
+                    if (filterBy === 'duracion') return formatDuration(item.duracion);
                     if (filterBy === 'inicio' || filterBy === 'fin') return formatTimeWithAmPm(item[filterBy]);
                     return item[filterBy] || 'N/A';
-                }))].sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
+                }))].sort((a, b) => {
+                    // Lógica de ordenamiento personalizada para fechas
+                    if (filterBy === 'fecha') {
+                        try {
+                            const [dayA, monthA, yearA] = a.split('/');
+                            const [dayB, monthB, yearB] = b.split('/');
+                            const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+                            const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+                            return dateA - dateB; // Orden ascendente
+                        } catch (e) { return a.localeCompare(b); }
+                    }
+                    return a.localeCompare(b, 'es', { numeric: true });
+                });
 
                 const dropdown = document.createElement('div');
                 dropdown.className = 'filter-dropdown p-2 space-y-1';
@@ -1720,6 +1732,38 @@
 
         //ordenar y renderizar tabla
         function sortAndRenderTable(tableBody, data, isHistorical) {
+            // Ordenar los datos por fecha y luego por hora de inicio (más recientes primero)
+            data.sort((a, b) => {
+                try {
+                    // Comparación de fecha
+                    const [dayA, monthA, yearA] = a.fecha.split('/');
+                    const [dayB, monthB, yearB] = b.fecha.split('/');
+                    const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+                    const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+                    if (dateA > dateB) return -1;
+                    if (dateA < dateB) return 1;
+
+                    // Si las fechas son iguales, comparar por hora de inicio
+                    // Convertir a formato 24h para una comparación correcta
+                    const to24Hour = (timeStr) => {
+                        if (!timeStr) return '00:00:00';
+                        const lcTime = timeStr.toLowerCase();
+                        const isPm = lcTime.includes('p. m.');
+                        const isAm = lcTime.includes('a. m.');
+                        let [time, modifier] = lcTime.split(' ');
+                        let [hours, minutes, seconds] = time.split(':');
+                        hours = parseInt(hours, 10);
+                        if (isPm && hours < 12) hours += 12;
+                        if (isAm && hours === 12) hours = 0; // Medianoche
+                        return `${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
+                    };
+                    return to24Hour(b.inicio).localeCompare(to24Hour(a.inicio));
+                } catch (e) {
+                    // Fallback por si alguna fecha no tiene el formato correcto
+                    return 0;
+                }
+            });
+
             const filterKey = isHistorical ? 'historical' : 'main';
             const filteredData = applyAllFilters(data, filterKey);
             renderTable(tableBody, filteredData, isHistorical);
@@ -3909,11 +3953,14 @@
             
             // Registro histórico descargar
             document.getElementById('download-historical-excel-btn').addEventListener('click', () => {
-                if (historicalCalls.length === 0) return showAlert("No hay datos históricos para descargar.", "warning");
-                const data = prepareExportData(historicalCalls);
-                const ws = XLSX.utils.json_to_sheet(data, { header: exportHeaders });
+                // Obtener los datos actualmente filtrados en la tabla
+                const filteredData = applyAllFilters(historicalCalls, 'historical');
+
+                if (filteredData.length === 0) return showAlert("No hay datos en la tabla para descargar.", "warning");
+                const dataToExport = prepareExportData(filteredData);
+                const ws = XLSX.utils.json_to_sheet(dataToExport, { header: exportHeaders });
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Llamadas Históricas");
+                XLSX.utils.book_append_sheet(wb, ws, "Histórico Filtrado");
                 XLSX.writeFile(wb, "Registro_historico.xlsx");
             });
             
