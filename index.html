@@ -2448,9 +2448,9 @@
         function updateDynamicSelectOptions() {
             const allData = [...calls, ...historicalCalls];
         
-            // --- Lógica Específica para Instituciones ---
+            // --- Lógica Específica para Instituciones (con normalización) ---
             // 1. Extraer todas las instituciones existentes en los registros.
-            const historicalInstitutions = allData.map(c => c.institucion).filter(Boolean);
+            const historicalInstitutions = allData.map(c => c.institucion).filter(Boolean).map(i => i.trim());
             
             // 2. Fusionar el catálogo oficial con las instituciones históricas.
             //    - Se utiliza `new Set()` para eliminar duplicados de forma automática y eficiente.
@@ -2463,16 +2463,16 @@
             updateSelectOptions('instituciones', fieldOptions.instituciones);
         
             // --- Lógica General para los demás campos (sin cambios) ---
-            // Se extraen los valores únicos de los datos existentes y se ordenan.
-            fieldOptions.areas = [...new Set(allData.map(c => c.area).filter(Boolean))].sort();
-            fieldOptions.asuntos = [...new Set(allData.map(c => c.asunto).filter(Boolean))].sort();
-            fieldOptions.consultas = [...new Set(allData.map(c => c.consulta).filter(Boolean))].sort();
-            fieldOptions.nombres = [...new Set(allData.map(c => c.nombre).filter(Boolean))].sort();
-            fieldOptions.cargos = [...new Set(allData.map(c => c.cargo).filter(Boolean))].sort();
-            fieldOptions.correos = [...new Set(allData.map(c => c.correo).filter(Boolean))].sort();
-            fieldOptions.telefonos = [...new Set(allData.map(c => c.telefono).filter(Boolean))].sort();
-            fieldOptions.comentarios = [...new Set(allData.map(c => c.comentarios).filter(Boolean))].sort();
-            fieldOptions.atendioUsers = [...new Set(allData.map(c => c.atendio).filter(Boolean))].sort();
+            // Se extraen los valores únicos de los datos existentes, se normalizan y se ordenan.
+            fieldOptions.areas = [...new Set(allData.map(c => c.area).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.asuntos = [...new Set(allData.map(c => c.asunto).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.consultas = [...new Set(allData.map(c => c.consulta).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.nombres = [...new Set(allData.map(c => c.nombre).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.cargos = [...new Set(allData.map(c => c.cargo).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.correos = [...new Set(allData.map(c => c.correo).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.telefonos = [...new Set(allData.map(c => c.telefono).filter(Boolean).map(v => String(v).trim()))].sort();
+            fieldOptions.comentarios = [...new Set(allData.map(c => c.comentarios).filter(Boolean).map(v => v.trim()))].sort();
+            fieldOptions.atendioUsers = [...new Set(allData.map(c => c.atendio).filter(Boolean).map(v => v.trim()))].sort();
             
             // Se actualizan los selectores correspondientes en la UI.
             updateSelectOptions('areas', fieldOptions.areas);
