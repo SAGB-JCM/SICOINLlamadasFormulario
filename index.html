@@ -1812,14 +1812,9 @@
             updateSingleDashboard(dataHistorico, totalCallsElemHistorico, avgDurationElemHistorico, salientesCountElemHistorico, entrantesCountElemHistorico);
         }
 
-        /**
-         * Actualiza los elementos de un dashboard específico con los datos proporcionados.
-         * @param {Array} data - El array de llamadas a procesar.
-         * @param {HTMLElement} totalElem - Elemento para el total de llamadas.
-         * @param {HTMLElement} avgElem - Elemento para la duración promedio.
-         * @param {HTMLElement} salientesElem - Elemento para el total de salientes.
-         * @param {HTMLElement} entrantesElem - Elemento para el total de entrantes.
-         */
+        
+        //Actualiza los elementos de un dashboard específico con los datos proporcionados.
+        
         function updateSingleDashboard(data, totalElem, avgElem, salientesElem, entrantesElem) {
             const totalCalls = data.length;
             const salientes = data.filter(c => c.estatus === 'Saliente').length;
@@ -1910,7 +1905,7 @@
             }
         }
 
-        // Actualizar llamada - VERSIÓN CORREGIDA
+        // Actualizar llamada
         async function updateCall(id, updateData, isHistorical) {
             if (!id) {
                 console.error("ID no válido para actualización");
@@ -1966,7 +1961,7 @@
         }
 
 
-        // Reemplazar la función handleEditClick con esta versión robusta
+        // Función Para editar llamada
         function handleEditClick(button) {
             requirePassword(() => {
                 const callId = button.getAttribute('data-id');
@@ -2162,14 +2157,8 @@
         // =============================================
         // MÓDULO: Gestión de opciones dinámicas y autocompletado (Lista de Instituciones Homologada)
         // =============================================
-   
-        /**
-         * @const {string[]} catalogoInstitucionesHomologado
-         * Catálogo predefinido de instituciones que sirve como base para las opciones del selector.
-         * Esta lista asegura que todas las instituciones oficiales estén siempre disponibles.
-         * En futuras versiones, podría cargarse desde una colección de Firestore para gestión remota.
-         */
 
+        //Lista de Instituciones
         const catalogoInstitucionesHomologado = [
             "AGN - Archivo General de la Nación",
             "CEPROPIE - Centro de Producción de Programas Informativos y Especiales",
@@ -2461,11 +2450,9 @@
         ];
 
 
-        /**
-         * Actualiza las opciones de todos los selectores dinámicos de la aplicación.
-         * Para el campo de 'institucion', fusiona el catálogo homologado con las instituciones
-         * existentes en la base de datos para garantizar una lista completa y retrocompatible.
-         */
+        
+        //Actualiza las opciones de todos los selectores dinámicos de la aplicación.
+
         function updateDynamicSelectOptions() {
             const allData = [...calls, ...historicalCalls];
         
@@ -2506,9 +2493,6 @@
             updateSelectOptions('telefonos', fieldOptions.telefonos);
             updateSelectOptions('comentarios', fieldOptions.comentarios);
         }
-
-
-
         
         //Actualizar opciones despues de editar una lista desplegable
         function updateSelectOptions(field, options, selectedId = null) {
@@ -2566,7 +2550,6 @@
             }
 
         }
-
 
         // Función para el autocompletado inteligente
         function setupAutofill() {
@@ -2675,13 +2658,8 @@
                 loadContactDetails(name, institution, true);
             });
 
-            // --- NUEVA FUNCIONALIDAD: FILTRADO DE CONSULTA POR ASUNTO ---
 
-            /**
-             * Filtra las opciones del select de 'Consulta' basándose en el 'Asunto' seleccionado.
-             * @param {jQuery} subjectSelect - El elemento select de asunto que disparó el evento.
-             * @param {jQuery} querySelect - El elemento select de consulta que debe ser actualizado.
-             */
+            //Filtra las opciones del select de 'Consulta' basándose en el 'Asunto' seleccionado.
             function filterQueriesBySubject(subjectSelect, querySelect) {
                 if (isProgrammaticChange) return;
 
@@ -2733,7 +2711,6 @@
 
         // =============================================
         // INICIO: Bloque de código para preservar estado del formulario
-        // Colocar este bloque ANTES de la función findAndReplaceInDatabase
         // =============================================
         
         // Nuevo helper function: getFormState
@@ -2779,13 +2756,8 @@
                 }
             });
         }
-        // =============================================
-        // FIN: Bloque de código para preservar estado del formulario
-        // =============================================
 
-
-
-
+        //Función para reemplazar opciones actualizadas, en la base de datos
         async function findAndReplaceInDatabase(field, oldValue, newValue) {
             const fieldToDbFieldMap = {
                 'instituciones': 'institucion', 
@@ -2864,13 +2836,7 @@
         // Añadir al inicio de las variables globales
         let isProgrammaticChange = false;
 
-        /**
-         * Configura todos los manejadores de eventos para los botones de añadir (+) y editar (lápiz)
-         * de los campos de formulario. Implementa la lógica para autoseleccionar la opción
-         * recién creada o modificada.
-         */
-
-
+        //Función que configura todos los manejadores de eventos para los botones de añadir (+) y editar (lápiz)
         function setupAddEditButtons() {
              const buttonToFieldMap = {
                  'edit-institution-btn': 'instituciones',
@@ -2985,8 +2951,6 @@
             }
         }
 
-
-
         function setupPasswordVerification() {
             confirmPasswordBtn.addEventListener('click', verifyPassword);
             cancelPasswordBtn.addEventListener('click', () => {
@@ -3004,7 +2968,6 @@
                 });
             }
         }
-
 
         function requirePassword(action) {
             pendingAction = action;
@@ -3045,15 +3008,13 @@
             }, (error) => console.error("Error en listener de histórico:", error));
         }
 
+
+
         // =============================================
         // MÓDULO: Gráficos y reportes
         // =============================================
-
-
-        /**
-         * Obtiene los datos filtrados según la configuración actual de la UI.
-         * @returns {Array} Un array con los objetos de llamada filtrados.
-         */
+        
+        //Obtiene los datos filtrados según la configuración actual de la UI        
         function getFilteredData() {
             const source = reportesDataSource.value;
             let data = [];
@@ -3077,7 +3038,6 @@
             }
             return data;
         }
-
         
         //Actualizar 
         function updateCharts() {
@@ -3119,7 +3079,6 @@
                     } catch (e) { /* Ignorar */ }
                 }
             });
-
 
             const createOrUpdateChart = (canvas, chartInstance, type, data, labelsOrder, datasetLabel = 'Cantidad') => {
                 // Destruye la instancia del gráfico si existe para evitar duplicaciones
@@ -3169,9 +3128,6 @@
                     } 
                 });
             };
-
-
-
             
             if (statusChart) statusChart.destroy();
             if (asuntoChart) asuntoChart.destroy();
@@ -3199,8 +3155,8 @@
             });
         }
 
-        //Update Chart
 
+        //Update Chart
         function updateDynamicChart() {
             const source = reportesDataSource.value;
             let data = [];
@@ -3315,8 +3271,6 @@
                 }
             });
         }
-
-        
         
         //Botón de Configuración
         function setupReportConfig() {
@@ -3350,11 +3304,6 @@
         // =============================================
         // MÓDULO: Genera un reporte ejecutivo en formato PDF.
         // =============================================
-
-        /**
-         * Genera un reporte ejecutivo en formato PDF.
-         * @param {object} options - Opciones de inclusión para cada sección del reporte.
-         */
 
         async function generateExecutiveReport(options) {
             const { includeStatus, includeAsunto, includeDay, includeAtendio, includeDynamicChart, includeDynamicTable } = options;
@@ -3473,11 +3422,8 @@
             }
         }
 
-        /**
-         * Genera una imagen de un gráfico de forma aislada y la devuelve como un Data URL.
-         * @param {object} config - Configuración del gráfico a generar.
-         * @returns {Promise<string>} Una promesa que se resuelve con el Data URL de la imagen del gráfico.
-         */
+        
+        //Genera una imagen de un gráfico de forma aislada y la devuelve como un Data URL.
         async function generateChartImage({ data, key, type, title }) {
             const canvas = document.createElement('canvas');
             canvas.width = 1400; // Resolución aumentada
@@ -3629,7 +3575,6 @@
         // =============================================
         // MÓDULO: Migración de datos
         // =============================================
-        
 
         async function migrateCallsToHistorical() {
             try {
@@ -3798,9 +3743,6 @@
                 });
             }
 
-
-
-
             // Funcion para actualizar estatus
             async function handleStatusToggle(e) {
                 const button = e.currentTarget;
@@ -3828,7 +3770,6 @@
                 if (target.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: target });
             });
 
-
             // Cancelar Eliminar llamada de historico
             cancelDeleteBtn.addEventListener('click', () => {
                 closeModal(confirmModal);
@@ -3842,7 +3783,6 @@
                     closeModal(confirmModal);
                 }
             });
-
 
             // Importar histórico
             historicalFileInput.addEventListener('change', (e) => {
@@ -4137,8 +4077,6 @@
 
         }
 
-        // Forzar actualización de opciones y render
-
         // =============================================
         // MÓDULO: Inicialización
         // =============================================
@@ -4163,8 +4101,6 @@
 
         // Iniciar la aplicación
         initialize();
-
-
 
     </script>
 </body> 
