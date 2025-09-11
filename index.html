@@ -1496,6 +1496,17 @@
         function openModal(modal) {
             modal.classList.remove('hidden', 'modal-leave');
             modal.classList.add('modal-enter');
+
+            // --- INICIO: Lógica de Autofoco ---
+            // Se añade un pequeño retardo para asegurar que el modal sea visible antes de intentar enfocar el campo.
+            setTimeout(() => {
+                if (modal.id === 'password-modal') {
+                    document.getElementById('password-input').focus();
+                } else if (modal.id === 'edit-option-modal') {
+                    document.getElementById('edit-option-input').focus();
+                }
+            }, 100); // 100ms es suficiente para que la animación de entrada comience.
+            // --- FIN: Lógica de Autofoco ---
         }
 
         //Cerrar modal
