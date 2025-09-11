@@ -1497,8 +1497,10 @@
                     document.getElementById('password-input').focus();
                 } else if (modal.id === 'edit-option-modal') {
                     document.getElementById('edit-option-input').focus();
+                } else if (modal.id === 'call-modal') {
+                    $('#caller-institution').select2('open');
                 }
-            }, 100); // 100ms es suficiente para que la animación de entrada comience.
+            }, 400); // 400ms es suficiente para que la animación de entrada comience.
             // --- FIN: Lógica de Autofoco ---
         }
 
