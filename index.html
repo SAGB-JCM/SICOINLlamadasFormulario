@@ -87,6 +87,11 @@
             max-height: 425px; /* Altura máxima reducida para scroll vertical (aprox 15% menos) */
             overflow-y: auto;
         }
+
+        /* Estilo específico para la altura de la tabla de histórico */
+        #historical-table-container {
+            max-height: 300px; /* <-- Puedes ajustar este valor a tu preferencia */
+        }
         
         .table-container::-webkit-scrollbar {
             width: 8px;
@@ -764,7 +769,7 @@
                             <button id="import-historical-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out hidden items-center space-x-2 whitespace-nowrap" disabled><i class="fa-solid fa-database"></i><span>Subir Excel</span></button>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl shadow-md table-container">
+                    <div id="historical-table-container" class="bg-white rounded-xl shadow-md table-container">
                         <table class="w-full text-sm text-left text-slate-500">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-100">
                                 <tr id="historical-table-header">
