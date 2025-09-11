@@ -693,28 +693,14 @@
             <main id="tab-content-registro" class="tab-content">
                 <!----------------- SECCIÓN DE DASHBOARD PRINCIPAL ---------------->
                 <section id="dashboard" class="mb-8">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold text-primary mb-2 sm:mb-0">Dashboard General</h2>
-                        <div class="flex items-center space-x-4">
-                            <button id="migrate-calls-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2">
-                                <i class="fa-solid fa-database"></i>
-                                <span>Migrar Llamadas</span>
-                                <div class="info-tooltip">
-                                    <i class="fa-solid fa-circle-info"></i>
-                                    <span class="tooltip-text">Mover todas las llamadas de Registro y Control al Histórico</span>
-                                </div>
-                            </button>
-
-                            <!-------- SELECTOR DE FUENTE DE DATOS EN DASHBOARD PRINCIPAL ---------------->
-                            <label for="dashboard-data-source" class="block text-sm font-medium text-gray-700">Fuente de datos:</label>
-                            <select id="dashboard-data-source" class="mt-1 block w-full md:w-auto rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2">
-                                <option value="registro">Registro y Control</option>
-                                <option value="historico">Histórico</option>
-                                <option value="combinado">Registro y Control + Histórico</option>
-                            </select>
-                        </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-primary">Resumen Operativo</h2>
+                        <button id="migrate-calls-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2">
+                            <i class="fa-solid fa-database"></i>
+                            <span>Migrar Llamadas</span>
+                        </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-phone-volume text-primary text-2xl"></i></div><div><p class="text-slate-500">Total de Llamadas</p><p id="total-calls" class="text-3xl font-bold text-primary">0</p></div></div>
                         <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-hourglass-half text-primary text-2xl"></i></div><div><p class="text-slate-500">Duración Promedio</p><p id="avg-duration" class="text-3xl font-bold text-primary">00:00</p></div></div>
                         <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-green-500/10 p-3 rounded-full"><i class="fa-solid fa-arrow-up-from-bracket text-green-500 text-2xl"></i></div><div><p class="text-slate-500">Llamadas Salientes</p><p id="salientes-count" class="text-3xl font-bold text-green-600">0</p></div></div>
@@ -763,14 +749,36 @@
 
             <!----------------- CONTENIDO DE LA TAB DE HISTÓRICO ---------------->
             <div id="tab-content-historico" class="tab-content hidden">
-                <section class="bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-primary mb-4">Cargar Histórico desde Excel</h2>
-                    <div class="flex flex-col md:flex-row items-center gap-4"><label for="historical-file-input" class="w-full md:w-auto cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg shadow-sm transition-all duration-200 ease-in-out text-center flex-grow"><i class="fa-solid fa-file-upload mr-2"></i><span id="file-name">Seleccionar archivo Excel (.xlsx)</span><input type="file" id="historical-file-input" class="hidden" accept=".xlsx, .xls"></label><button id="import-historical-btn" class="w-full md:w-auto bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled><i class="fa-solid fa-database mr-2"></i>Importar a la Base de Datos</button></div>
+                <section id="dashboard-historico" class="mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-primary mb-2 sm:mb-0">Resumen Operativo</h2>
+                        <div class="flex items-center space-x-4">
+                            <label for="dashboard-data-source-historico" class="block text-sm font-medium text-gray-700">Fuente de datos:</label>
+                            <select id="dashboard-data-source-historico" class="mt-1 block w-full md:w-auto rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2">
+                                <option value="historico">Histórico</option>
+                                <option value="combinado">Registro y Control + Histórico</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-phone-volume text-primary text-2xl"></i></div><div><p class="text-slate-500">Total de Llamadas</p><p id="total-calls-historico" class="text-3xl font-bold text-primary">0</p></div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-hourglass-half text-primary text-2xl"></i></div><div><p class="text-slate-500">Duración Promedio</p><p id="avg-duration-historico" class="text-3xl font-bold text-primary">00:00</p></div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-green-500/10 p-3 rounded-full"><i class="fa-solid fa-arrow-up-from-bracket text-green-500 text-2xl"></i></div><div><p class="text-slate-500">Llamadas Salientes</p><p id="salientes-count-historico" class="text-3xl font-bold text-green-600">0</p></div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4"><div class="bg-blue-500/10 p-3 rounded-full"><i class="fa-solid fa-inbox text-blue-500 text-2xl"></i></div><div><p class="text-slate-500">Llamadas Entrantes</p><p id="entrantes-count-historico" class="text-3xl font-bold text-blue-600">0</p></div></div>
+                    </div>
                 </section>
 
                 <!----------------- HISTÓRICO DE LLAMADAS - TABLA - LOG ---------------->
                 <section id="historical-log" class="mt-8">
-                    <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-primary">Registro Histórico</h2><div class="flex items-center space-x-2"><div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div><button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button></div></div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-primary">Registro Histórico</h2>
+                        <div class="flex items-center space-x-2">
+                            <div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div>
+                            <button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button>
+                            <label for="historical-file-input" class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 ease-in-out flex items-center space-x-2"><i class="fa-solid fa-file-upload"></i><span>Subir Excel</span><input type="file" id="historical-file-input" class="hidden" accept=".xlsx, .xls"></label>
+                            <button id="import-historical-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out hidden items-center space-x-2" disabled><i class="fa-solid fa-database"></i><span>Subir Excel</span></button>
+                        </div>
+                    </div>
                     <div class="bg-white rounded-xl shadow-md table-container">
                         <table class="w-full text-sm text-left text-slate-500">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-100">
@@ -1315,11 +1323,20 @@
         const userInfo = document.getElementById('user-info');
         const tabsContainer = document.getElementById('tabs');
         const tabContents = document.querySelectorAll('.tab-content');
-        const dashboardDataSource = document.getElementById('dashboard-data-source');
+        
+        // Elementos Dashboard Registro
         const totalCallsElem = document.getElementById('total-calls');
         const avgDurationElem = document.getElementById('avg-duration');
         const salientesCountElem = document.getElementById('salientes-count');
         const entrantesCountElem = document.getElementById('entrantes-count');
+
+        // Elementos Dashboard Histórico
+        const dashboardDataSourceHistorico = document.getElementById('dashboard-data-source-historico');
+        const totalCallsElemHistorico = document.getElementById('total-calls-historico');
+        const avgDurationElemHistorico = document.getElementById('avg-duration-historico');
+        const salientesCountElemHistorico = document.getElementById('salientes-count-historico');
+        const entrantesCountElemHistorico = document.getElementById('entrantes-count-historico');
+
         const timerElem = document.getElementById('timer');
         const startCallBtn = document.getElementById('start-call-btn');
         const downloadExcelBtn = document.getElementById('download-excel-btn');
@@ -1328,7 +1345,6 @@
         const historicalTableBody = document.getElementById('historical-table-body');
         const noHistoricalMessage = document.getElementById('no-historical-message');
         const historicalFileInput = document.getElementById('historical-file-input');
-        const historicalFileName = document.getElementById('file-name');
         const importHistoricalBtn = document.getElementById('import-historical-btn');
         const reportesDataSource = document.getElementById('reportes-data-source');
         const statusChartCanvas = document.getElementById('statusChart');
@@ -1799,28 +1815,40 @@
 
 
         //Actualizart el dashboard principal
-        function updateDashboard() {
-            const source = dashboardDataSource.value;
-            let data = [];
-            if (source === 'registro') data = calls;
-            else if (source === 'historico') data = historicalCalls;
-            else data = [...calls, ...historicalCalls];
-            
+        function updateAllDashboards() {
+            // Dashboard de Registro y Control (fuente fija)
+            updateSingleDashboard(calls, totalCallsElem, avgDurationElem, salientesCountElem, entrantesCountElem);
+
+            // Dashboard de Histórico (fuente variable)
+            const sourceHistorico = dashboardDataSourceHistorico.value;
+            let dataHistorico = [];
+            if (sourceHistorico === 'historico') {
+                dataHistorico = historicalCalls;
+            } else if (sourceHistorico === 'combinado') {
+                dataHistorico = [...calls, ...historicalCalls];
+            }
+            updateSingleDashboard(dataHistorico, totalCallsElemHistorico, avgDurationElemHistorico, salientesCountElemHistorico, entrantesCountElemHistorico);
+        }
+
+        /**
+         * Actualiza los elementos de un dashboard específico con los datos proporcionados.
+         * @param {Array} data - El array de llamadas a procesar.
+         * @param {HTMLElement} totalElem - Elemento para el total de llamadas.
+         * @param {HTMLElement} avgElem - Elemento para la duración promedio.
+         * @param {HTMLElement} salientesElem - Elemento para el total de salientes.
+         * @param {HTMLElement} entrantesElem - Elemento para el total de entrantes.
+         */
+        function updateSingleDashboard(data, totalElem, avgElem, salientesElem, entrantesElem) {
             const totalCalls = data.length;
             const salientes = data.filter(c => c.estatus === 'Saliente').length;
             const entrantes = totalCalls - salientes;
-
-            // Convertir duraciones a número y sumarlas
             const totalDuration = data.reduce((sum, c) => sum + (Number(c.duracion) || 0), 0);
-              
-            // Promedio redondeado a segundos enteros
             const avgDuration = totalCalls > 0 ? Math.round(totalDuration / totalCalls) : 0;
-            
-            // Actualizar UI    
-            totalCallsElem.textContent = totalCalls;
-            avgDurationElem.textContent = formatDuration(avgDuration);
-            salientesCountElem.textContent = salientes;
-            entrantesCountElem.textContent = entrantes;
+
+            if (totalElem) totalElem.textContent = totalCalls;
+            if (avgElem) avgElem.textContent = formatDuration(avgDuration);
+            if (salientesElem) salientesElem.textContent = salientes;
+            if (entrantesElem) entrantesElem.textContent = entrantes;
         }
 
         // =============================================
@@ -3016,7 +3044,7 @@
             onSnapshot(query(callsCollectionRef), (snapshot) => {
                 calls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 sortAndRenderTable(callLogTableBody, calls, false);
-                updateDashboard();
+                updateAllDashboards();
                 updateCharts();
                 updateDynamicSelectOptions();
             }, (error) => console.error("Error en listener de llamadas:", error));
@@ -3024,7 +3052,7 @@
             onSnapshot(query(historicalCallsCollectionRef), (snapshot) => {
                 historicalCalls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 sortAndRenderTable(historicalTableBody, historicalCalls, true);
-                updateDashboard();
+                updateAllDashboards();
                 updateCharts();
                 updateDynamicSelectOptions();
             }, (error) => console.error("Error en listener de histórico:", error));
@@ -3686,8 +3714,8 @@
             setupFiltering('filter-input-historical', () => historicalCalls, renderTable, true);
             setupAutofill();
             
-            // Dashboard ya jala Registro y Control como predeterminado en fuente de datos
-            dashboardDataSource.addEventListener('change', updateDashboard);
+            // Listener para el dashboard de la pestaña de histórico
+            dashboardDataSourceHistorico.addEventListener('change', updateAllDashboards);
             
             // Establecer "Histórico" como valor predeterminado en fuente de datos
             reportesDataSource.addEventListener('change', updateCharts);
@@ -3835,10 +3863,10 @@
             historicalFileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    historicalFileName.textContent = file.name;
+                    importHistoricalBtn.classList.remove('hidden');
                     importHistoricalBtn.disabled = false;
                 } else {
-                    historicalFileName.textContent = 'Seleccionar archivo Excel (.xlsx)';
+                    importHistoricalBtn.classList.add('hidden');
                     importHistoricalBtn.disabled = true;
                 }
             });
@@ -3959,8 +3987,8 @@
                             }
                             await importHistoricalData(processedData);
                             historicalFileInput.value = '';
-                            historicalFileName.textContent = 'Seleccionar archivo Excel (.xlsx)';
-                            importHistoricalBtn.disabled = true;                        
+                            importHistoricalBtn.disabled = true;
+                            importHistoricalBtn.classList.add('hidden');                        
                         
                         } catch (error) {
                             console.error("Error al procesar el archivo:", error);
@@ -4035,7 +4063,7 @@
                 try {
                     await migrateCallsToHistorical();
                     closeModal(migrateModal);
-                } catch (error) {
+                } catch (error) { 
                     console.error("Error en migración:", error);
                     showAlert("Error durante la migración: " + error.message, "error");
                 }
