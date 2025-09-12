@@ -169,57 +169,13 @@
         /* Ajustar el ancho de las tablas */
         .table-container table {
             width: 100%;
-            min-width: 1200px; /* Ancho mínimo aumentado */
+            min-width: 1800px; /* Ancho mínimo generoso para evitar compresión de columnas */
         }
 
         /* Asegurar que el contenedor de la tabla ocupe todo el ancho */
         .table-container {
             width: 100%;
             overflow-x: auto;
-        }
-
-        /* Ajustar el ancho de las columnas específicas si es necesario */
-        .table-container th:nth-child(1), /* No. */
-        .table-container td:nth-child(1),
-        .table-container th:nth-child(15), /* Atendió */
-        .table-container td:nth-child(15) {
-            width: 30px;
-        }
-
-        .table-container th:nth-child(2), /* Fecha */
-        .table-container td:nth-child(2){
-            width: 60px;
-        }
-        
-        .table-container th:nth-child(3), /* Inicio */
-        .table-container td:nth-child(3),
-        .table-container th:nth-child(4), /* Fin */
-        .table-container td:nth-child(4),
-        .table-container th:nth-child(5), /* Duración */
-        .table-container td:nth-child(5),
-        .table-container th:nth-child(6), /* Área */
-        .table-container td:nth-child(6){
-            width: 60px;
-        }
-        
-        .table-container th:nth-child(16),
-        .table-container td:nth-child(16) {
-            max-width: 70px; /* Ancho máximo para la columna */
-            white-space: normal; /* Permite que el texto se divida en líneas */
-            word-wrap: break-word; /* Rompe palabras largas si es necesario */
-        }
-
-        .table-container th:nth-child(7), /* Institución */
-        .table-container td:nth-child(7),
-        .table-container th:nth-child(8), /* Asunto */
-        .table-container td:nth-child(8),
-        .table-container th:nth-child(9), /* Consulta */
-        .table-container td:nth-child(9),
-        .table-container th:nth-child(10), /* Nombre */
-        .table-container td:nth-child(10),
-        .table-container th:nth-child(11), /* Cargo */
-        .table-container td:nth-child(11){
-            width: 70px;
         }
 
 
@@ -1524,6 +1480,11 @@
             return new Promise(resolve => {
                 if (!canvasElement) return resolve();
                 
+                // Función para truncar texto, inspirada en la app de trenes
+                function truncateText(text, maxLength = 30) {
+                    if (!text) return 'N/A';
+                    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+                }
                 const checkRender = () => {
                     if (canvasElement.width > 0 && canvasElement.height > 0) {
                         resolve();
@@ -1563,6 +1524,12 @@
 
             const headers = ['no', 'fecha', 'inicio', 'fin', 'duracion', 'area', 'institucion', 'asunto', 'consulta', 'nombre', 'cargo', 'correo', 'telefono', 'estatus', 'atendio', 'comentarios'];
 
+            // Función para truncar texto, inspirada en la app de trenes
+            function truncateText(text, maxLength = 30) {
+                if (!text) return 'N/A';
+                return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+            }
+
             data.forEach((call, index) => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
@@ -1576,9 +1543,19 @@
                     } else if (header === 'inicio' || header === 'fin') {
                         content = formatTimeWithAmPm(call[header]);
                     } else {
-                        content = call[header] || 'N/A';
+                        // Aplicar truncamiento a columnas con texto potencialmente largo
+                        const longTextFields = ['institucion', 'asunto', 'consulta', 'nombre', 'cargo', 'correo', 'comentarios'];
+                        if (longTextFields.includes(header)) {
+                            content = truncateText(call[header] || 'N/A');
+                        } else {
+                            content = call[header] || 'N/A';
+                        }
                     }
-                    return `<td class="py-4 px-6">${content}</td>`;
+                    
+                    // Añadir 'whitespace-nowrap' para evitar que el texto se divida en varias líneas
+                    // y mantener la altura de la fila consistente.
+                    return `<td class="py-4 px-6 whitespace-nowrap">${content}</td>`;
+
                 }).join('');
 
                 const actionsCell = `<td class="py-4 px-6 flex space-x-2">
