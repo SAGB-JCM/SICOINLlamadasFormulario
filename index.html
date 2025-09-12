@@ -1396,6 +1396,9 @@
         let currentFilterDropdown = null;
 
         // =============================================
+        // MÓDULO: Gestión de Modales (con contador para anidamiento)
+        // =============================================
+        let openModalCount = 0;
         // MÓDULO: Utilidades
         // =============================================
         
@@ -1449,7 +1452,10 @@
         function openModal(modal) {
             modal.classList.remove('hidden', 'modal-leave');
             modal.classList.add('modal-enter');
-            document.body.classList.add('modal-open'); // Bloquear scroll del fondo
+            if (openModalCount === 0) {
+                document.body.classList.add('modal-open'); // Bloquear scroll solo si es el primer modal
+            }
+            openModalCount++;
 
             // --- INICIO: Lógica de Autofoco ---
             // Se añade un pequeño retardo para asegurar que el modal sea visible antes de intentar enfocar el campo.
@@ -1471,7 +1477,11 @@
             modal.classList.add('modal-leave');
             setTimeout(() => {
                 modal.classList.add('hidden');
-                document.body.classList.remove('modal-open'); // Restaurar scroll del fondo
+                openModalCount--;
+                if (openModalCount <= 0) {
+                    document.body.classList.remove('modal-open'); // Restaurar scroll solo si no quedan modales abiertos
+                    openModalCount = 0; // Resetear por seguridad
+                }
             }, 300);
         }
 
@@ -2768,7 +2778,9 @@
                     if (fieldState.tags) {
                         fieldState.tags.forEach(tag => {
                             if (!select.find(`option[value="${tag.id}"]`).length) {
-                                select.append(new Option(tag.text, tag.id));
+                                const newOption = new Option(tag.text, tag.id);
+                                $(newOption).attr('data-select2-tag', 'true'); // Marcar como etiqueta para la siguiente captura de estado.
+                                select.append(newOption);
                             }
                         });
                     }
@@ -2779,7 +2791,7 @@
         }
 
         //Función para reemplazar opciones actualizadas, en la base de datos
-        async function findAndReplaceInDatabase(field, oldValue, newValue) {
+        async function findAndReplaceInDatabase(field, oldValue, newValue, activeFormId, formStateBeforeEdit) {
             const fieldToDbFieldMap = {
                 'instituciones': 'institucion', 
                 'areas': 'area', 
@@ -2810,8 +2822,13 @@
                 
                 // Actualizar las opciones globales en fieldOptions
                 fieldOptions[field] = [...new Set([...fieldOptions[field].filter(opt => opt !== oldValue), newValue])].sort();
-                // Redibujar los selects con la lista actualizada
+                // Redibujar los selects con la lista actualizada, preservando el estado del formulario
                 updateSelectOptions(field, fieldOptions[field]);
+
+                // Restaurar el estado del formulario para mantener los valores no guardados
+                if (formStateBeforeEdit) {
+                    restoreFormState(activeFormId, formStateBeforeEdit);
+                }
                 
                 showAlert(`Se actualizaron ${callsSnapshot.size + historicalSnapshot.size} registros.`, "success");
             } catch (error) {
@@ -2920,7 +2937,7 @@
  
                  requirePassword(async () => {
                      try {
-                         await findAndReplaceInDatabase(currentEditingField, currentEditingValue, newValue);
+                         await findAndReplaceInDatabase(currentEditingField, currentEditingValue, newValue, activeFormId, formStateBeforeEdit);
                          
                          if (formStateBeforeEdit) {
                              restoreFormState(activeFormId, formStateBeforeEdit);
@@ -2953,15 +2970,12 @@
         //Verificar contraseña
         function verifyPassword() {
             const password = passwordInput.value;
-            
-            if (password === 'admin') {
-                // No se llama a closeModal() completo para evitar que se quite 'modal-open' del body
-                // antes de que se abra el siguiente modal.
-                passwordModal.classList.remove('modal-enter');
-                passwordModal.classList.add('modal-leave');
-                setTimeout(() => passwordModal.classList.add('hidden'), 300);
 
+            if (password === 'admin') {
+                // Usar la función closeModal mejorada que maneja el contador
+                closeModal(passwordModal);
                 passwordInput.value = '';
+                
                 if (pendingAction) {
                     pendingAction();
                     pendingAction = null;
