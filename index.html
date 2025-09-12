@@ -1849,6 +1849,19 @@
             $('#call-form select').val(null).trigger('change');
             openModal(callModal);
 
+            // --- INICIO: Lógica para valores por defecto en nueva llamada ---
+            // Seleccionar "AGMO" en "Atendió" si existe la opción.
+            const atendioSelect = $('#call-atendio');
+            if (atendioSelect.find("option[value='AGMO']").length) {
+                atendioSelect.val('AGMO').trigger('change');
+            }
+
+            // Seleccionar "INSTITUCIÓN" en "Área" si existe la opción.
+            const areaSelect = $('#call-area');
+            if (areaSelect.find("option[value='INSTITUCIÓN']").length) {
+                areaSelect.val('INSTITUCIÓN').trigger('change');
+            }
+
             callStartTime = Date.now();
             timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
@@ -1871,7 +1884,7 @@
                 callData.inicio = new Date(callStartTime).toLocaleTimeString('es-ES', { hour12: false });
                 callData.fin = endTime.toLocaleTimeString('es-ES', { hour12: false });
                 callData.duracion = duration;
-                callData.estatus = 'Saliente'; // Se asume Saliente al guardar desde el formulario
+                callData.estatus = 'Entrante'; // Por defecto, las llamadas nuevas son 'Entrante'
                 saveCall(callData);
             }
             
@@ -2614,6 +2627,19 @@
                 if (currentName) {
                     loadContactDetails(currentName, institution, false);
                 }
+
+                // --- INICIO: Lógica para filtrar comentarios por institución ---
+                const commentsSelect = $('#call-comments');
+                const commentsForInstitution = [...new Set(allData
+                    .filter(c => c.institucion === institution)
+                    .map(c => c.comentarios)
+                    .filter(Boolean))].sort();
+
+                commentsSelect.empty(); // Limpiar opciones
+                commentsForInstitution.forEach(comment => {
+                    commentsSelect.append(new Option(comment, comment));
+                });
+                commentsSelect.val(null).trigger('change.select2'); // Resetear selección y actualizar
             });
 
             // Evento para institución (formulario de edición)
@@ -2641,6 +2667,19 @@
                 if (currentName) {
                     loadContactDetails(currentName, institution, true);
                 }
+
+                // --- INICIO: Lógica para filtrar comentarios por institución (modal de edición) ---
+                const editCommentsSelect = $('#edit-call-comments');
+                const commentsForInstitutionEdit = [...new Set(allData
+                    .filter(c => c.institucion === institution)
+                    .map(c => c.comentarios)
+                    .filter(Boolean))].sort();
+
+                editCommentsSelect.empty(); // Limpiar opciones
+                commentsForInstitutionEdit.forEach(comment => {
+                    editCommentsSelect.append(new Option(comment, comment));
+                });
+                editCommentsSelect.val(null).trigger('change.select2'); // Resetear selección y actualizar
             });
 
             // Evento para nombre (formulario principal)
