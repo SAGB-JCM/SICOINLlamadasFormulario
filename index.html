@@ -905,14 +905,14 @@
                             <div class="form-field">
                                 <label for="caller-cargo">Cargo del Solicitante</label>
                                 <div class="flex-with-buttons">
-                                    <select id="caller-cargo" name="cargo" required></select>
+                                    <select id="caller-cargo" name="cargo"></select>
                                     <button type="button" id="edit-cargo-btn" class="edit-btn"><i class="fa-solid fa-pen"></i></button>
                                 </div>
                             </div>
                             <div class="form-field">
                                 <label for="caller-email">Correo Electrónico</label>
                                 <div class="flex-with-buttons">
-                                    <select id="caller-email" name="correo" required></select>
+                                    <select id="caller-email" name="correo"></select>
                                     <button type="button" id="edit-email-btn" class="edit-btn"><i class="fa-solid fa-pen"></i></button>
                                 </div>
                             </div>
@@ -4106,10 +4106,6 @@
             
             // Asignar el listener para el botón de cerrar
             closeDetailsModalBtn.addEventListener('click', () => closeModal(viewDetailsModal));
-
-
-
-
         }
 
         // =============================================
