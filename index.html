@@ -4152,6 +4152,13 @@
             
             // Asignar el listener para el botón de cerrar
             closeDetailsModalBtn.addEventListener('click', () => closeModal(viewDetailsModal));
+
+            // Cierre del modal de detalles al hacer clic fuera
+            viewDetailsModal.addEventListener('click', (e) => {
+                if (e.target === viewDetailsModal) {
+                    closeModal(viewDetailsModal);
+                }
+            });
         }
 
         function setupQuickViewTooltip() {
