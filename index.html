@@ -565,6 +565,29 @@
             overflow: hidden;
         }
 
+        /* Estilos para el tooltip de vista rápida (replicado de la app de licitaciones) */
+        #quick-view-tooltip {
+            position: fixed;
+            display: none;
+            background-color: #1f2937; /* bg-gray-800 */
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            pointer-events: none; /* Para que no interfiera con el cursor */
+            font-size: 0.8rem;
+            line-height: 1.5;
+            max-width: 350px;
+            transition: opacity 0.2s ease-in-out;
+            opacity: 0;
+        }
+        #quick-view-tooltip.visible {
+            display: block;
+            opacity: 1;
+        }
+        #quick-view-tooltip strong { color: #A6802D; } /* text-secondary */
+        #quick-view-tooltip p { margin-bottom: 0.25rem; }
 
     </style>
     
@@ -1217,6 +1240,9 @@
         </div>
     </div>
 
+    <!-- Tooltip para vista rápida en tablas -->
+    <div id="quick-view-tooltip"></div>
+
     <div id="report-preview" class="hidden"></div>
 
     <script type="module">
@@ -1364,6 +1390,7 @@
         const closeDetailsModalBtn = document.getElementById('close-details-modal-btn');
         const includeDynamicChartCheckbox = document.getElementById('include-dynamic-chart');
         const includeDynamicTableCheckbox = document.getElementById('include-dynamic-table');
+        let quickViewTooltip;
         
         let currentEditIsHistorical = false;
         
@@ -1543,6 +1570,15 @@
             data.forEach((call, index) => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
+
+                // Añadimos los atributos data-* para el tooltip de vista rápida. (CORREGIDO)
+                row.dataset.quickview = 'true';
+                row.dataset.institucion = call.institucion || 'N/A';
+                row.dataset.asunto = call.asunto || 'N/A';
+                row.dataset.nombre = call.nombre || 'N/A';
+                row.dataset.atendio = call.atendio || 'N/A';
+                row.dataset.fecha = call.fecha || 'N/A';
+                row.dataset.duracion = formatDuration(call.duracion);
                 
                 let cells = headers.map(header => {
                     let content = '';
@@ -4038,49 +4074,55 @@
             const closeDetailsModalBtn = document.getElementById('close-details-modal-btn');
 
             function showDetailsModal(callItem) {
+                // Ocultar el tooltip de vista rápida al abrir el modal de detalles
+                if (quickViewTooltip) {
+                    quickViewTooltip.classList.remove('visible');
+                }
+
                 if (!callItem) return;
 
                 const detailsModalContent = document.getElementById('details-modal-content');
 
+                // Rediseño del contenido del modal para una mejor visualización
                 detailsModalContent.innerHTML = `
                     <div class="details-header">
                         <p class="date">Fecha: ${callItem.fecha || 'No especificada'}</p>
                         <h3 class="text-xl font-bold text-slate-800 mt-1">Institución: ${callItem.institucion || 'No especificada'}</h3>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 mb-8">
                         <div class="details-section">
                             <h4><i class="fa-solid fa-clock mr-2"></i>Horarios</h4>
-                            <p class="text-gray-700"><strong>Inicio:</strong> ${formatTimeWithAmPm(callItem.inicio)}</p>
-                            <p class="text-gray-700"><strong>Fin:</strong> ${formatTimeWithAmPm(callItem.fin)}</p>
-                            <p class="text-gray-700"><strong>Duración:</strong> ${formatDuration(callItem.duracion)}</p>
+                            <p class="text-gray-700 text-sm"><strong>Inicio:</strong> ${formatTimeWithAmPm(callItem.inicio)}</p>
+                            <p class="text-gray-700 text-sm"><strong>Fin:</strong> ${formatTimeWithAmPm(callItem.fin)}</p>
+                            <p class="text-gray-700 text-sm"><strong>Duración:</strong> ${formatDuration(callItem.duracion)}</p>
                         </div>
                         <div class="details-section">
                             <h4><i class="fa-solid fa-sitemap mr-2"></i>Clasificación</h4>
-                            <p class="text-gray-700"><strong>Área:</strong> ${callItem.area || 'N/A'}</p>
-                            <p class="text-gray-700"><strong>Asunto:</strong> ${callItem.asunto || 'N/A'}</p>
-                            <p class="text-gray-700"><strong>Consulta:</strong> ${callItem.consulta || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Área:</strong> ${callItem.area || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Asunto:</strong> ${callItem.asunto || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Consulta:</strong> ${callItem.consulta || 'N/A'}</p>
                         </div>
                          <div class="details-section">
                             <h4><i class="fa-solid fa-user-tie mr-2"></i>Atención</h4>
-                            <p class="text-gray-700"><strong>Atendió:</strong> ${callItem.atendio || 'N/A'}</p>
-                            <p class="text-gray-700"><strong>Estatus:</strong> <span class="font-semibold ${callItem.estatus === 'Saliente' ? 'text-green-600' : 'text-blue-600'}">${callItem.estatus || 'N/A'}</span></p>
+                            <p class="text-gray-700 text-sm"><strong>Atendió:</strong> ${callItem.atendio || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Estatus:</strong> <span class="font-semibold ${callItem.estatus === 'Saliente' ? 'text-green-600' : 'text-blue-600'}">${callItem.estatus || 'N/A'}</span></p>
                         </div>
                     </div>
 
                     <div class="details-section">
                         <h4><i class="fa-solid fa-user mr-2"></i>Datos del Solicitante</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                            <p class="text-gray-700"><strong>Nombre:</strong> ${callItem.nombre || 'N/A'}</p>
-                            <p class="text-gray-700"><strong>Cargo:</strong> ${callItem.cargo || 'N/A'}</p>
-                            <p class="text-gray-700"><strong>Correo:</strong> ${callItem.correo || 'N/A'}</p>
-                            <p class="text-gray-700"><strong>Teléfono:</strong> ${callItem.telefono || 'N/A'}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <p class="text-gray-700 text-sm"><strong>Nombre:</strong> ${callItem.nombre || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Cargo:</strong> ${callItem.cargo || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Correo:</strong> ${callItem.correo || 'N/A'}</p>
+                            <p class="text-gray-700 text-sm"><strong>Teléfono:</strong> ${callItem.telefono || 'N/A'}</p>
                         </div>
                     </div>
 
                     <div class="details-section">
                         <h4><i class="fa-solid fa-comments mr-2"></i>Comentarios Adicionales</h4>
-                        <p class="text-gray-700 italic">${callItem.comentarios || 'Sin comentarios.'}</p>
+                        <p class="text-gray-700 italic text-sm bg-white p-3 rounded-md border">${callItem.comentarios || 'Sin comentarios.'}</p>
                     </div>
                 `;
 
@@ -4093,6 +4135,9 @@
                 if (!row || e.target.closest('button')) {
                     return; 
                 }
+                // Ocultar el tooltip al iniciar el doble clic para evitar que se quede "pegado"
+                if (quickViewTooltip) quickViewTooltip.classList.remove('visible');
+
                 const callId = row.querySelector('.edit-btn')?.dataset.id;
                 if (!callId) return;
 
@@ -4109,16 +4154,59 @@
             closeDetailsModalBtn.addEventListener('click', () => closeModal(viewDetailsModal));
         }
 
+        function setupQuickViewTooltip() {
+            const showTooltip = (e) => {
+                const row = e.target.closest('tr[data-quickview="true"]');
+                if (!row) return;
+
+                const { institucion, asunto, nombre, atendio, fecha, duracion } = row.dataset;
+
+                quickViewTooltip.innerHTML = `
+                    <p><strong>Institución:</strong> ${institucion}</p>
+                    <p><strong>Asunto:</strong> ${asunto}</p>
+                    <p><strong>Solicitante:</strong> ${nombre}</p>
+                    <p><strong>Atendió:</strong> ${atendio}</p>
+                    <p><strong>Fecha:</strong> ${fecha}</p>
+                    <p><strong>Duración:</strong> ${duracion}</p>
+                `;
+                quickViewTooltip.classList.add('visible');
+            };
+
+            const hideTooltip = () => {
+                quickViewTooltip.classList.remove('visible');
+            };
+
+            const moveTooltip = (e) => {
+                if (quickViewTooltip.classList.contains('visible')) {
+                    // Posiciona el tooltip con un desfase para no tapar el cursor
+                    quickViewTooltip.style.left = `${e.clientX + 15}px`;
+                    quickViewTooltip.style.top = `${e.clientY + 15}px`;
+                }
+            };
+
+            // Aplicar a ambas tablas
+            [callLogTableBody, historicalTableBody].forEach(tbody => {
+                tbody.addEventListener('mouseover', showTooltip);
+                tbody.addEventListener('mouseout', hideTooltip);
+                tbody.addEventListener('mousemove', moveTooltip);
+            });
+        }
+
         // =============================================
         // MÓDULO: Inicialización
         // =============================================
 
         function initialize() {
+            document.addEventListener('DOMContentLoaded', () => {
+                quickViewTooltip = document.getElementById('quick-view-tooltip');
+            });
+
             initializeAppWithAuth();
             setupEventListeners();
             setupAddEditButtons();
             setupPasswordVerification();
             setupReportConfig();
+            setupQuickViewTooltip();
             
             // Configurar Select2 para todos los selects
             $('#call-form select, #edit-form select').each(function() {
