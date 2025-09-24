@@ -1859,10 +1859,19 @@
             });
         }
 
-        function setupColumnFilters(headerId, dataProvider, renderFunc, filterKey) {
+        function setupColumnFilters(headerId, dataProvider, renderFunc, filterKey, dayFilterProvider) {
             const headerRow = document.getElementById(headerId);
             headerRow.addEventListener('click', e => {
                 const header = e.target.closest('.filterable-header');
+                
+                // Nueva lógica: si el filtro de día está activo, el dataProvider debe ser el conjunto filtrado.
+                let currentDataProvider = dataProvider;
+                if (dayFilterProvider) {
+                    const dayFilteredData = dayFilterProvider();
+                    // Si hay datos filtrados por día, los usamos como base.
+                    if (dayFilteredData) currentDataProvider = () => dayFilteredData;
+                }
+
                 if (!header) return;
 
                 if (state.ui.currentFilterDropdown) {
@@ -1873,7 +1882,7 @@
                 const filterBy = header.dataset.filterBy;
                 
                 // Usar los datos pre-filtrados para generar las opciones del dropdown.
-                const preFilteredData = getPreFilteredData(dataProvider, filterKey, filterBy);
+                const preFilteredData = getPreFilteredData(currentDataProvider, filterKey, filterBy);
 
                 const uniqueValues = [...new Set(preFilteredData.map(item => {
                     if (filterBy === 'duracion') return formatDuration(item.duracion);
@@ -1937,7 +1946,7 @@
                         const checkedValues = Array.from(dropdown.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
                         state.activeFilters[filterKey][filterBy] = checkedValues;
                         header.classList.toggle('active', checkedValues.length > 0);
-                        const filteredData = applyAllFilters(dataProvider(), filterKey);
+                        const filteredData = applyAllFilters(currentDataProvider(), filterKey);
                         renderFunc(filterKey === 'main' ? DOM.callLogTableBody : DOM.historicalTableBody, filteredData, filterKey === 'historical');
                     }
                 });
@@ -1945,7 +1954,7 @@
                 dropdown.querySelector('.clear-filter-btn').addEventListener('click', () => {
                     state.activeFilters[filterKey][filterBy] = [];
                     header.classList.remove('active');
-                    const filteredData = applyAllFilters(dataProvider(), filterKey);
+                    const filteredData = applyAllFilters(currentDataProvider(), filterKey);
                     renderFunc(filterKey === 'main' ? DOM.callLogTableBody : DOM.historicalTableBody, filteredData, filterKey === 'historical');
                     if (state.ui.currentFilterDropdown) state.ui.currentFilterDropdown.remove();
                 });
@@ -3317,12 +3326,15 @@
                 statusCounts[call.estatus || 'N/A'] = (statusCounts[call.estatus || 'N/A'] || 0) + 1;
                 asuntoCounts[call.asunto || 'N/A'] = (asuntoCounts[call.asunto || 'N/A'] || 0) + 1;
                 atendioCounts[call.atendio || 'N/A'] = (atendioCounts[call.atendio || 'N/A'] || 0) + 1;
-                if (call.fecha && typeof call.fecha === 'string') {
-                    try {
-                        const date = new Date(call.fecha.split('/').reverse().join('-'));
-                        const day = date.toLocaleDateString('es-ES', { weekday: 'long' });
+                // --- CORRECCIÓN: Usar la función getDayOfWeek para consistencia ---
+                const dayOfWeekIndex = getDayOfWeek(call.fecha); // Devuelve 1 para Lunes, 2 para Martes, etc.
+                if (dayOfWeekIndex !== -1) {
+                    // Mapear el índice a un nombre de día para el gráfico
+                    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                    const day = days[dayOfWeekIndex];
+                    if (day) {
                         dayOfWeekCounts[day] = (dayOfWeekCounts[day] || 0) + 1;
-                    } catch (e) { /* Ignorar */ }
+                    }
                 }
             });
 
@@ -3894,6 +3906,11 @@
                     }
 
                     // Re-renderizar la tabla principal con el filtro (o sin él)
+                    // Y forzar la actualización de los filtros de columna
+                    const dayFilteredData = state.ui.activeDayFilter !== null ? state.calls.filter(c => getDayOfWeek(c.fecha) === state.ui.activeDayFilter) : state.calls;
+                    setupColumnFilters('main-table-header', () => dayFilteredData, renderTable, 'main');
+
+                    // Re-renderizar la tabla principal con el filtro (o sin él)
                     sortAndRenderTable(DOM.callLogTableBody, state.calls, false);
                 });
             });
@@ -4042,7 +4059,11 @@
         
         function setupEventListeners() {
             setupTabs();
-            setupColumnFilters('main-table-header', () => state.calls, renderTable, 'main');
+            // Modificación: El dataProvider para los filtros de columna ahora puede ser dinámico.
+            setupColumnFilters('main-table-header', () => {
+                // Si hay un filtro de día activo, devuelve los datos ya filtrados. Si no, todos los datos.
+                return state.ui.activeDayFilter !== null ? state.calls.filter(c => getDayOfWeek(c.fecha) === state.ui.activeDayFilter) : state.calls;
+            }, renderTable, 'main');
             setupColumnFilters('historical-table-header', () => state.historicalCalls, renderTable, 'historical');
 
             setupFiltering('filter-input-main', () => state.calls, renderTable, false);
