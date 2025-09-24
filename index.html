@@ -676,20 +676,31 @@
                     <div class="text-center md:text-left"><h3 class="text-lg font-semibold text-slate-800">Control de Llamadas</h3><p class="text-slate-500">Inicia una nueva llamada para activar el cronómetro y el formulario.</p></div>
                     <div class="flex items-center gap-6"><div class="text-center"><p class="text-sm font-medium text-slate-500">TIEMPO DE LLAMADA ACTUAL</p><p id="timer" class="text-2xl font-bold text-primary tracking-wider">00:00:00</p></div><button id="start-call-btn" class="bg-success hover:bg-success-dark text-white font-bold py-4 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center space-x-3"><i class="fa-solid fa-phone-alt h-6 w-6"></i><span>Iniciar Nueva Llamada</span></button></div>
                 </section>
-                
+
                 <!----------------- HISTORIAL DE LLAMADAS - TABLA - LOG ---------------->
                 <section id="call-log">
                     <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-primary">Historial de Llamadas</h2><div class="flex items-center space-x-2"><div class="relative w-full"><input type="text" id="filter-input-main" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-main" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div>
-                        <button id="download-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button>
-                        <button id="migrate-calls-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                        <button id="download-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button>                        
+                        <button id="start-migration-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
                             <i class="fa-solid fa-database"></i>
                             <span>Migrar Llamadas</span>
+                        </button>
+                        <button id="confirm-migration-btn" class="hidden bg-success hover:bg-success-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" disabled>
+                            <i class="fa-solid fa-check"></i>
+                            <span>Confirmar</span>
+                        </button>
+                        <button id="cancel-migration-btn" class="hidden bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                            <i class="fa-solid fa-times"></i>
+                            <span>Cancelar</span>
                         </button>
                     </div></div>
                     <div class="bg-white rounded-xl shadow-md table-container">
                         <table class="w-full text-sm text-left text-slate-500">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-100">
                                 <tr id="main-table-header">
+                                    <th scope="col" class="py-3 px-6 migration-select-col hidden">
+                                        <input type="checkbox" id="select-all-calls-checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                    </th>
                                     <th scope="col" class="py-3 px-6">No.</th>
                                     <th scope="col" class="py-3 px-6 filterable-header" data-filter-by="fecha">Fecha <span class="filter-icon"><i class="fa-solid fa-filter ml-1"></i></span></th>
                                     <th scope="col" class="py-3 px-6 filterable-header" data-filter-by="inicio">Inicio <span class="filter-icon"><i class="fa-solid fa-filter ml-1"></i></span></th>
@@ -1383,6 +1394,10 @@
         const chartSizeSlider = document.getElementById('chart-size-slider');
         const chartSizeValue = document.getElementById('chart-size-value');
         const migrateCallsBtn = document.getElementById('migrate-calls-btn');
+        const startMigrationBtn = document.getElementById('start-migration-btn');
+        const confirmMigrationBtn = document.getElementById('confirm-migration-btn');
+        const cancelMigrationBtn = document.getElementById('cancel-migration-btn');
+        const selectAllCallsCheckbox = document.getElementById('select-all-calls-checkbox');
         const migrateModal = document.getElementById('migrate-modal');
         const cancelMigrateBtn = document.getElementById('cancel-migrate-btn');
         const confirmMigrateBtn = document.getElementById('confirm-migrate-btn');
@@ -1422,12 +1437,13 @@
         };
         let currentFilterDropdown = null;
 
+        let isMigrationModeActive = false;
+        let selectedCallIdsToMigrate = new Set();
+
         // =============================================
         // MÓDULO: Gestión de Modales (con contador para anidamiento)
         // =============================================
         let openModalCount = 0;
-        // MÓDULO: Utilidades
-        // =============================================
         
         //Mostrar app
         function showApp() {
@@ -1579,7 +1595,7 @@
                 row.dataset.atendio = call.atendio || 'N/A';
                 row.dataset.fecha = call.fecha || 'N/A';
                 row.dataset.duracion = formatDuration(call.duracion);
-                
+
                 let cells = headers.map(header => {
                     let content = '';
                     if (header === 'no') content = index + 1;
@@ -1604,12 +1620,21 @@
 
                 }).join('');
 
+                // --- INICIO: Lógica para añadir el checkbox de migración al principio de la fila ---
+                let migrationCell = '';
+                // Solo se añade el checkbox a la tabla principal y si el modo migración está activo.
+                if (!isHistorical && isMigrationModeActive) {
+                    const isSelected = selectedCallIdsToMigrate.has(call.id);
+                    migrationCell = `<td class="py-4 px-6 whitespace-nowrap"><input type="checkbox" class="call-migration-checkbox rounded border-gray-300 text-primary focus:ring-primary" data-id="${call.id}" ${isSelected ? 'checked' : ''}></td>`;
+                }
+                // --- FIN: Lógica para añadir el checkbox de migración ---
+
                 const actionsCell = `<td class="py-4 px-6 flex space-x-2">
                         <button data-id="${call.id}" data-is-historical="${isHistorical}" class="edit-btn text-blue-500 hover:text-blue-700"><i class="fa-solid fa-edit"></i></button>
                         <button data-id="${call.id}" data-is-historical="${isHistorical}" class="delete-btn text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-alt"></i></button>
                     </td>`;
-                
-                row.innerHTML = cells + actionsCell;
+
+                row.innerHTML = migrationCell + cells + actionsCell;
                 tableBody.appendChild(row);
             });
         }
@@ -3648,50 +3673,42 @@
         // MÓDULO: Migración de datos
         // =============================================
 
-        async function migrateCallsToHistorical() {
+        async function migrateSelectedCallsToHistorical() {
             try {
-                if (calls.length === 0) {
-                    showAlert("No hay llamadas para migrar.", "warning");
+                if (selectedCallIdsToMigrate.size === 0) {
+                    showAlert("No hay llamadas seleccionadas para migrar.", "warning");
                     return;
                 }
                 
-                // Mostrar loader para bloquear interacciones durante migración
                 showLoader(true);
                 
                 const batch = writeBatch(db);
-                const callsCount = calls.length; // Guardar el count antes de limpiar
-                
-                calls.forEach(call => {
+                const callsToMigrate = calls.filter(call => selectedCallIdsToMigrate.has(call.id));
+                if (callsToMigrate.length === 0) return; // Doble verificación
+
+                callsToMigrate.forEach(call => {
                     const historicalDocRef = doc(historicalCallsCollectionRef);
-                    const { id, ...callData } = call; // Omitir el id antiguo
+                    const { id, ...callData } = call;
                     batch.set(historicalDocRef, { 
-                        ...callData,  // Usar solo los datos sin el id
+                        ...callData,
                         migratedAt: serverTimestamp(),
-                        originalId: id  // Guardar el id original en un campo separate
+                        originalId: id
                     });
-                });
-                
-                calls.forEach(call => {
+
                     const callDocRef = doc(callsCollectionRef, call.id);
                     batch.delete(callDocRef);
                 });
                 
                 await batch.commit();
                 
-                // Sincronización manual: Limpiar calls local y re-render inmediatamente
-                calls = [];
-                sortAndRenderTable(callLogTableBody, calls, false);
-                
-                // Actualizar dashboard y charts
-                updateAllDashboards();
-                updateCharts();
-                
-                showAlert(`Se migraron ${callsCount} llamadas al histórico.`, "success");
+                showAlert(`Se migraron ${callsToMigrate.length} llamadas al histórico.`, "success");
             } catch (error) {
                 console.error("Error al migrar llamadas:", error);
                 showAlert(`Error al migrar: ${error.message}`, "error");
             } finally {
                 showLoader(false);
+                // Salir del modo migración después de completar
+                toggleMigrationMode(false);
             }
         }
 
@@ -3701,6 +3718,28 @@
             if (loader) {
                 loader.style.display = show ? 'flex' : 'none';
             }
+        }
+
+        function toggleMigrationMode(activate) {
+            isMigrationModeActive = activate;
+            selectedCallIdsToMigrate.clear();
+
+            // Alternar visibilidad de botones
+            startMigrationBtn.classList.toggle('hidden', activate);
+            confirmMigrationBtn.classList.toggle('hidden', !activate);
+            cancelMigrationBtn.classList.toggle('hidden', !activate);
+            confirmMigrationBtn.disabled = true; // Siempre deshabilitar al entrar/salir del modo
+
+            // Alternar visibilidad de la columna de checkboxes
+            document.querySelectorAll('.migration-select-col').forEach(col => {
+                col.classList.toggle('hidden', !activate);
+            });
+
+            // Limpiar estado
+            selectAllCallsCheckbox.checked = false;
+
+            // Re-renderizar la tabla principal para mostrar/ocultar los checkboxes en las filas
+            sortAndRenderTable(callLogTableBody, calls, false);
         }
 
 
@@ -3826,11 +3865,30 @@
             }
 
             callLogTableBody.addEventListener('click', e => {
-                const target = e.target.closest('button');
-                if (!target) return;
-                if (target.classList.contains('edit-btn')) handleEditClick({ currentTarget: target });
-                if (target.classList.contains('delete-btn')) handleDeleteClick({ currentTarget: target });
-                if (target.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: target });
+                // Si se hizo clic en un botón, manejar la acción del botón y detener.
+                const buttonTarget = e.target.closest('button');
+                if (buttonTarget) {
+                    if (buttonTarget.classList.contains('edit-btn')) handleEditClick({ currentTarget: buttonTarget });
+                    if (buttonTarget.classList.contains('delete-btn')) handleDeleteClick({ currentTarget: buttonTarget });
+                    if (buttonTarget.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: buttonTarget });
+                    return;
+                }
+
+                // Si el modo de migración está activo y no se hizo clic en un botón, manejar la selección de la fila.
+                if (isMigrationModeActive) {
+                    const row = e.target.closest('tr');
+                    if (!row) return;
+
+                    const checkbox = row.querySelector('.call-migration-checkbox');
+                    if (checkbox) {
+                        // No procesar si el clic fue directamente en el checkbox para evitar doble evento.
+                        if (e.target === checkbox) return;
+
+                        // Invertir el estado del checkbox y disparar el evento 'change'
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
             });
 
             // Estatus tabla de histórico
@@ -4046,24 +4104,48 @@
                 updateCharts();
             });
 
-            // Migración de historial
-            migrateCallsBtn.addEventListener('click', () => {
-                requirePassword(() => openModal(migrateModal));
+            // Iniciar modo migración
+            startMigrationBtn.addEventListener('click', () => {
+                toggleMigrationMode(true);
             });
-            
-            // Cancelar migración de historial
-            cancelMigrateBtn.addEventListener('click', () => closeModal(migrateModal));
 
+            // Cancelar modo migración
+            cancelMigrationBtn.addEventListener('click', () => {
+                toggleMigrationMode(false);
+            });
 
-            // Confirmar migración de historial corregida Versión 2
-            confirmMigrateBtn.addEventListener('click', async () => {
-                try {
-                    await migrateCallsToHistorical();
-                    closeModal(migrateModal);
-                } catch (error) { 
-                    console.error("Error en migración:", error);
-                    showAlert("Error durante la migración: " + error.message, "error");
+            // Confirmar migración (ahora es el botón de éxito)
+            confirmMigrationBtn.addEventListener('click', () => {
+                if (selectedCallIdsToMigrate.size === 0) return;
+
+                requirePassword(async () => {
+                    await migrateSelectedCallsToHistorical();
+                });
+            });
+
+            // Lógica para seleccionar/deseleccionar llamadas
+            callLogTableBody.addEventListener('change', e => {
+                if (e.target.classList.contains('call-migration-checkbox')) {
+                    const callId = e.target.dataset.id;
+                    if (e.target.checked) {
+                        selectedCallIdsToMigrate.add(callId);
+                    } else {
+                        selectedCallIdsToMigrate.delete(callId);
+                    }
+                    confirmMigrationBtn.disabled = selectedCallIdsToMigrate.size === 0;
+                    selectAllCallsCheckbox.checked = selectedCallIdsToMigrate.size === calls.length && calls.length > 0;
                 }
+            });
+
+            // Lógica para "Seleccionar Todo"
+            selectAllCallsCheckbox.addEventListener('change', e => {
+                const isChecked = e.target.checked;
+                document.querySelectorAll('.call-migration-checkbox').forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                    const callId = checkbox.dataset.id;
+                    isChecked ? selectedCallIdsToMigrate.add(callId) : selectedCallIdsToMigrate.delete(callId);
+                });
+                confirmMigrationBtn.disabled = selectedCallIdsToMigrate.size === 0;
             });
 
 
@@ -4213,7 +4295,7 @@
             setupAddEditButtons();
             setupPasswordVerification();
             setupReportConfig();
-            setupQuickViewTooltip();
+            setupQuickViewTooltip(); 
             
             // Configurar Select2 para todos los selects
             $('#call-form select, #edit-form select').each(function() {
@@ -4231,4 +4313,4 @@
 
     </script>
 </body> 
-</html> 
+</html>  
