@@ -619,6 +619,14 @@
             border-radius: 2px;
         }
 
+        /* Estilos para la Alerta de Resumen (copiado de Licitaciones) */
+        #summary-alert-container.alert-enter { animation: slideInUp 0.5s ease-out forwards; }
+        #summary-alert-container.alert-leave { animation: slideOutDown 0.5s ease-in forwards; }
+
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideOutDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
+
+
     </style>
     
     <!-- Configuración de Tailwind con nueva paleta de colores -->
@@ -1342,6 +1350,31 @@
     <!-- Tooltip para vista rápida en tablas -->
     <div id="quick-view-tooltip"></div>
 
+    <!-- Contenedor para la Alerta de Resumen Semanal (adaptado de Licitaciones) -->
+    <div id="summary-alert-container" class="hidden fixed bottom-4 right-4 w-full max-w-sm z-40">
+        <div class="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa-solid fa-chart-pie text-primary text-xl"></i>
+                    </div>
+                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                        <p class="text-sm font-bold text-slate-800">Resumen operativo de la semana</p>
+                        <div id="summary-alert-content" class="mt-2 space-y-2 text-sm text-slate-600">
+                            <!-- El contenido se generará dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button id="close-summary-alert-btn" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <span class="sr-only">Cerrar</span>
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="report-preview" class="hidden"></div>
 
     <script type="module">
@@ -1469,6 +1502,7 @@
             timestampsEndTimeInput: document.getElementById('timestamps-end-time'),
             timestampsDurationElem: document.getElementById('timestamps-duration'),
             quickViewTooltip: document.getElementById('quick-view-tooltip'),
+            // Nuevos elementos para la alerta de resumen
         };
         
         //Alternar visualización de etiquetas Reporte dinámico
@@ -3286,6 +3320,9 @@
                 updateAllDashboards();
                 updateCharts();
                 updateDynamicSelectOptions();
+
+                // Llamar a la función de la alerta después de que los datos se carguen
+                setTimeout(checkAndShowSummaryAlert, 1000);
             }, (error) => console.error("Error en listener de llamadas:", error));
             
             onSnapshot(query(historicalCallsCollectionRef), (snapshot) => {
@@ -3931,6 +3968,96 @@
                     sortAndRenderTable(DOM.callLogTableBody, state.calls, false);
                 });
             });
+        }
+
+        // =============================================
+        // MÓDULO: Notificación de Resumen Semanal (Adaptado de Licitaciones)
+        // =============================================
+        let summaryAlertShown = false;
+        let summaryAlertTimeout;
+
+        function getWeekRange() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0 (Dom) - 6 (Sáb)
+            const diffToMonday = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Ajuste para que la semana empiece en Lunes
+            
+            const startOfWeek = new Date(now.setDate(diffToMonday));
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+
+            return { start: startOfWeek, end: endOfWeek };
+        }
+
+        function checkAndShowSummaryAlert() {
+            if (summaryAlertShown) return;
+
+            const { start, end } = getWeekRange();
+            
+            const weeklyCalls = state.calls.filter(call => {
+                try {
+                    const [day, month, year] = call.fecha.split('/');
+                    const callDate = new Date(`${year}-${month}-${day}`);
+                    return callDate >= start && callDate <= end;
+                } catch (e) { return false; }
+            });
+
+            if (weeklyCalls.length > 0) {
+                const totalCalls = weeklyCalls.length;
+                const salientes = weeklyCalls.filter(c => c.estatus === 'Saliente').length;
+                const entrantes = totalCalls - salientes;
+                const totalDuration = weeklyCalls.reduce((sum, c) => sum + (Number(c.duracion) || 0), 0);
+                const avgDuration = totalCalls > 0 ? Math.round(totalDuration / totalCalls) : 0;
+
+                const alertContainer = document.getElementById('summary-alert-container');
+                const alertContent = document.getElementById('summary-alert-content');
+
+                alertContent.innerHTML = `
+                    <div class="flex justify-between items-center"><span><i class="fa-solid fa-phone-volume w-4 text-center mr-1"></i> Total:</span> <strong>${totalCalls}</strong></div>
+                    <div class="flex justify-between items-center"><span><i class="fa-solid fa-arrow-up-from-bracket w-4 text-center mr-1 text-green-500"></i> Salientes:</span> <strong>${salientes}</strong></div>
+                    <div class="flex justify-between items-center"><span><i class="fa-solid fa-inbox w-4 text-center mr-1 text-blue-500"></i> Entrantes:</span> <strong>${entrantes}</strong></div>
+                    <div class="flex justify-between items-center"><span><i class="fa-solid fa-hourglass-half w-4 text-center mr-1"></i> Duración Prom:</span> <strong>${formatDuration(avgDuration)}</strong></div>
+                    <div class="mt-3 text-right">
+                        <button id="view-summary-btn" class="text-xs font-bold text-primary hover:underline">Ver Detalle</button>
+                    </div>
+                `;
+
+                alertContainer.classList.remove('hidden', 'alert-leave');
+                alertContainer.classList.add('alert-enter');
+                summaryAlertShown = true;
+
+                startSummaryAlertTimeout();
+            }
+        }
+
+        function startSummaryAlertTimeout() {
+            clearTimeout(summaryAlertTimeout);
+            summaryAlertTimeout = setTimeout(() => {
+                const closeBtn = document.getElementById('close-summary-alert-btn');
+                if (closeBtn) closeBtn.click();
+            }, 15000); // 15 segundos
+        }
+
+        function setupSummaryAlertListeners() {
+            document.body.addEventListener('click', (e) => {
+                if (e.target && e.target.id === 'view-summary-btn') {
+                    document.querySelector('button[data-tab="historico"]').click();
+                    DOM.dashboardDataSourceHistorico.value = 'registro';
+                    DOM.dashboardDataSourceHistorico.dispatchEvent(new Event('change'));
+                    document.getElementById('close-summary-alert-btn').click();
+                } else if (e.target && e.target.closest('#close-summary-alert-btn')) {
+                    const container = document.getElementById('summary-alert-container');
+                    container.classList.remove('alert-enter');
+                    container.classList.add('alert-leave');
+                    clearTimeout(summaryAlertTimeout);
+                }
+            });
+
+            const alertContainer = document.getElementById('summary-alert-container');
+            alertContainer.addEventListener('mouseenter', () => clearTimeout(summaryAlertTimeout));
+            alertContainer.addEventListener('mouseleave', startSummaryAlertTimeout);
         }
 
         // =============================================
@@ -4692,6 +4819,7 @@
             setupAddEditButtons();
             setupPasswordVerification();
             setupReportConfig();
+            setupSummaryAlertListeners();
             setupQuickViewTooltip(); 
             
             // Configurar Select2 para todos los selects
