@@ -63,6 +63,23 @@
         .bg-danger { background-color: #EF4444; }
         .hover\:bg-danger-dark:hover { background-color: #DC2626; }
         
+        :root {
+            --primary-color: #A6802D; /* Color primario por defecto */
+        }
+
+        /* Estilos para los indicadores de día de la semana */
+        .indicator-card.active-filter {
+            /* Contorno más grueso y sombra más pronunciada */
+            box-shadow: 0 0 0 3px var(--primary-color), 0 6px 12px -2px rgba(0, 0, 0, 0.15), 0 3px 7px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .indicator-card.current-day-highlight {
+            /* Subrayado más grueso y un fondo sutil para diferenciarlo */
+            border-bottom: 4px solid var(--primary-color);
+            background-color: #fdfbf5; /* Un tono muy claro de amarillo/dorado */
+        }
+
         .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
         .modal-leave { animation: fadeOut 0.3s ease-in forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -675,11 +692,32 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-primary">Resumen Operativo</h2>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-white p-4 rounded-xl shadow-md flex items-center space-x-3"><div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-phone-volume text-primary text-xl"></i></div><div><p class="text-sm text-slate-500">Total de Llamadas</p><p id="total-calls" class="text-2xl font-bold text-primary">0</p></div></div>
-                        <div class="bg-white p-4 rounded-xl shadow-md flex items-center space-x-3"><div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-hourglass-half text-primary text-xl"></i></div><div><p class="text-sm text-slate-500">Duración Promedio</p><p id="avg-duration" class="text-2xl font-bold text-primary">00:00</p></div></div>
-                        <div class="bg-white p-4 rounded-xl shadow-md flex items-center space-x-3"><div class="bg-green-500/10 p-2 rounded-full"><i class="fa-solid fa-arrow-up-from-bracket text-green-500 text-xl"></i></div><div><p class="text-sm text-slate-500">Llamadas Salientes</p><p id="salientes-count" class="text-2xl font-bold text-green-600">0</p></div></div>
-                        <div class="bg-white p-4 rounded-xl shadow-md flex items-center space-x-3"><div class="bg-blue-500/10 p-2 rounded-full"><i class="fa-solid fa-inbox text-blue-500 text-xl"></i></div><div><p class="text-sm text-slate-500">Llamadas Entrantes</p><p id="entrantes-count" class="text-2xl font-bold text-blue-600">0</p></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <!-- Lunes -->
+                        <div data-day="1" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Lunes">
+                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Lunes</p><p id="calls-lunes-count" class="text-2xl font-bold text-primary">0</p></div>
+                        </div>
+                        <!-- Martes -->
+                        <div data-day="2" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Martes">
+                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Martes</p><p id="calls-martes-count" class="text-2xl font-bold text-primary">0</p></div>
+                        </div>
+                        <!-- Miércoles -->
+                        <div data-day="3" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Miércoles">
+                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Miércoles</p><p id="calls-miercoles-count" class="text-2xl font-bold text-primary">0</p></div>
+                        </div>
+                        <!-- Jueves -->
+                        <div data-day="4" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Jueves">
+                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Jueves</p><p id="calls-jueves-count" class="text-2xl font-bold text-primary">0</p></div>
+                        </div>
+                        <!-- Viernes -->
+                        <div data-day="5" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Viernes">
+                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Viernes</p><p id="calls-viernes-count" class="text-2xl font-bold text-primary">0</p></div>
+                        </div>
                     </div>
                 </section>
 
@@ -1472,6 +1510,7 @@
                 currentEditingField: null,
                 currentEditingValue: null,
                 pendingAction: null,
+                activeDayFilter: null, // null o un número de 1 a 5 para el día
                 isProgrammaticChange: false,
                 showChartLabels: true,
             },
@@ -1746,12 +1785,32 @@
             });
         }
 
+        function getDayOfWeek(dateString) {
+            if (!dateString || typeof dateString !== 'string') return -1;
+            try {
+                // Formato esperado: DD/MM/YYYY
+                const [day, month, year] = dateString.split('/');
+                // Ojo: los meses en JS son 0-indexados (Enero=0)
+                const date = new Date(year, month - 1, day);
+                // getDay() devuelve 0 para Domingo, 1 para Lunes, etc.
+                return date.getDay();
+            } catch (e) {
+                return -1; // Retorna un valor inválido si la fecha no se puede parsear
+            }
+        }
+
         function applyAllFilters(data, filterKey) {
             const searchInput = document.getElementById(`filter-input-${filterKey}`);
             const searchText = searchInput ? searchInput.value.toLowerCase() : '';
             const columnFilters = state.activeFilters[filterKey];
 
             return data.filter(item => {
+                // Filtro del dashboard de días de la semana (solo para la tabla principal)
+                if (filterKey === 'main' && state.ui.activeDayFilter !== null) {
+                    const callDay = getDayOfWeek(item.fecha);
+                    if (callDay !== state.ui.activeDayFilter) return false;
+                }
+
                 // 1. Check search box filter
                 const matchesSearch = searchText === '' || Object.values(item).some(value => 
                     String(value).toLowerCase().includes(searchText)
@@ -1949,12 +2008,9 @@
             renderTable(tableBody, filteredData, isHistorical);
         }
 
-
         //Actualizart el dashboard principal
-        function updateAllDashboards() {
-            // Dashboard de Registro y Control (fuente fija)
-            updateSingleDashboard(state.calls, DOM.totalCallsElem, DOM.avgDurationElem, DOM.salientesCountElem, DOM.entrantesCountElem);
-
+        function updateAllDashboards() {            
+            updateWeekdayDashboard();
             // Dashboard de Histórico (fuente variable)
             const sourceHistorico = DOM.dashboardDataSourceHistorico.value;
             let dataHistorico = [];
@@ -1966,6 +2022,33 @@
             updateSingleDashboard(dataHistorico, DOM.totalCallsElemHistorico, DOM.avgDurationElemHistorico, DOM.salientesCountElemHistorico, DOM.entrantesCountElemHistorico);
         }
 
+        function updateWeekdayDashboard() {
+            const dayCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }; // Lunes a Viernes
+            const dayIds = { 1: 'lunes', 2: 'martes', 3: 'miercoles', 4: 'jueves', 5: 'viernes' };
+
+            state.calls.forEach(call => {
+                const day = getDayOfWeek(call.fecha);
+                if (day >= 1 && day <= 5) { // Solo contar de Lunes a Viernes
+                    dayCounts[day]++;
+                }
+            });
+
+            for (const dayNum in dayCounts) {
+                const countElement = document.getElementById(`calls-${dayIds[dayNum]}-count`);
+                if (countElement) {
+                    countElement.textContent = dayCounts[dayNum];
+                }
+            }
+
+            // Resaltar el día actual
+            const today = new Date().getDay(); // 0=Dom, 1=Lun, ...
+            document.querySelectorAll('#dashboard .indicator-card').forEach(card => {
+                card.classList.remove('current-day-highlight');
+                if (parseInt(card.dataset.day) === today) {
+                    card.classList.add('current-day-highlight');
+                }
+            });
+        }
         
         //Actualiza los elementos de un dashboard específico con los datos proporcionados.
         
@@ -3782,6 +3865,40 @@
             });
         }
 
+        function setupWeekdayDashboardFilter() {
+            const indicators = document.querySelectorAll('#dashboard .indicator-card');
+
+            indicators.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    // Evitar que el evento se propague si se hace clic en un ícono dentro de la tarjeta
+                    if (e.target.closest('i')) return;
+
+                    const dayFilter = parseInt(card.dataset.day, 10);
+                    const isDeactivating = state.ui.activeDayFilter === dayFilter;
+
+                    if (isDeactivating) {
+                        state.ui.activeDayFilter = null;
+                        card.classList.remove('active-filter');
+                        // Opcional: Limpiar todos los otros filtros al desactivar el filtro de día
+                        state.activeFilters.main = {};
+                        document.querySelectorAll('#main-table-header .filterable-header.active').forEach(h => h.classList.remove('active'));
+                        const searchInput = document.getElementById('filter-input-main');
+                        if (searchInput) {
+                            searchInput.value = '';
+                        }
+                    } else {
+                        // Limpiar visualmente el filtro activo anterior antes de establecer uno nuevo
+                        indicators.forEach(c => c.classList.remove('active-filter'));
+                        state.ui.activeDayFilter = dayFilter;
+                        card.classList.add('active-filter');
+                    }
+
+                    // Re-renderizar la tabla principal con el filtro (o sin él)
+                    sortAndRenderTable(DOM.callLogTableBody, state.calls, false);
+                });
+            });
+        }
+
         // =============================================
         // MÓDULO: Migración de datos
         // =============================================
@@ -3927,9 +4044,11 @@
             setupTabs();
             setupColumnFilters('main-table-header', () => state.calls, renderTable, 'main');
             setupColumnFilters('historical-table-header', () => state.historicalCalls, renderTable, 'historical');
+
             setupFiltering('filter-input-main', () => state.calls, renderTable, false);
             setupFiltering('filter-input-historical', () => state.historicalCalls, renderTable, true);
             setupAutofill();
+            setupWeekdayDashboardFilter();
             
             // Listener para el dashboard de la pestaña de histórico
             DOM.dashboardDataSourceHistorico.addEventListener('change', updateAllDashboards);
@@ -3937,7 +4056,6 @@
             // Establecer "Histórico" como valor predeterminado en fuente de datos
             DOM.reportesDataSource.addEventListener('change', updateCharts);
             DOM.reportesDataSource.value = 'historico'; 
-
 
             DOM.dynamicChartVariable.addEventListener('change', updateDynamicChart);
 
