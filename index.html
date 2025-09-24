@@ -69,15 +69,16 @@
 
         /* Estilos para los indicadores de día de la semana */
         .indicator-card.active-filter {
-            /* Contorno más grueso y sombra más pronunciada */
-            box-shadow: 0 0 0 3px var(--primary-color), 0 6px 12px -2px rgba(0, 0, 0, 0.15), 0 3px 7px -3px rgba(0, 0, 0, 0.1);
+            /* Estilo homologado con la app de licitaciones */
+            box-shadow: 0 0 0 2px var(--primary-color), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transform: translateY(-2px);
         }
 
         .indicator-card.current-day-highlight {
-            /* Subrayado más grueso y un fondo sutil para diferenciarlo */
-            border-bottom: 4px solid var(--primary-color);
-            background-color: #fdfbf5; /* Un tono muy claro de amarillo/dorado */
+            /* Estilo homologado con la app de licitaciones */
+            border-bottom: 3px solid var(--primary-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            background-color: #fcfdff;
         }
 
         .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
@@ -695,28 +696,28 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         <!-- Lunes -->
                         <div data-day="1" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Lunes">
-                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
-                            <div><p class="text-sm text-slate-500">Lunes</p><p id="calls-lunes-count" class="text-2xl font-bold text-primary">0</p></div>
+                            <div class="bg-blue-100 p-2 rounded-full"><i data-default-icon="fa-headset" class="fa-solid fa-headset text-blue-500 text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Lunes</p><p id="calls-lunes-count" class="text-2xl font-bold text-blue-600">0</p></div>
                         </div>
                         <!-- Martes -->
                         <div data-day="2" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Martes">
-                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
-                            <div><p class="text-sm text-slate-500">Martes</p><p id="calls-martes-count" class="text-2xl font-bold text-primary">0</p></div>
+                            <div class="bg-indigo-100 p-2 rounded-full"><i data-default-icon="fa-users-gear" class="fa-solid fa-users-gear text-indigo-500 text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Martes</p><p id="calls-martes-count" class="text-2xl font-bold text-indigo-600">0</p></div>
                         </div>
                         <!-- Miércoles -->
                         <div data-day="3" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Miércoles">
-                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
-                            <div><p class="text-sm text-slate-500">Miércoles</p><p id="calls-miercoles-count" class="text-2xl font-bold text-primary">0</p></div>
+                            <div class="bg-purple-100 p-2 rounded-full"><i data-default-icon="fa-comments" class="fa-solid fa-comments text-purple-500 text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Miércoles</p><p id="calls-miercoles-count" class="text-2xl font-bold text-purple-600">0</p></div>
                         </div>
                         <!-- Jueves -->
                         <div data-day="4" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Jueves">
-                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
-                            <div><p class="text-sm text-slate-500">Jueves</p><p id="calls-jueves-count" class="text-2xl font-bold text-primary">0</p></div>
+                            <div class="bg-pink-100 p-2 rounded-full"><i data-default-icon="fa-chart-line" class="fa-solid fa-chart-line text-pink-500 text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Jueves</p><p id="calls-jueves-count" class="text-2xl font-bold text-pink-600">0</p></div>
                         </div>
                         <!-- Viernes -->
                         <div data-day="5" class="indicator-card bg-white p-4 rounded-xl shadow-md flex items-center space-x-3 cursor-pointer transition-all duration-200" title="Hacer clic para filtrar por Viernes">
-                            <div class="bg-primary/10 p-2 rounded-full"><i class="fa-solid fa-calendar-day text-primary text-xl"></i></div>
-                            <div><p class="text-sm text-slate-500">Viernes</p><p id="calls-viernes-count" class="text-2xl font-bold text-primary">0</p></div>
+                            <div class="bg-green-100 p-2 rounded-full"><i data-default-icon="fa-phone-volume" class="fa-solid fa-phone-volume text-green-500 text-xl"></i></div>
+                            <div><p class="text-sm text-slate-500">Viernes</p><p id="calls-viernes-count" class="text-2xl font-bold text-green-600">0</p></div>
                         </div>
                     </div>
                 </section>
@@ -2051,10 +2052,23 @@
 
             // Resaltar el día actual
             const today = new Date().getDay(); // 0=Dom, 1=Lun, ...
+            const iconColors = { 1: 'text-blue-500', 2: 'text-indigo-500', 3: 'text-purple-500', 4: 'text-pink-500', 5: 'text-green-500' };
+
             document.querySelectorAll('#dashboard .indicator-card').forEach(card => {
+                const day = parseInt(card.dataset.day);
+                const iconElement = card.querySelector('i');
+                const defaultIcon = iconElement.dataset.defaultIcon;
+
+                // 1. Restablecer el estilo y el icono por defecto
                 card.classList.remove('current-day-highlight');
-                if (parseInt(card.dataset.day) === today) {
+                iconElement.className = `fa-solid ${defaultIcon} ${iconColors[day]} text-xl`;
+
+                // 2. Aplicar el estilo especial para el día actual
+                if (day === today) {
                     card.classList.add('current-day-highlight');
+                    // Cambiar el icono y el color para el día actual
+                    iconElement.classList.remove(iconColors[day]);
+                    iconElement.classList.add('fa-calendar-star', 'text-primary');
                 }
             });
         }
