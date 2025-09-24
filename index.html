@@ -589,6 +589,12 @@
         #quick-view-tooltip strong { color: #A6802D; } /* text-secondary */
         #quick-view-tooltip p { margin-bottom: 0.25rem; }
 
+        /* Estilo para resaltar el texto de búsqueda */
+        .highlight {
+            background-color: #fef9c3; /* Tailwind yellow-100 */
+            border-radius: 2px;
+        }
+
     </style>
     
     <!-- Configuración de Tailwind con nueva paleta de colores -->
@@ -754,15 +760,30 @@
                         <h2 class="text-xl font-bold text-primary">Registro Histórico</h2>
                         <div class="flex items-center space-x-2">
                             <div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div>
-                            <button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button>
+                            <button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar</span></button>
                             <label for="historical-file-input" class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-upload"></i><span>Subir Excel</span><input type="file" id="historical-file-input" class="hidden" accept=".xlsx, .xls"></label>
                             <button id="import-historical-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out hidden items-center space-x-2 whitespace-nowrap" disabled><i class="fa-solid fa-database"></i><span>Subir Excel</span></button>
+                            <button id="start-reverse-migration-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Migrar a Registro</span>
+                            </button>
+                            <button id="confirm-reverse-migration-btn" class="hidden bg-success hover:bg-success-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" disabled>
+                                <i class="fa-solid fa-check"></i>
+                                <span>Confirmar</span>
+                            </button>
+                            <button id="cancel-reverse-migration-btn" class="hidden bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                                <i class="fa-solid fa-times"></i>
+                                <span>Cancelar</span>
+                            </button>
                         </div>
                     </div>
                     <div id="historical-table-container" class="bg-white rounded-xl shadow-md table-container">
                         <table class="w-full text-sm text-left text-slate-500">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-100">
                                 <tr id="historical-table-header">
+                                    <th scope="col" class="py-3 px-6 reverse-migration-select-col hidden">
+                                        <input type="checkbox" id="select-all-historical-calls-checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                    </th>
                                     <th scope="col" class="py-3 px-6">No.</th>
                                     <th scope="col" class="py-3 px-6 filterable-header" data-filter-by="fecha">Fecha <span class="filter-icon"><i class="fa-solid fa-filter ml-1"></i></span></th>
                                     <th scope="col" class="py-3 px-6 filterable-header" data-filter-by="inicio">Inicio <span class="filter-icon"><i class="fa-solid fa-filter ml-1"></i></span></th>
@@ -1399,6 +1420,11 @@
         const cancelMigrationBtn = document.getElementById('cancel-migration-btn');
         const selectAllCallsCheckbox = document.getElementById('select-all-calls-checkbox');
         const migrateModal = document.getElementById('migrate-modal');
+        // Nuevos elementos para migración inversa
+        const startReverseMigrationBtn = document.getElementById('start-reverse-migration-btn');
+        const confirmReverseMigrationBtn = document.getElementById('confirm-reverse-migration-btn');
+        const cancelReverseMigrationBtn = document.getElementById('cancel-reverse-migration-btn');
+        const selectAllHistoricalCallsCheckbox = document.getElementById('select-all-historical-calls-checkbox');
         const cancelMigrateBtn = document.getElementById('cancel-migrate-btn');
         const confirmMigrateBtn = document.getElementById('confirm-migrate-btn');
         const viewDetailsModal = document.getElementById('view-details-modal');
@@ -1439,6 +1465,9 @@
 
         let isMigrationModeActive = false;
         let selectedCallIdsToMigrate = new Set();
+        
+        let isReverseMigrationModeActive = false;
+        let selectedHistoricalCallIdsToMigrate = new Set();
 
         // =============================================
         // MÓDULO: Gestión de Modales (con contador para anidamiento)
@@ -1569,6 +1598,16 @@
             });
         }
 
+        //Función para resaltar texto
+        function highlightText(text, searchTerm) {
+            if (!searchTerm || typeof text !== 'string') {
+                return text;
+            }
+            // Escapar caracteres especiales en el término de búsqueda para la expresión regular
+            const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+            return text.replace(regex, `<span class="highlight">$1</span>`);
+        }
         //Renderizar tablas
         function renderTable(tableBody, data, isHistorical = false) {
             const noDataMessage = isHistorical ? noHistoricalMessage : noCallsMessage;
@@ -1576,6 +1615,10 @@
             noDataMessage.classList.toggle('hidden', data.length > 0);
 
             const headers = ['no', 'fecha', 'inicio', 'fin', 'duracion', 'area', 'institucion', 'asunto', 'consulta', 'nombre', 'cargo', 'correo', 'telefono', 'estatus', 'atendio', 'comentarios'];
+
+            const filterKey = isHistorical ? 'historical' : 'main';
+            const searchInput = document.getElementById(`filter-input-${filterKey}`);
+            const searchText = searchInput ? searchInput.value.trim() : '';
 
             // Función para truncar texto, inspirada en la app de trenes
             function truncateText(text, maxLength = 30) {
@@ -1608,17 +1651,26 @@
                         // Aplicar truncamiento a columnas con texto potencialmente largo
                         const longTextFields = ['institucion', 'asunto', 'consulta', 'nombre', 'cargo', 'correo', 'comentarios'];
                         if (longTextFields.includes(header)) {
-                            content = truncateText(call[header] || 'N/A');
+                            content = truncateText(call[header] || 'N/A', 30);
                         } else {
                             content = call[header] || 'N/A';
                         }
                     }
-                    
+
+                    const finalContent = (header !== 'estatus' && searchText) ? highlightText(String(content), searchText) : content;
                     // Añadir 'whitespace-nowrap' para evitar que el texto se divida en varias líneas
                     // y mantener la altura de la fila consistente.
-                    return `<td class="py-4 px-6 whitespace-nowrap">${content}</td>`;
+                    return `<td class="py-4 px-6 whitespace-nowrap">${finalContent}</td>`;
 
                 }).join('');
+
+                // --- INICIO: Lógica para añadir el checkbox de migración inversa ---
+                let reverseMigrationCell = '';
+                if (isHistorical && isReverseMigrationModeActive) {
+                    const isSelected = selectedHistoricalCallIdsToMigrate.has(call.id);
+                    reverseMigrationCell = `<td class="py-4 px-6 whitespace-nowrap"><input type="checkbox" class="historical-call-migration-checkbox rounded border-gray-300 text-primary focus:ring-primary" data-id="${call.id}" ${isSelected ? 'checked' : ''}></td>`;
+                }
+                // --- FIN: Lógica para añadir el checkbox de migración inversa ---
 
                 // --- INICIO: Lógica para añadir el checkbox de migración al principio de la fila ---
                 let migrationCell = '';
@@ -1634,7 +1686,7 @@
                         <button data-id="${call.id}" data-is-historical="${isHistorical}" class="delete-btn text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-alt"></i></button>
                     </td>`;
 
-                row.innerHTML = migrationCell + cells + actionsCell;
+                row.innerHTML = migrationCell + reverseMigrationCell + cells + actionsCell;
                 tableBody.appendChild(row);
             });
         }
@@ -3742,6 +3794,69 @@
             sortAndRenderTable(callLogTableBody, calls, false);
         }
 
+        // =============================================
+        // MÓDULO: Migración Inversa (Histórico -> Registro)
+        // =============================================
+
+        function toggleReverseMigrationMode(activate) {
+            isReverseMigrationModeActive = activate;
+            selectedHistoricalCallIdsToMigrate.clear();
+
+            // Alternar visibilidad de botones
+            startReverseMigrationBtn.classList.toggle('hidden', activate);
+            confirmReverseMigrationBtn.classList.toggle('hidden', !activate);
+            cancelReverseMigrationBtn.classList.toggle('hidden', !activate);
+            confirmReverseMigrationBtn.disabled = true;
+
+            // Alternar visibilidad de la columna de checkboxes en el histórico
+            document.querySelectorAll('.reverse-migration-select-col').forEach(col => {
+                col.classList.toggle('hidden', !activate);
+            });
+
+            // Limpiar estado del checkbox "seleccionar todo"
+            selectAllHistoricalCallsCheckbox.checked = false;
+
+            // Re-renderizar la tabla del histórico para mostrar/ocultar los checkboxes
+            sortAndRenderTable(historicalTableBody, historicalCalls, true);
+        }
+
+        async function migrateSelectedCallsToRegistry() {
+            try {
+                if (selectedHistoricalCallIdsToMigrate.size === 0) {
+                    showAlert("No hay llamadas seleccionadas para migrar.", "warning");
+                    return;
+                }
+
+                showLoader(true);
+
+                const batch = writeBatch(db);
+                const callsToMigrate = historicalCalls.filter(call => selectedHistoricalCallIdsToMigrate.has(call.id));
+
+                callsToMigrate.forEach(call => {
+                    const newCallDocRef = doc(callsCollectionRef); // Nuevo documento en 'calls'
+                    const { id, migratedAt, originalId, ...callData } = call; // Excluir campos de migración
+                    
+                    batch.set(newCallDocRef, {
+                        ...callData,
+                        createdAt: serverTimestamp(), // Nueva fecha de creación en el registro
+                        updatedAt: serverTimestamp()
+                    });
+
+                    const historicalDocRef = doc(historicalCallsCollectionRef, call.id);
+                    batch.delete(historicalDocRef); // Eliminar del histórico
+                });
+
+                await batch.commit();
+
+                showAlert(`Se migraron ${callsToMigrate.length} llamadas al registro principal.`, "success");
+            } catch (error) {
+                console.error("Error al migrar llamadas al registro:", error);
+                showAlert(`Error en la migración inversa: ${error.message}`, "error");
+            } finally {
+                showLoader(false);
+                toggleReverseMigrationMode(false); // Salir del modo migración
+            }
+        }
 
         // =============================================
         // MÓDULO: Configuración de eventos 
@@ -3892,12 +4007,28 @@
             });
 
             // Estatus tabla de histórico
-            historicalTableBody.addEventListener('click', e => {
-                const target = e.target.closest('button');
-                if (!target) return;
-                if (target.classList.contains('edit-btn')) handleEditClick({ currentTarget: target });
-                if (target.classList.contains('delete-btn')) handleDeleteClick({ currentTarget: target });
-                if (target.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: target });
+            historicalTableBody.addEventListener('click', (e) => {
+                const buttonTarget = e.target.closest('button');
+                if (buttonTarget) {
+                    if (buttonTarget.classList.contains('edit-btn')) handleEditClick({ currentTarget: buttonTarget });
+                    if (buttonTarget.classList.contains('delete-btn')) handleDeleteClick({ currentTarget: buttonTarget });
+                    if (buttonTarget.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: buttonTarget });
+                    return;
+                }
+
+                // Lógica para seleccionar fila en modo de migración inversa
+                if (isReverseMigrationModeActive) {
+                    const row = e.target.closest('tr');
+                    if (!row) return;
+
+                    const checkbox = row.querySelector('.historical-call-migration-checkbox');
+                    if (checkbox) {
+                        if (e.target === checkbox) return;
+
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
             });
 
             // Cancelar Eliminar llamada de historico
@@ -4148,6 +4279,48 @@
                 confirmMigrationBtn.disabled = selectedCallIdsToMigrate.size === 0;
             });
 
+            // --- INICIO: Lógica para Migración Inversa ---
+
+            // Iniciar modo migración inversa
+            startReverseMigrationBtn.addEventListener('click', () => {
+                toggleReverseMigrationMode(true);
+            });
+
+            // Cancelar modo migración inversa
+            cancelReverseMigrationBtn.addEventListener('click', () => {
+                toggleReverseMigrationMode(false);
+            });
+
+            // Confirmar migración inversa
+            confirmReverseMigrationBtn.addEventListener('click', () => {
+                if (selectedHistoricalCallIdsToMigrate.size === 0) return;
+                requirePassword(async () => {
+                    await migrateSelectedCallsToRegistry();
+                });
+            });
+
+            // Lógica para seleccionar/deseleccionar llamadas del histórico
+            historicalTableBody.addEventListener('change', e => {
+                if (e.target.classList.contains('historical-call-migration-checkbox')) {
+                    const callId = e.target.dataset.id;
+                    e.target.checked ? selectedHistoricalCallIdsToMigrate.add(callId) : selectedHistoricalCallIdsToMigrate.delete(callId);
+                    confirmReverseMigrationBtn.disabled = selectedHistoricalCallIdsToMigrate.size === 0;
+                    selectAllHistoricalCallsCheckbox.checked = selectedHistoricalCallIdsToMigrate.size === historicalCalls.length && historicalCalls.length > 0;
+                }
+            });
+
+            // Lógica para "Seleccionar Todo" en el histórico
+            selectAllHistoricalCallsCheckbox.addEventListener('change', e => {
+                const isChecked = e.target.checked;
+                document.querySelectorAll('.historical-call-migration-checkbox').forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                    const callId = checkbox.dataset.id;
+                    isChecked ? selectedHistoricalCallIdsToMigrate.add(callId) : selectedHistoricalCallIdsToMigrate.delete(callId);
+                });
+                confirmReverseMigrationBtn.disabled = selectedHistoricalCallIdsToMigrate.size === 0;
+            });
+
+            // --- FIN: Lógica para Migración Inversa ---
 
             // =============================================
             // MÓDULO: Visualización de Detalles (Doble Clic)
@@ -4283,7 +4456,7 @@
 
         // =============================================
         // MÓDULO: Inicialización
-        // =============================================
+        // ============================================= 
 
         function initialize() {
             document.addEventListener('DOMContentLoaded', () => {
@@ -4313,4 +4486,4 @@
 
     </script>
 </body> 
-</html>  
+</html> 
