@@ -582,6 +582,12 @@
             transition: opacity 0.2s ease-in-out;
             opacity: 0;
         }
+        /* Estilo para el título de horarios editable */
+        .editable-header {
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .editable-header:hover { color: #A6802D; } /* Color primario al pasar el ratón */
         #quick-view-tooltip.visible {
             display: block;
             opacity: 1;
@@ -908,7 +914,7 @@
     </div>
     
     <!----------------- MODAL NUEVA LLAMADA ---------------->
-    <div id="call-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center wide-modal">
+    <div id="call-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center wide-modal">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-6xl mx-4">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
             <div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold text-primary">Detalles de la Llamada</h3><div class="text-right"><p class="text-sm font-medium text-slate-500">TIEMPO DE LLAMADA ACTUAL</p><p id="modal-timer" class="text-2xl font-bold text-primary tracking-wider">00:00:00</p></div></div>
@@ -1006,7 +1012,7 @@
     </div>
 
     <!----------------- MODAL EDITAR LLAMADA ---------------->
-    <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center wide-modal">
+    <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center wide-modal">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-6xl mx-4">
             <button id="close-edit-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
             <h3 class="text-2xl font-bold text-primary mb-6">Editar Llamada</h3>
@@ -1106,17 +1112,17 @@
 
 
     <!----------------- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE LLAMADA ---------------->
-    <div id="confirm-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center"><h3 class="text-xl font-bold text-slate-800 mb-4">Confirmar Eliminación</h3><p class="text-slate-600 mb-6">¿Estás seguro de que deseas eliminar este registro?</p><div class="flex justify-center space-x-4"><button id="cancel-delete-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancelar</button><button id="confirm-delete-btn" class="bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg">Eliminar</button></div></div>
     </div>
     
     <!----------------- MODAL DE CONFIRMACIÓN DE REEMPLAZAR HISTÓRICO ---------------->
-    <div id="replace-historical-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="replace-historical-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center"><h3 class="text-xl font-bold text-primary mb-4">Reemplazar Histórico</h3><p class="text-slate-600 mb-6">¿Desea reemplazar el histórico actual?</p><div class="flex justify-center space-x-4"><button id="cancel-replace-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">No</button><button id="confirm-replace-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Sí</button></div></div>
     </div>
     
     <!----------------- MODAL DE CONFIRMACIÓN DE EDITAR OPCIÓN DE LISTA ---------------->
-    <div id="edit-option-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="edit-option-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center">
             <h3 class="text-xl font-bold text-primary mb-4">Editar Opción</h3>
             <input type="text" id="edit-option-input" placeholder="Edite la opción" class="w-full p-2 border border-gray-300 rounded-md mb-4">
@@ -1128,7 +1134,7 @@
     </div>
 
     <!----------------- MODAL DE CONFIRMACIÓN DE CONTRASEÑA  ---------------->
-    <div id="password-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="password-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center">
             <h3 class="text-xl font-bold text-primary mb-4">Verificación de Seguridad</h3>
             <p class="text-slate-600 mb-4">Esta acción requiere autenticación. Por favor, ingrese la contraseña.</p>
@@ -1141,7 +1147,7 @@
     </div>
 
     <!----------------- MODAL DE GENERACIÓN DE REPORTE EJECUTIVO  ---------------->
-    <div id="report-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="report-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl mx-4">
             <button id="close-report-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
             <h3 class="text-2xl font-bold text-primary mb-6">Generar Reporte Ejecutivo</h3>
@@ -1187,7 +1193,7 @@
     </div>
 
     <!----------------- MODAL DE CONFIGURACIÓN DEL REPORTE EJECUTIVO  ---------------->
-    <div id="config-report-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="config-report-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl mx-4">
             <button id="close-config-report-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
             
@@ -1242,7 +1248,7 @@
     </div>
 
     <!----------------- MODAL DE CONFIRMACIÓN DE MIGRACIÓN DE LLAMADAS (DE HISTORIAL A HISTÓRICO)  ---------------->
-    <div id="migrate-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div id="migrate-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center">
             <h3 class="text-xl font-bold text-primary mb-4">Migrar Llamadas</h3>
             <p class="text-slate-600 mb-6">¿Está seguro de que desea migrar todas las llamadas de Registro y Control al Histórico? Esta acción no se puede deshacer.</p>
@@ -1255,7 +1261,7 @@
 
 
     <!----------------- MODAL VER DETALLES DE LLAMADA ---------------->
-    <div id="view-details-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center wide-modal">
+    <div id="view-details-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center wide-modal">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl mx-4">
             <button id="close-details-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
                 <i class="fa-solid fa-times-circle fa-lg"></i>
@@ -1269,6 +1275,26 @@
                     <!-- El contenido se generará dinámicamente -->
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!----------------- MODAL EDITAR HORARIOS ---------------->
+    <div id="edit-timestamps-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+        <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4">
+            <button id="close-timestamps-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
+            <h3 class="text-2xl font-bold text-primary mb-6">Editar Horarios de la Llamada</h3>
+            <form id="edit-timestamps-form" class="space-y-4">
+                <input type="hidden" id="timestamps-call-id">
+                <input type="hidden" id="timestamps-is-historical">
+                <div><label for="timestamps-date" class="block text-sm font-medium text-gray-700">Fecha</label><input type="date" id="timestamps-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2" required></div>
+                <div><label for="timestamps-start-time" class="block text-sm font-medium text-gray-700">Hora de Inicio</label><input type="time" id="timestamps-start-time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2" step="1" required></div>
+                <div><label for="timestamps-end-time" class="block text-sm font-medium text-gray-700">Hora de Fin</label><input type="time" id="timestamps-end-time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2" step="1" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Duración Calculada</label><p id="timestamps-duration" class="mt-1 text-lg font-mono p-2 bg-gray-100 rounded-md">00:00:00</p></div>
+                <div class="flex items-center justify-end pt-4 space-x-4">
+                    <button type="button" id="cancel-timestamps-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancelar</button>
+                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1303,51 +1329,106 @@
         // =============================================
         // MÓDULO: Variables globales y estado de la aplicación
         // =============================================
-        let timerInterval;
-        let callStartTime;
-        let calls = [];
-        let historicalCalls = [];
-        let userId;
-        
         const callsCollectionRef = collection(db, "calls");
         const historicalCallsCollectionRef = collection(db, "historicalCalls");
         
-        // Elementos del DOM
-        const loader = document.getElementById('loader');
-        const appContainer = document.getElementById('app');
-        const userInfo = document.getElementById('user-info');
-        const tabsContainer = document.getElementById('tabs');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        // Elementos Dashboard Registro
-        const totalCallsElem = document.getElementById('total-calls');
-        const avgDurationElem = document.getElementById('avg-duration');
-        const salientesCountElem = document.getElementById('salientes-count');
-        const entrantesCountElem = document.getElementById('entrantes-count');
-
-        // Elementos Dashboard Histórico
-        const dashboardDataSourceHistorico = document.getElementById('dashboard-data-source-historico');
-        const totalCallsElemHistorico = document.getElementById('total-calls-historico');
-        const avgDurationElemHistorico = document.getElementById('avg-duration-historico');
-        const salientesCountElemHistorico = document.getElementById('salientes-count-historico');
-        const entrantesCountElemHistorico = document.getElementById('entrantes-count-historico');
-
-        const timerElem = document.getElementById('timer');
-        const startCallBtn = document.getElementById('start-call-btn');
-        const downloadExcelBtn = document.getElementById('download-excel-btn');
-        const callLogTableBody = document.getElementById('calls-table-body');
-        const noCallsMessage = document.getElementById('no-calls-message');
-        const historicalTableBody = document.getElementById('historical-table-body');
-        const noHistoricalMessage = document.getElementById('no-historical-message');
-        const historicalFileInput = document.getElementById('historical-file-input');
-        const importHistoricalBtn = document.getElementById('import-historical-btn');
-        const reportesDataSource = document.getElementById('reportes-data-source');
-        const statusChartCanvas = document.getElementById('statusChart');
-        const asuntoChartCanvas = document.getElementById('asuntoChart');
-        const dayOfWeekChartCanvas = document.getElementById('dayOfWeekChart');
-        const atendioChartCanvas = document.getElementById('atendioChart');
-        const dynamicChartCanvas = document.getElementById('dynamicChart');
-        const dynamicChartVariable = document.getElementById('dynamic-chart-variable');
+        // Centralized DOM Elements
+        const DOM = {
+            loader: document.getElementById('loader'),
+            appContainer: document.getElementById('app'),
+            userInfo: document.getElementById('user-info'),
+            tabsContainer: document.getElementById('tabs'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            totalCallsElem: document.getElementById('total-calls'),
+            avgDurationElem: document.getElementById('avg-duration'),
+            salientesCountElem: document.getElementById('salientes-count'),
+            entrantesCountElem: document.getElementById('entrantes-count'),
+            dashboardDataSourceHistorico: document.getElementById('dashboard-data-source-historico'),
+            totalCallsElemHistorico: document.getElementById('total-calls-historico'),
+            avgDurationElemHistorico: document.getElementById('avg-duration-historico'),
+            salientesCountElemHistorico: document.getElementById('salientes-count-historico'),
+            entrantesCountElemHistorico: document.getElementById('entrantes-count-historico'),
+            startCallBtn: document.getElementById('start-call-btn'),
+            downloadExcelBtn: document.getElementById('download-excel-btn'),
+            callLogTableBody: document.getElementById('calls-table-body'),
+            noCallsMessage: document.getElementById('no-calls-message'),
+            historicalTableBody: document.getElementById('historical-table-body'),
+            noHistoricalMessage: document.getElementById('no-historical-message'),
+            historicalFileInput: document.getElementById('historical-file-input'),
+            importHistoricalBtn: document.getElementById('import-historical-btn'),
+            reportesDataSource: document.getElementById('reportes-data-source'),
+            statusChartCanvas: document.getElementById('statusChart'),
+            asuntoChartCanvas: document.getElementById('asuntoChart'),
+            dayOfWeekChartCanvas: document.getElementById('dayOfWeekChart'),
+            atendioChartCanvas: document.getElementById('atendioChart'),
+            dynamicChartCanvas: document.getElementById('dynamicChart'),
+            dynamicChartVariable: document.getElementById('dynamic-chart-variable'),
+            dynamicTableBody: document.getElementById('dynamic-table-body'),
+            dynamicTableHeader: document.getElementById('dynamic-table-header'),
+            callModal: document.getElementById('call-modal'),
+            callForm: document.getElementById('call-form'),
+            closeModalBtn: document.getElementById('close-modal-btn'),
+            editModal: document.getElementById('edit-modal'),
+            editForm: document.getElementById('edit-form'),
+            modalTimerElem: document.getElementById('modal-timer'),
+            closeEditModalBtn: document.getElementById('close-edit-modal-btn'),
+            confirmModal: document.getElementById('confirm-modal'),
+            cancelDeleteBtn: document.getElementById('cancel-delete-btn'),
+            confirmDeleteBtn: document.getElementById('confirm-delete-btn'),
+            pivotTableContainer: document.getElementById('pivot-table'),
+            replaceHistoricalModal: document.getElementById('replace-historical-modal'),
+            cancelReplaceBtn: document.getElementById('cancel-replace-btn'),
+            confirmReplaceBtn: document.getElementById('confirm-replace-btn'),
+            editOptionModal: document.getElementById('edit-option-modal'),
+            editOptionInput: document.getElementById('edit-option-input'),
+            cancelEditOptionBtn: document.getElementById('cancel-edit-option-btn'),
+            confirmEditOptionBtn: document.getElementById('confirm-edit-option-btn'),
+            passwordModal: document.getElementById('password-modal'),
+            passwordInput: document.getElementById('password-input'),
+            cancelPasswordBtn: document.getElementById('cancel-password-btn'),
+            confirmPasswordBtn: document.getElementById('confirm-password-btn'),
+            generateReportBtn: document.getElementById('generate-report-btn'),
+            configReportBtn: document.getElementById('config-report-btn'),
+            reportModal: document.getElementById('report-modal'),
+            closeReportModalBtn: document.getElementById('close-report-modal-btn'),
+            reportForm: document.getElementById('report-form'),
+            generatePdfBtn: document.getElementById('generate-pdf-btn'),
+            configReportModal: document.getElementById('config-report-modal'),
+            closeConfigReportModalBtn: document.getElementById('close-config-report-modal-btn'),
+            configReportForm: document.getElementById('config-report-form'),
+            saveConfigReportBtn: document.getElementById('save-config-report-btn'),
+            filterAllDataRadio: document.getElementById('filter-all-data'),
+            filterByPeriodRadio: document.getElementById('filter-by-period'),
+            configReportStartDate: document.getElementById('config-report-start-date'),
+            configReportEndDate: document.getElementById('config-report-end-date'),
+            reportPreview: document.getElementById('report-preview'),
+            chartSizeSlider: document.getElementById('chart-size-slider'),
+            chartSizeValue: document.getElementById('chart-size-value'),
+            startMigrationBtn: document.getElementById('start-migration-btn'),
+            confirmMigrationBtn: document.getElementById('confirm-migration-btn'),
+            cancelMigrationBtn: document.getElementById('cancel-migration-btn'),
+            selectAllCallsCheckbox: document.getElementById('select-all-calls-checkbox'),
+            migrateModal: document.getElementById('migrate-modal'),
+            startReverseMigrationBtn: document.getElementById('start-reverse-migration-btn'),
+            confirmReverseMigrationBtn: document.getElementById('confirm-reverse-migration-btn'),
+            cancelReverseMigrationBtn: document.getElementById('cancel-reverse-migration-btn'),
+            selectAllHistoricalCallsCheckbox: document.getElementById('select-all-historical-calls-checkbox'),
+            cancelMigrateBtn: document.getElementById('cancel-migrate-btn'),
+            confirmMigrateBtn: document.getElementById('confirm-migrate-btn'),
+            viewDetailsModal: document.getElementById('view-details-modal'),
+            closeDetailsModalBtn: document.getElementById('close-details-modal-btn'),
+            includeDynamicChartCheckbox: document.getElementById('include-dynamic-chart'),
+            includeDynamicTableCheckbox: document.getElementById('include-dynamic-table'),
+            editTimestampsModal: document.getElementById('edit-timestamps-modal'),
+            editTimestampsForm: document.getElementById('edit-timestamps-form'),
+            closeTimestampsModalBtn: document.getElementById('close-timestamps-modal-btn'),
+            cancelTimestampsBtn: document.getElementById('cancel-timestamps-btn'),
+            timestampsDateInput: document.getElementById('timestamps-date'),
+            timestampsStartTimeInput: document.getElementById('timestamps-start-time'),
+            timestampsEndTimeInput: document.getElementById('timestamps-end-time'),
+            timestampsDurationElem: document.getElementById('timestamps-duration'),
+            quickViewTooltip: document.getElementById('quick-view-tooltip'),
+        };
         
         //Alternar visualización de etiquetas Reporte dinámico
         const toggleLabelsBtn = document.createElement('button');
@@ -1357,133 +1438,72 @@
         toggleLabelsBtn.title = 'Alternar visualización de etiquetas';
 
         // Insertar el botón después del select
-        dynamicChartVariable.parentNode.insertBefore(toggleLabelsBtn, dynamicChartVariable.nextSibling);
-
-        // Variable para controlar el estado de las etiquetas
-        let showChartLabels = true;
+        DOM.dynamicChartVariable.parentNode.insertBefore(toggleLabelsBtn, DOM.dynamicChartVariable.nextSibling);
 
         // Event listener para el botón
         toggleLabelsBtn.addEventListener('click', () => {
-            showChartLabels = !showChartLabels;
-            toggleLabelsBtn.classList.toggle('bg-primary', showChartLabels);
-            toggleLabelsBtn.classList.toggle('text-white', showChartLabels);
+            state.ui.showChartLabels = !state.ui.showChartLabels;
+            toggleLabelsBtn.classList.toggle('bg-primary', state.ui.showChartLabels);
+            toggleLabelsBtn.classList.toggle('text-white', state.ui.showChartLabels);
             updateDynamicChart();
         });
 
 
-        const dynamicTableBody = document.getElementById('dynamic-table-body');
-        const dynamicTableHeader = document.getElementById('dynamic-table-header');
-        let statusChart, asuntoChart, dayOfWeekChart, atendioChart, dynamicChart;
-        const callModal = document.getElementById('call-modal');
-        const callForm = document.getElementById('call-form');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const editModal = document.getElementById('edit-modal');
-        const editForm = document.getElementById('edit-form');
-        const modalTimerElem = document.getElementById('modal-timer');
-        const closeEditModalBtn = document.getElementById('close-edit-modal-btn');
-        const confirmModal = document.getElementById('confirm-modal');
-        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        const pivotTableContainer = document.getElementById('pivot-table');
-        const replaceHistoricalModal = document.getElementById('replace-historical-modal');
-        const cancelReplaceBtn = document.getElementById('cancel-replace-btn');
-        const confirmReplaceBtn = document.getElementById('confirm-replace-btn');
-        
-        const editOptionModal = document.getElementById('edit-option-modal');
-        const editOptionInput = document.getElementById('edit-option-input');
-        const cancelEditOptionBtn = document.getElementById('cancel-edit-option-btn');
-        const confirmEditOptionBtn = document.getElementById('confirm-edit-option-btn');
-        const passwordModal = document.getElementById('password-modal');
-        const passwordInput = document.getElementById('password-input');
-        const cancelPasswordBtn = document.getElementById('cancel-password-btn');
-        const confirmPasswordBtn = document.getElementById('confirm-password-btn');
-        const generateReportBtn = document.getElementById('generate-report-btn');
-        const configReportBtn = document.getElementById('config-report-btn');
-        const reportModal = document.getElementById('report-modal');
-        const closeReportModalBtn = document.getElementById('close-report-modal-btn');
-        const reportForm = document.getElementById('report-form');
-        const generatePdfBtn = document.getElementById('generate-pdf-btn');
-        const configReportModal = document.getElementById('config-report-modal');
-        const closeConfigReportModalBtn = document.getElementById('close-config-report-modal-btn');
-        const configReportForm = document.getElementById('config-report-form');
-        const saveConfigReportBtn = document.getElementById('save-config-report-btn');
-        const filterAllDataRadio = document.getElementById('filter-all-data');
-        const filterByPeriodRadio = document.getElementById('filter-by-period');
-        const configReportStartDate = document.getElementById('config-report-start-date');
-        const configReportEndDate = document.getElementById('config-report-end-date');
-        const reportPreview = document.getElementById('report-preview');
-        const chartSizeSlider = document.getElementById('chart-size-slider');
-        const chartSizeValue = document.getElementById('chart-size-value');
-        const migrateCallsBtn = document.getElementById('migrate-calls-btn');
-        const startMigrationBtn = document.getElementById('start-migration-btn');
-        const confirmMigrationBtn = document.getElementById('confirm-migration-btn');
-        const cancelMigrationBtn = document.getElementById('cancel-migration-btn');
-        const selectAllCallsCheckbox = document.getElementById('select-all-calls-checkbox');
-        const migrateModal = document.getElementById('migrate-modal');
-        // Nuevos elementos para migración inversa
-        const startReverseMigrationBtn = document.getElementById('start-reverse-migration-btn');
-        const confirmReverseMigrationBtn = document.getElementById('confirm-reverse-migration-btn');
-        const cancelReverseMigrationBtn = document.getElementById('cancel-reverse-migration-btn');
-        const selectAllHistoricalCallsCheckbox = document.getElementById('select-all-historical-calls-checkbox');
-        const cancelMigrateBtn = document.getElementById('cancel-migrate-btn');
-        const confirmMigrateBtn = document.getElementById('confirm-migrate-btn');
-        const viewDetailsModal = document.getElementById('view-details-modal');
-        const closeDetailsModalBtn = document.getElementById('close-details-modal-btn');
-        const includeDynamicChartCheckbox = document.getElementById('include-dynamic-chart');
-        const includeDynamicTableCheckbox = document.getElementById('include-dynamic-table');
-        let quickViewTooltip;
-        
-        let currentEditIsHistorical = false;
-        
-        let fieldOptions = {
-            areas: [],
-            asuntos: [],
-            consultas: [],
-            nombres: [],
-            cargos: [],
-            correos: [],
-            telefonos: [],
-            comentarios: [],
-            instituciones: [],
-            atendioUsers: []
+        // Centralized Application State
+        const state = {
+            userId: null,
+            calls: [],
+            historicalCalls: [],
+            fieldOptions: {
+                areas: [], asuntos: [], consultas: [], nombres: [], cargos: [],
+                correos: [], telefonos: [], comentarios: [], instituciones: [], atendioUsers: []
+            },
+            ui: {
+                timerInterval: null,
+                callStartTime: null,
+                openModalCount: 0,
+                currentFilterDropdown: null,
+                isMigrationModeActive: false,
+                selectedCallIdsToMigrate: new Set(),
+                isReverseMigrationModeActive: false,
+                selectedHistoricalCallIdsToMigrate: new Set(),
+                currentEditIsHistorical: false,
+                currentEditingField: null,
+                currentEditingValue: null,
+                pendingAction: null,
+                isProgrammaticChange: false,
+                showChartLabels: true,
+            },
+            reportFilter: {
+                type: 'all', // 'all' o 'period'
+                startDate: null,
+                endDate: null
+            },
+            activeFilters: {
+                main: {},
+                historical: {}
+            },
+            charts: {
+                status: null, asunto: null, dayOfWeek: null, atendio: null, dynamic: null
+            }
         };
-
-        let currentEditingField = null;
-        let currentEditingValue = null;
-        let pendingAction = null;
-        let reportFilter = {
-            type: 'all', // 'all' o 'period'
-            startDate: null,
-            endDate: null
-        };
-
-        let activeFilters = {
-            main: {},
-            historical: {}
-        };
-        let currentFilterDropdown = null;
-
-        let isMigrationModeActive = false;
-        let selectedCallIdsToMigrate = new Set();
-        
-        let isReverseMigrationModeActive = false;
-        let selectedHistoricalCallIdsToMigrate = new Set();
 
         // =============================================
         // MÓDULO: Gestión de Modales (con contador para anidamiento)
         // =============================================
         let openModalCount = 0;
+        const z_INDEX_BASE = 50; // Base para el z-index de los modales
         
         //Mostrar app
         function showApp() {
-            loader.classList.add('hidden');
-            appContainer.classList.remove('hidden');
+            DOM.loader.classList.add('hidden');
+            DOM.appContainer.classList.remove('hidden');
         }
 
         function showAlert(message, type = 'info') {
             const alertContainer = document.createElement('div');
             const colors = { success: 'bg-green-500', error: 'bg-red-500', warning: 'bg-yellow-500', info: 'bg-gray-500' };
-            alertContainer.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 z-[60] ${colors[type]}`;
+            alertContainer.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 z-[100] ${colors[type]}`;
             alertContainer.textContent = message;
             document.body.appendChild(alertContainer);
             setTimeout(() => { alertContainer.remove(); }, 3000);
@@ -1520,41 +1540,75 @@
             }
         }
 
+        // Convierte una hora en formato 12h (con a.m./p.m.) a formato 24h (HH:mm:ss)
+        function convertTo24HourFormat(timeStr) {
+            if (!timeStr || typeof timeStr !== 'string') return '00:00:00';
+            const lcTime = timeStr.toLowerCase();
+
+            // Case 1: Already in 24h format (e.g., "14:30:00")
+            if (!lcTime.includes('a. m.') && !lcTime.includes('p. m.')) {
+                // Basic validation and normalization for 24h format
+                if (/^\d{1,2}:\d{1,2}(:\d{1,2})?$/.test(lcTime)) {
+                    const parts = lcTime.split(':');
+                    const h = String(parts[0] || '00').padStart(2, '0');
+                    const m = String(parts[1] || '00').padStart(2, '0');
+                    const s = String(parts[2] || '00').padStart(2, '0');
+                    return `${h}:${m}:${s}`;
+                }
+                return '00:00:00'; // Invalid format
+            }
+
+            // Case 2: In 12h format (e.g., "2:30 p. m.")
+            const isPm = lcTime.includes('p. m.');
+            const timePart = lcTime.split(' ')[0];
+            const [hours, minutes = '00', seconds = '00'] = timePart.split(':');
+
+            let h = parseInt(hours, 10);
+            if (isNaN(h)) return '00:00:00';
+
+            // Convert to 24h logic
+            if (isPm && h < 12) h += 12;
+            else if (!isPm && h === 12) h = 0; // Handle 12 a.m. (midnight)
+
+            return `${String(h).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
         //Abrir modal
         function openModal(modal) {
+            state.ui.openModalCount++;
+            modal.style.zIndex = z_INDEX_BASE + state.ui.openModalCount;
             modal.classList.remove('hidden', 'modal-leave');
             modal.classList.add('modal-enter');
-            if (openModalCount === 0) {
-                document.body.classList.add('modal-open'); // Bloquear scroll solo si es el primer modal
-            }
-            openModalCount++;
+            // Bloquear el scroll del body siempre que haya al menos un modal abierto.
+            document.body.classList.add('modal-open');
+
 
             // --- INICIO: Lógica de Autofoco ---
             // Se añade un pequeño retardo para asegurar que el modal sea visible antes de intentar enfocar el campo.
             setTimeout(() => {
-                if (modal.id === 'password-modal') {
-                    document.getElementById('password-input').focus();
-                } else if (modal.id === 'edit-option-modal') {
-                    document.getElementById('edit-option-input').focus();
-                } else if (modal.id === 'call-modal') {
+                if (modal === DOM.passwordModal) {
+                    DOM.passwordInput.focus();
+                } else if (modal === DOM.editOptionModal) {
+                    DOM.editOptionInput.focus();
+                } else if (modal === DOM.callModal) {
                     $('#caller-institution').select2('open');
                 }
             }, 400); // 400ms es suficiente para que la animación de entrada comience.
             // --- FIN: Lógica de Autofoco ---
-        }
+        } 
 
         //Cerrar modal
         function closeModal(modal) {
-            modal.classList.remove('modal-enter');
+            modal.classList.remove('modal-enter'); 
             modal.classList.add('modal-leave');
+            modal.style.zIndex = ''; // Limpiar el z-index al cerrar
             setTimeout(() => {
                 modal.classList.add('hidden');
-                openModalCount--;
-                if (openModalCount <= 0) {
+                state.ui.openModalCount--;
+                if (state.ui.openModalCount === 0) {
                     document.body.classList.remove('modal-open'); // Restaurar scroll solo si no quedan modales abiertos
-                    openModalCount = 0; // Resetear por seguridad
                 }
-            }, 300);
+            }, 300); 
         }
 
         // Función auxiliar para esperar a que un gráfico se renderice completamente
@@ -1585,12 +1639,12 @@
         
         //Configuración de Pestañas
         function setupTabs() {
-            tabsContainer.addEventListener('click', (e) => {
+            DOM.tabsContainer.addEventListener('click', (e) => {
                 if (e.target.matches('.tab-btn')) {
                     const tabName = e.target.dataset.tab;
                     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
-                    tabContents.forEach(content => content.classList.toggle('hidden', content.id !== `tab-content-${tabName}`));
+                    DOM.tabContents.forEach(content => content.classList.toggle('hidden', content.id !== `tab-content-${tabName}`));
                     if (tabName === 'reportes') {
                         setTimeout(updateCharts, 50); // Delay to ensure container is visible
                     }
@@ -1610,7 +1664,7 @@
         }
         //Renderizar tablas
         function renderTable(tableBody, data, isHistorical = false) {
-            const noDataMessage = isHistorical ? noHistoricalMessage : noCallsMessage;
+            const noDataMessage = isHistorical ? DOM.noHistoricalMessage : DOM.noCallsMessage;
             tableBody.innerHTML = '';
             noDataMessage.classList.toggle('hidden', data.length > 0);
 
@@ -1666,8 +1720,8 @@
 
                 // --- INICIO: Lógica para añadir el checkbox de migración inversa ---
                 let reverseMigrationCell = '';
-                if (isHistorical && isReverseMigrationModeActive) {
-                    const isSelected = selectedHistoricalCallIdsToMigrate.has(call.id);
+                if (isHistorical && state.ui.isReverseMigrationModeActive) {
+                    const isSelected = state.ui.selectedHistoricalCallIdsToMigrate.has(call.id);
                     reverseMigrationCell = `<td class="py-4 px-6 whitespace-nowrap"><input type="checkbox" class="historical-call-migration-checkbox rounded border-gray-300 text-primary focus:ring-primary" data-id="${call.id}" ${isSelected ? 'checked' : ''}></td>`;
                 }
                 // --- FIN: Lógica para añadir el checkbox de migración inversa ---
@@ -1675,8 +1729,8 @@
                 // --- INICIO: Lógica para añadir el checkbox de migración al principio de la fila ---
                 let migrationCell = '';
                 // Solo se añade el checkbox a la tabla principal y si el modo migración está activo.
-                if (!isHistorical && isMigrationModeActive) {
-                    const isSelected = selectedCallIdsToMigrate.has(call.id);
+                if (!isHistorical && state.ui.isMigrationModeActive) {
+                    const isSelected = state.ui.selectedCallIdsToMigrate.has(call.id);
                     migrationCell = `<td class="py-4 px-6 whitespace-nowrap"><input type="checkbox" class="call-migration-checkbox rounded border-gray-300 text-primary focus:ring-primary" data-id="${call.id}" ${isSelected ? 'checked' : ''}></td>`;
                 }
                 // --- FIN: Lógica para añadir el checkbox de migración ---
@@ -1694,7 +1748,7 @@
         function applyAllFilters(data, filterKey) {
             const searchInput = document.getElementById(`filter-input-${filterKey}`);
             const searchText = searchInput ? searchInput.value.toLowerCase() : '';
-            const columnFilters = activeFilters[filterKey];
+            const columnFilters = state.activeFilters[filterKey];
 
             return data.filter(item => {
                 // 1. Check search box filter
@@ -1731,7 +1785,7 @@
             const allData = dataProvider();
             const searchInput = document.getElementById(`filter-input-${filterKey}`);
             const searchText = searchInput ? searchInput.value.toLowerCase() : '';
-            const columnFilters = activeFilters[filterKey];
+            const columnFilters = state.activeFilters[filterKey];
 
             return allData.filter(item => {
                 const matchesSearch = searchText === '' || Object.values(item).some(value => String(value).toLowerCase().includes(searchText));
@@ -1751,9 +1805,9 @@
                 const header = e.target.closest('.filterable-header');
                 if (!header) return;
 
-                if (currentFilterDropdown) {
-                    currentFilterDropdown.remove();
-                    currentFilterDropdown = null;
+                if (state.ui.currentFilterDropdown) {
+                    state.ui.currentFilterDropdown.remove();
+                    state.ui.currentFilterDropdown = null;
                 }
 
                 const filterBy = header.dataset.filterBy;
@@ -1782,7 +1836,7 @@
                 const dropdown = document.createElement('div');
                 dropdown.className = 'filter-dropdown p-2 space-y-1';
                 
-                const activeColumnFilters = activeFilters[filterKey][filterBy] || [];
+                const activeColumnFilters = state.activeFilters[filterKey][filterBy] || [];
 
                 dropdown.innerHTML = `
                     <div class="p-1 border-b border-gray-200">
@@ -1804,7 +1858,7 @@
                 const rect = header.getBoundingClientRect();
                 dropdown.style.top = `${rect.bottom + window.scrollY}px`;
                 dropdown.style.left = `${rect.left + window.scrollX}px`;
-                currentFilterDropdown = dropdown;
+                state.ui.currentFilterDropdown = dropdown;
 
                 // Lógica para el buscador dentro del filtro
                 const searchInput = dropdown.querySelector('.filter-search-input');
@@ -1821,26 +1875,26 @@
                 dropdown.addEventListener('change', e => {
                     if (e.target.classList.contains('filter-checkbox')) {
                         const checkedValues = Array.from(dropdown.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
-                        activeFilters[filterKey][filterBy] = checkedValues;
+                        state.activeFilters[filterKey][filterBy] = checkedValues;
                         header.classList.toggle('active', checkedValues.length > 0);
                         const filteredData = applyAllFilters(dataProvider(), filterKey);
-                        renderFunc(document.getElementById(filterKey === 'main' ? 'calls-table-body' : 'historical-table-body'), filteredData, filterKey === 'historical');
+                        renderFunc(filterKey === 'main' ? DOM.callLogTableBody : DOM.historicalTableBody, filteredData, filterKey === 'historical');
                     }
                 });
 
                 dropdown.querySelector('.clear-filter-btn').addEventListener('click', () => {
-                    activeFilters[filterKey][filterBy] = [];
+                    state.activeFilters[filterKey][filterBy] = [];
                     header.classList.remove('active');
                     const filteredData = applyAllFilters(dataProvider(), filterKey);
-                    renderFunc(document.getElementById(filterKey === 'main' ? 'calls-table-body' : 'historical-table-body'), filteredData, filterKey === 'historical');
-                    if (currentFilterDropdown) currentFilterDropdown.remove();
+                    renderFunc(filterKey === 'main' ? DOM.callLogTableBody : DOM.historicalTableBody, filteredData, filterKey === 'historical');
+                    if (state.ui.currentFilterDropdown) state.ui.currentFilterDropdown.remove();
                 });
             });
 
             document.addEventListener('click', (e) => {
-                if (currentFilterDropdown && !currentFilterDropdown.contains(e.target) && !e.target.closest('.filterable-header')) {
-                    currentFilterDropdown.remove();
-                    currentFilterDropdown = null;
+                if (state.ui.currentFilterDropdown && !state.ui.currentFilterDropdown.contains(e.target) && !e.target.closest('.filterable-header')) {
+                    state.ui.currentFilterDropdown.remove();
+                    state.ui.currentFilterDropdown = null;
                 }
             }, true);
         }
@@ -1853,7 +1907,7 @@
                 const filterText = filterInput.value.toLowerCase();
                 clearFilterBtn.classList.toggle('hidden', !filterText);
                 const filteredData = applyAllFilters(dataProvider(), filterKey);
-                renderFunc(document.getElementById(isHistorical ? 'historical-table-body' : 'calls-table-body'), filteredData, isHistorical);
+                renderFunc(isHistorical ? DOM.historicalTableBody : DOM.callLogTableBody, filteredData, isHistorical);
             });
             clearFilterBtn.addEventListener('click', () => {
                 filterInput.value = ''; filterInput.dispatchEvent(new Event('input'));
@@ -1866,31 +1920,25 @@
             // Ordenar los datos por fecha y luego por hora de inicio (más recientes primero)
             data.sort((a, b) => {
                 try {
-                    // Comparación de fecha
-                    const [dayA, monthA, yearA] = a.fecha.split('/');
-                    const [dayB, monthB, yearB] = b.fecha.split('/');
-                    const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-                    const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-                    if (dateA > dateB) return -1;
-                    if (dateA < dateB) return 1;
+                    // Construir objetos Date completos para una comparación precisa
+                    const [dayA, monthA, yearA] = a.fecha.split('/').map(part => part.padStart(2, '0'));
+                    const timeA24 = convertTo24HourFormat(a.inicio);
+                    const dateTimeA = new Date(`${yearA}-${monthA}-${dayA}T${timeA24}`);
 
-                    // Si las fechas son iguales, comparar por hora de inicio
-                    // Convertir a formato 24h para una comparación correcta
-                    const to24Hour = (timeStr) => {
-                        if (!timeStr) return '00:00:00';
-                        const lcTime = timeStr.toLowerCase();
-                        const isPm = lcTime.includes('p. m.');
-                        const isAm = lcTime.includes('a. m.');
-                        let [time, modifier] = lcTime.split(' ');
-                        let [hours, minutes, seconds] = time.split(':');
-                        hours = parseInt(hours, 10);
-                        if (isPm && hours < 12) hours += 12;
-                        if (isAm && hours === 12) hours = 0; // Medianoche
-                        return `${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
-                    };
-                    return to24Hour(b.inicio).localeCompare(to24Hour(a.inicio));
+                    const [dayB, monthB, yearB] = b.fecha.split('/').map(part => part.padStart(2, '0'));
+                    const timeB24 = convertTo24HourFormat(b.inicio);
+                    const dateTimeB = new Date(`${yearB}-${monthB}-${dayB}T${timeB24}`);
+
+                    // Validar que las fechas sean válidas antes de comparar
+                    if (isNaN(dateTimeA.getTime()) || isNaN(dateTimeB.getTime())) {
+                        return 0; // No ordenar si hay datos inválidos
+                    }
+
+                    // Para orden descendente (más reciente primero), restar A de B
+                    return dateTimeB - dateTimeA;
                 } catch (e) {
-                    // Fallback por si alguna fecha no tiene el formato correcto
+                    // Fallback por si algún dato está malformado y causa un error
+                    console.warn("No se pudo ordenar un elemento por datos malformados:", { itemA: a, itemB: b, error: e });
                     return 0;
                 }
             });
@@ -1904,17 +1952,17 @@
         //Actualizart el dashboard principal
         function updateAllDashboards() {
             // Dashboard de Registro y Control (fuente fija)
-            updateSingleDashboard(calls, totalCallsElem, avgDurationElem, salientesCountElem, entrantesCountElem);
+            updateSingleDashboard(state.calls, DOM.totalCallsElem, DOM.avgDurationElem, DOM.salientesCountElem, DOM.entrantesCountElem);
 
             // Dashboard de Histórico (fuente variable)
-            const sourceHistorico = dashboardDataSourceHistorico.value;
+            const sourceHistorico = DOM.dashboardDataSourceHistorico.value;
             let dataHistorico = [];
             if (sourceHistorico === 'historico') {
-                dataHistorico = historicalCalls;
+                dataHistorico = state.historicalCalls;
             } else if (sourceHistorico === 'combinado') {
-                dataHistorico = [...calls, ...historicalCalls];
+                dataHistorico = [...state.calls, ...state.historicalCalls];
             }
-            updateSingleDashboard(dataHistorico, totalCallsElemHistorico, avgDurationElemHistorico, salientesCountElemHistorico, entrantesCountElemHistorico);
+            updateSingleDashboard(dataHistorico, DOM.totalCallsElemHistorico, DOM.avgDurationElemHistorico, DOM.salientesCountElemHistorico, DOM.entrantesCountElemHistorico);
         }
 
         
@@ -1939,18 +1987,11 @@
         
         //Empieza a contar tiempo de llamada
         function startTimer() {
-            startCallBtn.dataset.state = 'active';
-            startCallBtn.innerHTML = `<i class="fa-solid fa-stopwatch h-6 w-6"></i><span>Finalizar Llamada</span>`;
-            startCallBtn.classList.replace('bg-success', 'bg-danger');
-            startCallBtn.classList.replace('hover:bg-success-dark', 'hover:bg-danger-dark');
-            
-            callForm.reset();
+            DOM.callForm.reset();
             // Reset all select2 fields
             $('#call-form select').val(null).trigger('change');
-            openModal(callModal);
+            openModal(DOM.callModal);
 
-            // --- INICIO: Lógica para valores por defecto en nueva llamada ---
-            // Seleccionar "AGMO" en "Atendió" si existe la opción.
             const atendioSelect = $('#call-atendio');
             if (atendioSelect.find("option[value='AGMO']").length) {
                 atendioSelect.val('AGMO').trigger('change');
@@ -1962,44 +2003,35 @@
                 areaSelect.val('INSTITUCIÓN').trigger('change');
             }
 
-            callStartTime = Date.now();
-            timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-                const formattedTime = formatDuration(elapsed);
-                timerElem.textContent = formattedTime;
-                modalTimerElem.textContent = formattedTime;
+            state.ui.callStartTime = Date.now();
+            state.ui.timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - state.ui.callStartTime) / 1000);
+                DOM.modalTimerElem.textContent = formatDuration(elapsed);
             }, 1000);
         }
         
         //Detiene el contador de tiempo de llamada
         function stopTimer(shouldSave = true) {
-            clearInterval(timerInterval);
+            clearInterval(state.ui.timerInterval);
             if (shouldSave) {
                 const endTime = new Date();
-                const duration = Math.floor((endTime - callStartTime) / 1000);
-                const formData = new FormData(callForm);
+                const duration = Math.floor((endTime - state.ui.callStartTime) / 1000);
+                const formData = new FormData(DOM.callForm);
                 const callData = Object.fromEntries(formData.entries());
                 
-                callData.fecha = new Date(callStartTime).toLocaleDateString('es-ES');
-                callData.inicio = new Date(callStartTime).toLocaleTimeString('es-ES', { hour12: false });
+                callData.fecha = new Date(state.ui.callStartTime).toLocaleDateString('es-ES');
+                callData.inicio = new Date(state.ui.callStartTime).toLocaleTimeString('es-ES', { hour12: false });
                 callData.fin = endTime.toLocaleTimeString('es-ES', { hour12: false });
                 callData.duracion = duration;
                 callData.estatus = 'Entrante'; // Por defecto, las llamadas nuevas son 'Entrante'
                 saveCall(callData);
             }
-            
-            //Inicio de llamada
-            startCallBtn.dataset.state = 'inactive';
-            startCallBtn.innerHTML = `<i class="fa-solid fa-phone-alt h-6 w-6"></i><span>Iniciar Nueva Llamada</span>`;
-            startCallBtn.classList.replace('bg-danger', 'bg-success');
-            startCallBtn.classList.replace('hover:bg-danger-dark', 'hover:bg-success-dark');
             resetTimer();
         }
 
         //Resetear contados
         function resetTimer() {
-            timerElem.textContent = '00:00:00';
-            modalTimerElem.textContent = '00:00:00';
+            DOM.modalTimerElem.textContent = '00:00:00';
         }
         
         //Guardar llamada
@@ -2090,8 +2122,8 @@
                     return;
                 }
 
-                currentEditIsHistorical = isHistorical;
-                const allData = isHistorical ? (Array.isArray(historicalCalls) ? historicalCalls : []) : (Array.isArray(calls) ? calls : []);
+                state.ui.currentEditIsHistorical = isHistorical;
+                const allData = isHistorical ? (Array.isArray(state.historicalCalls) ? state.historicalCalls : []) : (Array.isArray(state.calls) ? state.calls : []);
                 const callToEdit = allData.find(call => String(call.id) === String(callId));
 
                 if (!callToEdit) {
@@ -2099,7 +2131,7 @@
                     return;
                 }
 
-                document.getElementById('edit-id').value = callId;
+                DOM.editForm.querySelector('#edit-id').value = callId;
 
                 // Helper local: asegurar y seleccionar opción en Select2
                 function ensureSelectHasAndSelect($sel, value, text) {
@@ -2136,7 +2168,7 @@
                 $('#edit-call-query').val(callToEdit.consulta || '').trigger('change.select2');
 
                 // 2) Poblar directamente las opciones del select "nombre" basadas en la institución (no depender del handler global)
-                const namesForInst = buildNamesForInstitution([... (Array.isArray(calls)?calls:[]), ...(Array.isArray(historicalCalls)?historicalCalls:[])], callToEdit.institucion || '');
+                const namesForInst = buildNamesForInstitution([... (Array.isArray(state.calls)?state.calls:[]), ...(Array.isArray(state.historicalCalls)?state.historicalCalls:[])], callToEdit.institucion || '');
 
                 const $editName = $('#edit-caller-name');
 
@@ -2191,12 +2223,12 @@
                 $('#edit-call-atendio').val(callToEdit.atendio || '').trigger('change.select2');
 
                 // 5) Abrir modal después de todo (para evitar race conditions visuales)
-                openModal(editModal);
+                openModal(DOM.editModal);
             });
         }
 
 
-        closeEditModalBtn.addEventListener('click', () => closeModal(editModal));
+        DOM.closeEditModalBtn.addEventListener('click', () => closeModal(DOM.editModal));
 
         // Manejar cambio de estado
         async function handleStatusToggle(button) {
@@ -2223,14 +2255,14 @@
         function handleDeleteClick(button) {
             requirePassword(() => {
                 callToDeleteId = button.getAttribute('data-id');
-                callToDeleteIsHistorical = button.getAttribute('data-is-historical') === 'true';
+                state.ui.callToDeleteIsHistorical = button.getAttribute('data-is-historical') === 'true';
                 
                 if (!callToDeleteId) {
                     console.error("ID de llamada no encontrado para eliminación");
                     return;
                 }
                 
-                openModal(confirmModal);
+                openModal(DOM.confirmModal);
             });
         }
 
@@ -2242,7 +2274,7 @@
         //Eliminar toto el históroco
         async function deleteAllHistorical() {
             const batch = writeBatch(db);
-            historicalCalls.forEach(call => {
+            state.historicalCalls.forEach(call => {
                 const ref = doc(historicalCallsCollectionRef, call.id);
                 batch.delete(ref);
             });
@@ -2263,7 +2295,7 @@
                 
                 // Forzar actualización de opciones y render
                 updateDynamicSelectOptions();
-                renderTable(historicalTableBody, historicalCalls, true);
+                renderTable(DOM.historicalTableBody, state.historicalCalls, true);
 
 
             } catch (error) {
@@ -2573,7 +2605,7 @@
         //Actualiza las opciones de todos los selectores dinámicos de la aplicación.
 
         function updateDynamicSelectOptions() {
-            const allData = [...calls, ...historicalCalls];
+            const allData = [...state.calls, ...state.historicalCalls];
         
             // --- Lógica Específica para Instituciones (con normalización) ---
             // 1. Extraer todas las instituciones existentes en los registros.
@@ -2586,31 +2618,31 @@
             const combinedInstitutions = [...new Set([...catalogoInstitucionesHomologado, ...historicalInstitutions])].sort();
             
             // 3. Actualizar el estado global y el selector de UI.
-            fieldOptions.instituciones = combinedInstitutions;
-            updateSelectOptions('instituciones', fieldOptions.instituciones);
+            state.fieldOptions.instituciones = combinedInstitutions;
+            updateSelectOptions('instituciones', state.fieldOptions.instituciones);
         
             // --- Lógica General para los demás campos (sin cambios) ---
             // Se extraen los valores únicos de los datos existentes, se normalizan y se ordenan.
-            fieldOptions.areas = [...new Set(allData.map(c => c.area).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.asuntos = [...new Set(allData.map(c => c.asunto).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.consultas = [...new Set(allData.map(c => c.consulta).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.nombres = [...new Set(allData.map(c => c.nombre).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.cargos = [...new Set(allData.map(c => c.cargo).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.correos = [...new Set(allData.map(c => c.correo).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.telefonos = [...new Set(allData.map(c => c.telefono).filter(Boolean).map(v => String(v).trim()))].sort();
-            fieldOptions.comentarios = [...new Set(allData.map(c => c.comentarios).filter(Boolean).map(v => v.trim()))].sort();
-            fieldOptions.atendioUsers = [...new Set(allData.map(c => c.atendio).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.areas = [...new Set(allData.map(c => c.area).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.asuntos = [...new Set(allData.map(c => c.asunto).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.consultas = [...new Set(allData.map(c => c.consulta).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.nombres = [...new Set(allData.map(c => c.nombre).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.cargos = [...new Set(allData.map(c => c.cargo).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.correos = [...new Set(allData.map(c => c.correo).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.telefonos = [...new Set(allData.map(c => c.telefono).filter(Boolean).map(v => String(v).trim()))].sort();
+            state.fieldOptions.comentarios = [...new Set(allData.map(c => c.comentarios).filter(Boolean).map(v => v.trim()))].sort();
+            state.fieldOptions.atendioUsers = [...new Set(allData.map(c => c.atendio).filter(Boolean).map(v => v.trim()))].sort();
             
             // Se actualizan los selectores correspondientes en la UI.
-            updateSelectOptions('areas', fieldOptions.areas);
-            updateSelectOptions('asuntos', fieldOptions.asuntos);
-            updateSelectOptions('consultas', fieldOptions.consultas);
-            updateSelectOptions('nombres', fieldOptions.nombres);
-            updateSelectOptions('cargos', fieldOptions.cargos);
-            updateSelectOptions('correos', fieldOptions.correos);
-            updateSelectOptions('atendioUsers', fieldOptions.atendioUsers);
-            updateSelectOptions('telefonos', fieldOptions.telefonos);
-            updateSelectOptions('comentarios', fieldOptions.comentarios);
+            updateSelectOptions('areas', state.fieldOptions.areas);
+            updateSelectOptions('asuntos', state.fieldOptions.asuntos);
+            updateSelectOptions('consultas', state.fieldOptions.consultas);
+            updateSelectOptions('nombres', state.fieldOptions.nombres);
+            updateSelectOptions('cargos', state.fieldOptions.cargos);
+            updateSelectOptions('correos', state.fieldOptions.correos);
+            updateSelectOptions('atendioUsers', state.fieldOptions.atendioUsers);
+            updateSelectOptions('telefonos', state.fieldOptions.telefonos);
+            updateSelectOptions('comentarios', state.fieldOptions.comentarios);
         }
         
         //Actualizar opciones despues de editar una lista desplegable
@@ -2650,18 +2682,18 @@
 
                         // Restaurar el valor seleccionado si todavía existe
                         if (currentValue && normalizedOptions.some(o => o.id === currentValue)) {
-                            isProgrammaticChange = true;
+                            state.ui.isProgrammaticChange = true;
                             select.val(currentValue).trigger('change.select2');
                             setTimeout(() => {
-                                isProgrammaticChange = false;
+                                state.ui.isProgrammaticChange = false;
                             }, 100);
                         }
                         // Seleccionar por id si se especifica
                         else if (selectedId && normalizedOptions.some(o => o.id === selectedId)) {
-                            isProgrammaticChange = true;
+                            state.ui.isProgrammaticChange = true;
                             select.val(selectedId).trigger('change.select2');
                             setTimeout(() => {
-                                isProgrammaticChange = false;
+                                state.ui.isProgrammaticChange = false;
                             }, 100);
                         }
                     }
@@ -2676,7 +2708,7 @@
             function loadContactDetails(name, institution, isEditModal) {
                 if (!name || !institution) return;
 
-                const allData = [...calls, ...historicalCalls];
+                const allData = [...state.calls, ...state.historicalCalls];
                 const records = allData
                     .filter(c => c.nombre === name && c.institucion === institution)
                     .sort((a, b) => {
@@ -2706,12 +2738,12 @@
             // Evento para institución (formulario principal)
             $('#caller-institution').on('change', function() {
 
-                if (isProgrammaticChange) return;
+                if (state.ui.isProgrammaticChange) return;
 
                 const institution = $(this).val();
                 const nameSelect = $('#caller-name');
                 
-                const allData = [...calls, ...historicalCalls];
+                const allData = [...state.calls, ...state.historicalCalls];
                 const namesForInstitution = [...new Set(allData
                     .filter(c => c.institucion === institution)
                     .map(c => c.nombre)
@@ -2746,12 +2778,12 @@
             // Evento para institución (formulario de edición)
             $('#edit-caller-institution').on('change', function() {
 
-                if (isProgrammaticChange) return;
+                if (state.ui.isProgrammaticChange) return;
 
                 const institution = $(this).val();
                 const nameSelect = $('#edit-caller-name');
                 
-                const allData = [...calls, ...historicalCalls];
+                const allData = [...state.calls, ...state.historicalCalls];
                 const namesForInstitution = [...new Set(allData
                     .filter(c => c.institucion === institution)
                     .map(c => c.nombre)
@@ -2786,7 +2818,7 @@
             // Evento para nombre (formulario principal)
             $('#caller-name').on('change', function() {
 
-                if (isProgrammaticChange) return;
+                if (state.ui.isProgrammaticChange) return;
 
                 const name = $(this).val();
                 const institution = $('#caller-institution').val();
@@ -2796,7 +2828,7 @@
             // Evento para nombre (formulario de edición)
             $('#edit-caller-name').on('change', function() {
 
-                if (isProgrammaticChange) return;
+                if (state.ui.isProgrammaticChange) return;
 
                 const name = $(this).val();
                 const institution = $('#edit-caller-institution').val();
@@ -2806,10 +2838,10 @@
 
             //Filtra las opciones del select de 'Consulta' basándose en el 'Asunto' seleccionado.
             function filterQueriesBySubject(subjectSelect, querySelect) {
-                if (isProgrammaticChange) return;
+                if (state.ui.isProgrammaticChange) return;
 
                 const subject = subjectSelect.val();
-                const allData = [...calls, ...historicalCalls];
+                const allData = [...state.calls, ...state.historicalCalls];
 
                 // Si no hay un asunto seleccionado, no hacemos nada (o podríamos mostrar todas las consultas)
                 if (!subject) {
@@ -2935,9 +2967,9 @@
                 await batch.commit();
                 
                 // Actualizar las opciones globales en fieldOptions
-                fieldOptions[field] = [...new Set([...fieldOptions[field].filter(opt => opt !== oldValue), newValue])].sort();
+                state.fieldOptions[field] = [...new Set([...state.fieldOptions[field].filter(opt => opt !== oldValue), newValue])].sort();
                 // Redibujar los selects con la lista actualizada, preservando el estado del formulario
-                updateSelectOptions(field, fieldOptions[field]);
+                updateSelectOptions(field, state.fieldOptions[field]);
 
                 // Restaurar el estado del formulario para mantener los valores no guardados
                 if (formStateBeforeEdit) {
@@ -2954,7 +2986,7 @@
         // Nuevo helper function: updateSelectOptionsPreservingState
         async function updateSelectOptionsPreservingState(field, newValue, activeModalStates) {
             // Actualizar opciones globales
-            fieldOptions[field] = [...new Set([...fieldOptions[field], newValue])].sort();
+            state.fieldOptions[field] = [...new Set([...state.fieldOptions[field], newValue])].sort();
             
             // Actualizar selects sin destruir estado
             $('select[name="' + field + '"]').each(function() {
@@ -2972,10 +3004,10 @@
             
             // Restaurar estado de modales
             if (activeModalStates.editModal) {
-                restoreFormState('edit-form', activeModalStates.editModal);
+                restoreFormState(DOM.editForm.id, activeModalStates.editModal);
             }
             if (activeModalStates.callModal) {
-                restoreFormState('call-form', activeModalStates.callModal);
+                restoreFormState(DOM.callForm.id, activeModalStates.callModal);
             }
         }
 
@@ -2985,8 +3017,6 @@
         // Variable global para mantener el contexto del <select> que está siendo modificado.
         // Se gestiona su ciclo de vida: se establece al iniciar y se limpia al finalizar o cancelar.
         let activeSelectElement = null;
-        // Añadir al inicio de las variables globales
-        let isProgrammaticChange = false;
 
         //Función que configura todos los manejadores de eventos para los botones de añadir (+) y editar (lápiz)
         function setupAddEditButtons() {
@@ -3026,32 +3056,32 @@
                          return showAlert("Por favor, seleccione una opción para editar.", "warning");
                      }
                         
-                     currentEditingField = field;
-                     currentEditingValue = currentValue;
-                     editOptionInput.value = currentValue;
-                     editOptionInput.placeholder = `Edite la opción para ${field}`;
-                     openModal(editOptionModal);
+                     state.ui.currentEditingField = field;
+                     state.ui.currentEditingValue = currentValue;
+                     DOM.editOptionInput.value = currentValue;
+                     DOM.editOptionInput.placeholder = `Edite la opción para ${field}`;
+                     openModal(DOM.editOptionModal);
                  });
              });
             
              // 2. LÓGICA DE CONFIRMACIÓN PARA EDITAR OPCIÓN EXISTENTE
-             confirmEditOptionBtn.addEventListener('click', () => {
-                 const newValue = editOptionInput.value.trim();
+             DOM.confirmEditOptionBtn.addEventListener('click', () => {
+                 const newValue = DOM.editOptionInput.value.trim();
  
-                 if (!newValue || !currentEditingField || !currentEditingValue) {
+                 if (!newValue || !state.ui.currentEditingField || !state.ui.currentEditingValue) {
                      return;
                  }
  
-                 closeModal(editOptionModal);
+                 closeModal(DOM.editOptionModal);
                  
-                 const activeFormId = !callModal.classList.contains('hidden') ? 'call-form' : 
-                                      !editModal.classList.contains('hidden') ? 'edit-form' : null;
+                 const activeFormId = !DOM.callModal.classList.contains('hidden') ? DOM.callForm.id : 
+                                      !DOM.editModal.classList.contains('hidden') ? DOM.editForm.id : null;
                  
                  const formStateBeforeEdit = activeFormId ? getFormState(activeFormId) : null;
  
                  requirePassword(async () => {
                      try {
-                         await findAndReplaceInDatabase(currentEditingField, currentEditingValue, newValue, activeFormId, formStateBeforeEdit);
+                         await findAndReplaceInDatabase(state.ui.currentEditingField, state.ui.currentEditingValue, newValue, activeFormId, formStateBeforeEdit);
                          
                          if (formStateBeforeEdit) {
                              restoreFormState(activeFormId, formStateBeforeEdit);
@@ -3070,8 +3100,8 @@
              });
              
              // 3. LIMPIEZA DE ESTADO EN CASO DE CANCELACIÓN
-             cancelEditOptionBtn.addEventListener('click', () => {
-                 closeModal(editOptionModal);
+             DOM.cancelEditOptionBtn.addEventListener('click', () => {
+                 closeModal(DOM.editOptionModal);
                  activeSelectElement = null;
              });
         }
@@ -3083,32 +3113,32 @@
 
         //Verificar contraseña
         function verifyPassword() {
-            const password = passwordInput.value;
+            const password = DOM.passwordInput.value;
 
             if (password === 'admin') {
                 // Usar la función closeModal mejorada que maneja el contador
-                closeModal(passwordModal);
-                passwordInput.value = '';
+                closeModal(DOM.passwordModal);
+                DOM.passwordInput.value = '';
                 
-                if (pendingAction) {
-                    pendingAction();
-                    pendingAction = null;
+                if (state.ui.pendingAction) {
+                    state.ui.pendingAction();
+                    state.ui.pendingAction = null;
                 }
             } else {
                 showAlert("Contraseña incorrecta", "error");
-                passwordInput.value = '';
+                DOM.passwordInput.value = '';
             }
         }
 
         function setupPasswordVerification() {
-            confirmPasswordBtn.addEventListener('click', verifyPassword);
-            cancelPasswordBtn.addEventListener('click', () => {
-                closeModal(passwordModal);
-                pendingAction = null;
+            DOM.confirmPasswordBtn.addEventListener('click', verifyPassword);
+            DOM.cancelPasswordBtn.addEventListener('click', () => {
+                closeModal(DOM.passwordModal);
+                state.ui.pendingAction = null;
             });
             
             // Usar el elemento correcto del DOM para el evento keypress
-            const passwordInputElement = document.getElementById('password-input');
+            const passwordInputElement = DOM.passwordInput;
             if (passwordInputElement) {
                 passwordInputElement.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
@@ -3119,8 +3149,8 @@
         }
 
         function requirePassword(action) {
-            pendingAction = action;
-            openModal(passwordModal);
+            state.ui.pendingAction = action;
+            openModal(DOM.passwordModal);
         }
 
 
@@ -3128,8 +3158,8 @@
         async function initializeAppWithAuth() {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    userId = user.uid;
-                    userInfo.textContent = `Usuario Anónimo: ${userId.substring(0, 8)}...`;
+                    state.userId = user.uid;
+                    DOM.userInfo.textContent = `Usuario Anónimo: ${state.userId.substring(0, 8)}...`;
                     setupRealtimeListeners();
                     showApp();
                 } else {
@@ -3141,16 +3171,16 @@
         //Realtime Listas de llamadas e histórico
         function setupRealtimeListeners() {
             onSnapshot(query(callsCollectionRef), (snapshot) => {
-                calls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                sortAndRenderTable(callLogTableBody, calls, false);
+                state.calls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                sortAndRenderTable(DOM.callLogTableBody, state.calls, false);
                 updateAllDashboards();
                 updateCharts();
                 updateDynamicSelectOptions();
             }, (error) => console.error("Error en listener de llamadas:", error));
             
             onSnapshot(query(historicalCallsCollectionRef), (snapshot) => {
-                historicalCalls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                sortAndRenderTable(historicalTableBody, historicalCalls, true);
+                state.historicalCalls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                sortAndRenderTable(DOM.historicalTableBody, state.historicalCalls, true);
                 updateAllDashboards();
                 updateCharts();
                 updateDynamicSelectOptions();
@@ -3163,17 +3193,17 @@
         // MÓDULO: Gráficos y reportes
         // =============================================
         
-        //Obtiene los datos filtrados según la configuración actual de la UI        
-        function getFilteredData() {
-            const source = reportesDataSource.value;
+        // Obtiene los datos para los reportes según la fuente y el filtro de fecha.
+        function getReportData() {
+            const source = DOM.reportesDataSource.value;
             let data = [];
-            if (source === 'registro') data = calls;
-            else if (source === 'historico') data = historicalCalls;
-            else data = [...calls, ...historicalCalls];
+            if (source === 'registro') data = state.calls;
+            else if (source === 'historico') data = state.historicalCalls;
+            else data = [...state.calls, ...state.historicalCalls];
 
-            if (reportFilter.type === 'period' && reportFilter.startDate && reportFilter.endDate) {
-                const startDate = new Date(reportFilter.startDate);
-                let endDate = new Date(reportFilter.endDate);
+            if (state.reportFilter.type === 'period' && state.reportFilter.startDate && state.reportFilter.endDate) {
+                const startDate = new Date(state.reportFilter.startDate);
+                let endDate = new Date(state.reportFilter.endDate);
                 endDate.setHours(23, 59, 59, 999); // Incluir todo el día de fin
                 return data.filter(call => {
                     if (!call.fecha) return false;
@@ -3190,27 +3220,10 @@
         
         //Actualizar 
         function updateCharts() {
-            const source = reportesDataSource.value;
-            let data = [];
-            if (source === 'registro') data = calls;
-            else if (source === 'historico') data = historicalCalls;
-            else data = [...calls, ...historicalCalls];
-            
-            if (reportFilter.type === 'period' && reportFilter.startDate && reportFilter.endDate) {
-                const startDate = new Date(reportFilter.startDate);
-                let endDate = new Date(reportFilter.endDate);
-                endDate.setHours(23, 59, 59, 999);
-                data = data.filter(call => {
-                    if (!call.fecha) return false;
-                    try {
-                        const callDate = new Date(call.fecha.split('/').reverse().join('-'));
-                        return callDate >= startDate && callDate <= endDate;
-                    } catch (e) { return false; }
-                });
-            }
+            const data = getReportData();
             
             const chartWrappers = document.querySelectorAll('.chart-wrapper');
-            const chartSize = chartSizeSlider.value;
+            const chartSize = DOM.chartSizeSlider.value;
             chartWrappers.forEach(wrapper => {
                 wrapper.style.height = `${chartSize}px`;
             });
@@ -3278,16 +3291,16 @@
                 });
             };
             
-            if (statusChart) statusChart.destroy();
-            if (asuntoChart) asuntoChart.destroy();
-            if (dayOfWeekChart) dayOfWeekChart.destroy();
-            if (atendioChart) atendioChart.destroy();
-            if (dynamicChart) dynamicChart.destroy();
+            if (state.charts.status) state.charts.status.destroy();
+            if (state.charts.asunto) state.charts.asunto.destroy();
+            if (state.charts.dayOfWeek) state.charts.dayOfWeek.destroy();
+            if (state.charts.atendio) state.charts.atendio.destroy();
+            if (state.charts.dynamic) state.charts.dynamic.destroy();
 
-            statusChart = createOrUpdateChart(statusChartCanvas, statusChart, 'pie', statusCounts);
-            asuntoChart = createOrUpdateChart(asuntoChartCanvas, asuntoChart, 'bar', asuntoCounts, null, 'Llamadas por Asunto');
-            atendioChart = createOrUpdateChart(atendioChartCanvas, atendioChart, 'bar', atendioCounts, null, 'Llamadas Atendidas');
-            dayOfWeekChart = createOrUpdateChart(dayOfWeekChartCanvas, dayOfWeekChart, 'line', dayOfWeekCounts, ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'], 'Llamadas por Día');
+            state.charts.status = createOrUpdateChart(DOM.statusChartCanvas, state.charts.status, 'pie', statusCounts);
+            state.charts.asunto = createOrUpdateChart(DOM.asuntoChartCanvas, state.charts.asunto, 'bar', asuntoCounts, null, 'Llamadas por Asunto');
+            state.charts.atendio = createOrUpdateChart(DOM.atendioChartCanvas, state.charts.atendio, 'bar', atendioCounts, null, 'Llamadas Atendidas');
+            state.charts.dayOfWeek = createOrUpdateChart(DOM.dayOfWeekChartCanvas, state.charts.dayOfWeek, 'line', dayOfWeekCounts, ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'], 'Llamadas por Día');
                  
             // Actualizar gráfica dinámica
             updateDynamicChart();
@@ -3298,7 +3311,7 @@
                 renderers: { "Tabla": "Tabla", "Gráfico de Barras": "Gráfico de Barras", "Gráfico de Líneas": "Gráfico de Líneas", "Mapa de Calor": "Mapa de Calor" }
             };
 
-            $(pivotTableContainer).pivotUI(data, {
+            $(DOM.pivotTableContainer).pivotUI(data, {
                 rows: ["area"], cols: ["estatus"], vals: ["duracion"],
                 aggregatorName: "Conteo", rendererName: "Tabla", locale: "es"
             });
@@ -3307,26 +3320,9 @@
 
         //Update Chart
         function updateDynamicChart() {
-            const source = reportesDataSource.value;
-            let data = [];
-            if (source === 'registro') data = calls;
-            else if (source === 'historico') data = historicalCalls;
-            else data = [...calls, ...historicalCalls];
+            const data = getReportData();
             
-            if (reportFilter.type === 'period' && reportFilter.startDate && reportFilter.endDate) {
-                const startDate = new Date(reportFilter.startDate);
-                let endDate = new Date(reportFilter.endDate);
-                endDate.setHours(23, 59, 59, 999);
-                data = data.filter(call => {
-                    if (!call.fecha) return false;
-                    try {
-                        const callDate = new Date(call.fecha.split('/').reverse().join('-'));
-                        return callDate >= startDate && callDate <= endDate;
-                    } catch (e) { return false; }
-                });
-            }
-            
-            const selectedVariable = dynamicChartVariable.value;
+            const selectedVariable = DOM.dynamicChartVariable.value;
             const variableCounts = {};
             const variableStatusCounts = {};
             
@@ -3346,15 +3342,15 @@
             });
             
             // Actualizar tabla dinámica
-            const table = dynamicTableBody.closest('table');
+            const table = DOM.dynamicTableBody.closest('table');
             let tfoot = table.querySelector('tfoot');
             if (!tfoot) {
                 tfoot = document.createElement('tfoot');
                 table.appendChild(tfoot);
             }
             
-            dynamicTableBody.innerHTML = '';
-            dynamicTableHeader.textContent = selectedVariable.charAt(0).toUpperCase() + selectedVariable.slice(1);
+            DOM.dynamicTableBody.innerHTML = '';
+            DOM.dynamicTableHeader.textContent = selectedVariable.charAt(0).toUpperCase() + selectedVariable.slice(1);
             
             let totalSaliente = 0;
             let totalEntrante = 0;
@@ -3373,7 +3369,7 @@
                     <td>${counts.Entrante || 0}</td>
                     <td>${total}</td>
                 `;
-                dynamicTableBody.appendChild(row);
+                DOM.dynamicTableBody.appendChild(row);
             });
 
             // Añadir fila de totales al tfoot
@@ -3387,12 +3383,12 @@
             `;
             
             // Actualizar gráfico
-            if (dynamicChart) dynamicChart.destroy();
+            if (state.charts.dynamic) state.charts.dynamic.destroy();
             
             const labels = Object.keys(variableCounts);
             const chartData = Object.values(variableCounts);
             
-            dynamicChart = new Chart(dynamicChartCanvas, {
+            state.charts.dynamic = new Chart(DOM.dynamicChartCanvas, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -3411,9 +3407,9 @@
                         },
                         x: {
                             ticks: {
-                                display: showChartLabels,
-                                maxRotation: showChartLabels ? 90 : 0,
-                                minRotation: showChartLabels ? 45 : 0
+                                display: state.ui.showChartLabels,
+                                maxRotation: state.ui.showChartLabels ? 90 : 0,
+                                minRotation: state.ui.showChartLabels ? 45 : 0
                             }
                         }
                     }
@@ -3423,29 +3419,29 @@
         
         //Botón de Configuración
         function setupReportConfig() {
-            configReportBtn.addEventListener('click', () => openModal(configReportModal));
-            closeConfigReportModalBtn.addEventListener('click', () => closeModal(configReportModal));
+            DOM.configReportBtn.addEventListener('click', () => openModal(DOM.configReportModal));
+            DOM.closeConfigReportModalBtn.addEventListener('click', () => closeModal(DOM.configReportModal));
             
-            filterAllDataRadio.addEventListener('change', () => {
-                configReportStartDate.disabled = true;
-                configReportEndDate.disabled = true;
+            DOM.filterAllDataRadio.addEventListener('change', () => {
+                DOM.configReportStartDate.disabled = true;
+                DOM.configReportEndDate.disabled = true;
             });
             
-            filterByPeriodRadio.addEventListener('change', () => {
-                configReportStartDate.disabled = false;
-                configReportEndDate.disabled = false;
+            DOM.filterByPeriodRadio.addEventListener('change', () => {
+                DOM.configReportStartDate.disabled = false;
+                DOM.configReportEndDate.disabled = false;
             });
             
-            saveConfigReportBtn.addEventListener('click', () => {
-                if (filterByPeriodRadio.checked && (!configReportStartDate.value || !configReportEndDate.value)) {
+            DOM.saveConfigReportBtn.addEventListener('click', () => {
+                if (DOM.filterByPeriodRadio.checked && (!DOM.configReportStartDate.value || !DOM.configReportEndDate.value)) {
                     return showAlert("Por favor, seleccione un rango de fechas válido.", "warning");
                 }
-                reportFilter.type = filterAllDataRadio.checked ? 'all' : 'period';
-                reportFilter.startDate = configReportStartDate.value;
-                reportFilter.endDate = configReportEndDate.value;
+                state.reportFilter.type = DOM.filterAllDataRadio.checked ? 'all' : 'period';
+                state.reportFilter.startDate = DOM.configReportStartDate.value;
+                state.reportFilter.endDate = DOM.configReportEndDate.value;
                 
                 showAlert("Configuración de reportes guardada.", "success");
-                closeModal(configReportModal);
+                closeModal(DOM.configReportModal);
                 updateCharts();
             });
         }
@@ -3456,7 +3452,7 @@
 
         async function generateExecutiveReport(options) {
             const { includeStatus, includeAsunto, includeDay, includeAtendio, includeDynamicChart, includeDynamicTable } = options;
-            const data = getFilteredData();
+            const data = getReportData();
 
             // --- Preparación de Datos y Métricas ---
             const totalCalls = data.length;
@@ -3492,7 +3488,7 @@
                     <div class="reporte-header">
                         <h1>Reporte de Llamadas</h1>
                         <p>Generado el: ${currentDate}</p>
-                        <p>${reportFilter.type === 'period' ? `Período: ${reportFilter.startDate} al ${reportFilter.endDate}` : 'Todos los registros'}</p>
+                        <p>${state.reportFilter.type === 'period' ? `Período: ${state.reportFilter.startDate} al ${state.reportFilter.endDate}` : 'Todos los registros'}</p>
                     </div>
                     <div class="reporte-metricas">
                         <div class="metrica"><h3>Salientes</h3><p>${salientes}</p></div>
@@ -3506,11 +3502,11 @@
 
             // --- Generación y Adjunto de Gráficos ---
             const chartConfigs = [
-                { condition: includeStatus, title: "Distribución por Estatus", data: getFilteredData(), key: 'estatus', type: 'pie' },
-                { condition: includeAsunto, title: "Llamadas por Asunto", data: getFilteredData(), key: 'asunto', type: 'bar' },
-                { condition: includeDay, title: "Tendencia Semanal", data: getFilteredData(), key: 'fecha', type: 'line' },
-                { condition: includeAtendio, title: "Distribución por Servidor Público", data: getFilteredData(), key: 'atendio', type: 'bar' },
-                { condition: includeDynamicChart, title: `Análisis por ${dynamicChartVariable.value}`, data: getFilteredData(), key: dynamicChartVariable.value, type: 'bar' }
+                { condition: includeStatus, title: "Distribución por Estatus", data: getReportData(), key: 'estatus', type: 'pie' },
+                { condition: includeAsunto, title: "Llamadas por Asunto", data: getReportData(), key: 'asunto', type: 'bar' },
+                { condition: includeDay, title: "Tendencia Semanal", data: getReportData(), key: 'fecha', type: 'line' },
+                { condition: includeAtendio, title: "Distribución por Servidor Público", data: getReportData(), key: 'atendio', type: 'bar' },
+                { condition: includeDynamicChart, title: `Análisis por ${DOM.dynamicChartVariable.value}`, data: getReportData(), key: DOM.dynamicChartVariable.value, type: 'bar' }
             ];
 
             for (const config of chartConfigs) {
@@ -3525,7 +3521,7 @@
 
             // --- Generación y Adjunto de Tabla Dinámica ---
             if (includeDynamicTable) {
-                const selectedVariable = dynamicChartVariable.value;
+                const selectedVariable = DOM.dynamicChartVariable.value;
                 const variableStatusCounts = {};
                 data.forEach(call => {
                     const value = call[selectedVariable] || 'N/A';
@@ -3722,12 +3718,76 @@
         }
 
         // =============================================
+        // MÓDULO: Edición de Horarios
+        // =============================================
+        function openEditTimestampsModal(callItem, isHistorical) {
+            // Poblar el formulario
+            DOM.editTimestampsForm.querySelector('#timestamps-call-id').value = callItem.id;
+            DOM.editTimestampsForm.querySelector('#timestamps-is-historical').value = isHistorical;
+
+            // Convertir fecha DD/MM/YYYY a YYYY-MM-DD para el input
+            try {
+                const [day, month, year] = callItem.fecha.split('/');
+                DOM.timestampsDateInput.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            } catch (e) {
+                console.error("Error al parsear la fecha para el modal de edición:", callItem.fecha, e);
+                DOM.timestampsDateInput.value = ''; // Dejar vacío si hay error
+            }
+            
+            DOM.timestampsStartTimeInput.value = convertTo24HourFormat(callItem.inicio);
+            DOM.timestampsEndTimeInput.value = convertTo24HourFormat(callItem.fin);
+
+            calculateAndDisplayDuration();
+            openModal(DOM.editTimestampsModal);
+        }
+
+        function calculateAndDisplayDuration() {
+            const start = DOM.timestampsStartTimeInput.value;
+            const end = DOM.timestampsEndTimeInput.value;
+
+            if (start && end) {
+                const startDate = new Date(`1970-01-01T${start}Z`);
+                const endDate = new Date(`1970-01-01T${end}Z`);
+                let diff = (endDate.getTime() - startDate.getTime()) / 1000;
+                if (diff < 0) diff = 0; // No permitir duraciones negativas
+                DOM.timestampsDurationElem.textContent = formatDuration(diff);
+            }
+        }
+
+        async function saveTimestamps(e) {
+            e.preventDefault();
+            requirePassword(async () => {
+                const callId = DOM.editTimestampsForm.querySelector('#timestamps-call-id').value;
+                const isHistorical = DOM.editTimestampsForm.querySelector('#timestamps-is-historical').value === 'true';
+                
+                // Formatear la fecha correctamente desde el input YYYY-MM-DD a DD/MM/YYYY
+                const dateParts = DOM.timestampsDateInput.value.split('-');
+                const newDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+
+                const newStart24h = DOM.timestampsStartTimeInput.value;
+                const newEnd24h = DOM.timestampsEndTimeInput.value;
+                const newDuration = (new Date(`1970-01-01T${newEnd24h}Z`) - new Date(`1970-01-01T${newStart24h}Z`)) / 1000;
+
+                try {
+                    await updateCall(callId, { fecha: newDate, inicio: formatTimeWithAmPm(newStart24h), fin: formatTimeWithAmPm(newEnd24h), duracion: newDuration }, isHistorical);
+                    // Forzar el reordenamiento de la tabla correcta después de la actualización exitosa.
+                    const data = isHistorical ? state.historicalCalls : state.calls;
+                    const tableBody = isHistorical ? DOM.historicalTableBody : DOM.callLogTableBody;
+                    sortAndRenderTable(tableBody, data, isHistorical);
+                } finally {
+                    closeModal(DOM.editTimestampsModal);
+                    closeModal(DOM.viewDetailsModal); // Cerrar también el modal de detalles para forzar la reapertura con datos frescos
+                }
+            });
+        }
+
+        // =============================================
         // MÓDULO: Migración de datos
         // =============================================
 
         async function migrateSelectedCallsToHistorical() {
             try {
-                if (selectedCallIdsToMigrate.size === 0) {
+                if (state.ui.selectedCallIdsToMigrate.size === 0) {
                     showAlert("No hay llamadas seleccionadas para migrar.", "warning");
                     return;
                 }
@@ -3735,7 +3795,7 @@
                 showLoader(true);
                 
                 const batch = writeBatch(db);
-                const callsToMigrate = calls.filter(call => selectedCallIdsToMigrate.has(call.id));
+                const callsToMigrate = state.calls.filter(call => state.ui.selectedCallIdsToMigrate.has(call.id));
                 if (callsToMigrate.length === 0) return; // Doble verificación
 
                 callsToMigrate.forEach(call => {
@@ -3766,21 +3826,21 @@
 
         // Añadir función showLoader si no existe
         function showLoader(show) {
-            const loader = document.getElementById('loader');
+            const loader = DOM.loader;
             if (loader) {
                 loader.style.display = show ? 'flex' : 'none';
             }
         }
 
         function toggleMigrationMode(activate) {
-            isMigrationModeActive = activate;
-            selectedCallIdsToMigrate.clear();
+            state.ui.isMigrationModeActive = activate;
+            state.ui.selectedCallIdsToMigrate.clear();
 
             // Alternar visibilidad de botones
-            startMigrationBtn.classList.toggle('hidden', activate);
-            confirmMigrationBtn.classList.toggle('hidden', !activate);
-            cancelMigrationBtn.classList.toggle('hidden', !activate);
-            confirmMigrationBtn.disabled = true; // Siempre deshabilitar al entrar/salir del modo
+            DOM.startMigrationBtn.classList.toggle('hidden', activate);
+            DOM.confirmMigrationBtn.classList.toggle('hidden', !activate);
+            DOM.cancelMigrationBtn.classList.toggle('hidden', !activate);
+            DOM.confirmMigrationBtn.disabled = true; // Siempre deshabilitar al entrar/salir del modo
 
             // Alternar visibilidad de la columna de checkboxes
             document.querySelectorAll('.migration-select-col').forEach(col => {
@@ -3788,10 +3848,10 @@
             });
 
             // Limpiar estado
-            selectAllCallsCheckbox.checked = false;
+            DOM.selectAllCallsCheckbox.checked = false;
 
             // Re-renderizar la tabla principal para mostrar/ocultar los checkboxes en las filas
-            sortAndRenderTable(callLogTableBody, calls, false);
+            sortAndRenderTable(DOM.callLogTableBody, state.calls, false);
         }
 
         // =============================================
@@ -3799,14 +3859,14 @@
         // =============================================
 
         function toggleReverseMigrationMode(activate) {
-            isReverseMigrationModeActive = activate;
-            selectedHistoricalCallIdsToMigrate.clear();
+            state.ui.isReverseMigrationModeActive = activate;
+            state.ui.selectedHistoricalCallIdsToMigrate.clear();
 
             // Alternar visibilidad de botones
-            startReverseMigrationBtn.classList.toggle('hidden', activate);
-            confirmReverseMigrationBtn.classList.toggle('hidden', !activate);
-            cancelReverseMigrationBtn.classList.toggle('hidden', !activate);
-            confirmReverseMigrationBtn.disabled = true;
+            DOM.startReverseMigrationBtn.classList.toggle('hidden', activate);
+            DOM.confirmReverseMigrationBtn.classList.toggle('hidden', !activate);
+            DOM.cancelReverseMigrationBtn.classList.toggle('hidden', !activate);
+            DOM.confirmReverseMigrationBtn.disabled = true;
 
             // Alternar visibilidad de la columna de checkboxes en el histórico
             document.querySelectorAll('.reverse-migration-select-col').forEach(col => {
@@ -3814,15 +3874,15 @@
             });
 
             // Limpiar estado del checkbox "seleccionar todo"
-            selectAllHistoricalCallsCheckbox.checked = false;
+            DOM.selectAllHistoricalCallsCheckbox.checked = false;
 
             // Re-renderizar la tabla del histórico para mostrar/ocultar los checkboxes
-            sortAndRenderTable(historicalTableBody, historicalCalls, true);
+            sortAndRenderTable(DOM.historicalTableBody, state.historicalCalls, true);
         }
 
         async function migrateSelectedCallsToRegistry() {
             try {
-                if (selectedHistoricalCallIdsToMigrate.size === 0) {
+                if (state.ui.selectedHistoricalCallIdsToMigrate.size === 0) {
                     showAlert("No hay llamadas seleccionadas para migrar.", "warning");
                     return;
                 }
@@ -3830,7 +3890,7 @@
                 showLoader(true);
 
                 const batch = writeBatch(db);
-                const callsToMigrate = historicalCalls.filter(call => selectedHistoricalCallIdsToMigrate.has(call.id));
+                const callsToMigrate = state.historicalCalls.filter(call => state.ui.selectedHistoricalCallIdsToMigrate.has(call.id));
 
                 callsToMigrate.forEach(call => {
                     const newCallDocRef = doc(callsCollectionRef); // Nuevo documento en 'calls'
@@ -3864,49 +3924,49 @@
         
         function setupEventListeners() {
             setupTabs();
-            setupColumnFilters('main-table-header', () => calls, renderTable, 'main');
-            setupColumnFilters('historical-table-header', () => historicalCalls, renderTable, 'historical');
-            setupFiltering('filter-input-main', () => calls, renderTable, false);
-            setupFiltering('filter-input-historical', () => historicalCalls, renderTable, true);
+            setupColumnFilters('main-table-header', () => state.calls, renderTable, 'main');
+            setupColumnFilters('historical-table-header', () => state.historicalCalls, renderTable, 'historical');
+            setupFiltering('filter-input-main', () => state.calls, renderTable, false);
+            setupFiltering('filter-input-historical', () => state.historicalCalls, renderTable, true);
             setupAutofill();
             
             // Listener para el dashboard de la pestaña de histórico
-            dashboardDataSourceHistorico.addEventListener('change', updateAllDashboards);
+            DOM.dashboardDataSourceHistorico.addEventListener('change', updateAllDashboards);
             
             // Establecer "Histórico" como valor predeterminado en fuente de datos
-            reportesDataSource.addEventListener('change', updateCharts);
-            reportesDataSource.value = 'historico'; 
+            DOM.reportesDataSource.addEventListener('change', updateCharts);
+            DOM.reportesDataSource.value = 'historico'; 
 
 
-            dynamicChartVariable.addEventListener('change', updateDynamicChart);
-            
-            startCallBtn.addEventListener('click', () => {
-                startCallBtn.dataset.state === 'active' ? (stopTimer(false), closeModal(callModal)) : startTimer();
+            DOM.dynamicChartVariable.addEventListener('change', updateDynamicChart);
+
+            DOM.startCallBtn.addEventListener('click', () => {
+                startTimer();
+            });
+
+            DOM.closeModalBtn.addEventListener('click', () => {
+                closeModal(DOM.callModal);
+                stopTimer(false); // Detener el cronómetro sin guardar si se cierra con la 'X'
             });
             
-            closeModalBtn.addEventListener('click', () => {
-                closeModal(callModal);
-                if (startCallBtn.dataset.state === 'active') stopTimer(false);
-            });
-            
-            callForm.addEventListener('submit', (e) => {
+            DOM.callForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                if (!callForm.checkValidity()) return showAlert("Por favor, complete todos los campos obligatorios.", "warning");
+                if (!DOM.callForm.checkValidity()) return showAlert("Por favor, complete todos los campos obligatorios.", "warning");
                 stopTimer();
-                closeModal(callModal);
+                closeModal(DOM.callModal);
             });
             
-            closeEditModalBtn.addEventListener('click', () => closeModal(editModal));
-            editForm.addEventListener('submit', async (e) => {
+            DOM.closeEditModalBtn.addEventListener('click', () => closeModal(DOM.editModal));
+            DOM.editForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (!editForm.checkValidity()) return showAlert("Por favor, complete todos los campos obligatorios.", "warning");
+                if (!DOM.editForm.checkValidity()) return showAlert("Por favor, complete todos los campos obligatorios.", "warning");
                 
-                const formData = new FormData(editForm);
+                const formData = new FormData(DOM.editForm);
                 const updateData = Object.fromEntries(formData.entries());
-                const id = document.getElementById('edit-id').value;
+                const id = DOM.editForm.querySelector('#edit-id').value;
                 
-                await updateCall(id, updateData, currentEditIsHistorical);
-                closeModal(editModal);
+                await updateCall(id, updateData, state.ui.currentEditIsHistorical);
+                closeModal(DOM.editModal);
             });
 
             let callToDeleteId = null;
@@ -3915,13 +3975,10 @@
             function handleDeleteClick(e) {
                 requirePassword(() => {
                     callToDeleteId = e.currentTarget.dataset.id;
-                    callToDeleteIsHistorical = e.currentTarget.dataset.isHistorical === 'true';
-                    openModal(confirmModal);
+                    state.ui.callToDeleteIsHistorical = e.currentTarget.dataset.isHistorical === 'true';
+                    openModal(DOM.confirmModal);
                 });
             }
-
-
-            let isProgrammaticChange = false;
 
             // Reemplazar la función handleEditClick con esta versión corregida
             function handleEditClick(event) {
@@ -3935,8 +3992,8 @@
                         return;
                     }
 
-                    currentEditIsHistorical = isHistorical;
-                    const allData = isHistorical ? historicalCalls : calls;
+                    state.ui.currentEditIsHistorical = isHistorical;
+                    const allData = isHistorical ? state.historicalCalls : state.calls;
                     const callToEdit = allData.find(call => call.id === callId);
 
                     if (!callToEdit) {
@@ -3944,10 +4001,10 @@
                         return;
                     }
 
-                    document.getElementById('edit-id').value = callId;
+                    DOM.editForm.querySelector('#edit-id').value = callId;
 
                     // Desactivar autofill durante la carga inicial
-                    isProgrammaticChange = true;
+                    state.ui.isProgrammaticChange = true;
                     
                     $('#edit-caller-institution').val(callToEdit.institucion || '').trigger('change.select2');
                     $('#edit-call-area').val(callToEdit.area || '').trigger('change.select2');
@@ -3962,10 +4019,10 @@
 
                     // Reactivar autofill después de la carga
                     setTimeout(() => {
-                        isProgrammaticChange = false;
+                        state.ui.isProgrammaticChange = false;
                     }, 100);
 
-                    openModal(editModal);
+                    openModal(DOM.editModal);
                 });
             }
 
@@ -3979,7 +4036,7 @@
                 await updateCall(callId, { estatus: newStatus }, isHistorical);
             }
 
-            callLogTableBody.addEventListener('click', e => {
+            DOM.callLogTableBody.addEventListener('click', e => {
                 // Si se hizo clic en un botón, manejar la acción del botón y detener.
                 const buttonTarget = e.target.closest('button');
                 if (buttonTarget) {
@@ -3990,7 +4047,7 @@
                 }
 
                 // Si el modo de migración está activo y no se hizo clic en un botón, manejar la selección de la fila.
-                if (isMigrationModeActive) {
+                if (state.ui.isMigrationModeActive) {
                     const row = e.target.closest('tr');
                     if (!row) return;
 
@@ -4007,7 +4064,7 @@
             });
 
             // Estatus tabla de histórico
-            historicalTableBody.addEventListener('click', (e) => {
+            DOM.historicalTableBody.addEventListener('click', (e) => {
                 const buttonTarget = e.target.closest('button');
                 if (buttonTarget) {
                     if (buttonTarget.classList.contains('edit-btn')) handleEditClick({ currentTarget: buttonTarget });
@@ -4017,7 +4074,7 @@
                 }
 
                 // Lógica para seleccionar fila en modo de migración inversa
-                if (isReverseMigrationModeActive) {
+                if (state.ui.isReverseMigrationModeActive) {
                     const row = e.target.closest('tr');
                     if (!row) return;
 
@@ -4032,35 +4089,35 @@
             });
 
             // Cancelar Eliminar llamada de historico
-            cancelDeleteBtn.addEventListener('click', () => {
-                closeModal(confirmModal);
+            DOM.cancelDeleteBtn.addEventListener('click', () => {
+                closeModal(DOM.confirmModal);
                 callToDeleteId = null;
             });
             
             // Eliminar llamada de historico
-            confirmDeleteBtn.addEventListener('click', async () => {
+            DOM.confirmDeleteBtn.addEventListener('click', async () => {
                 if (callToDeleteId) {
-                    await deleteCall(callToDeleteId, callToDeleteIsHistorical);
-                    closeModal(confirmModal);
+                    await deleteCall(callToDeleteId, state.ui.callToDeleteIsHistorical);
+                    closeModal(DOM.confirmModal);
                 }
             });
 
             // Importar histórico
-            historicalFileInput.addEventListener('change', (e) => {
+            DOM.historicalFileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    importHistoricalBtn.classList.remove('hidden');
-                    importHistoricalBtn.disabled = false;
+                    DOM.importHistoricalBtn.classList.remove('hidden');
+                    DOM.importHistoricalBtn.disabled = false;
                 } else {
-                    importHistoricalBtn.classList.add('hidden');
-                    importHistoricalBtn.disabled = true;
+                    DOM.importHistoricalBtn.classList.add('hidden');
+                    DOM.importHistoricalBtn.disabled = true;
                 }
             });
 
             // Importar histórico
-            importHistoricalBtn.addEventListener('click', () => {
+            DOM.importHistoricalBtn.addEventListener('click', () => {
                 requirePassword(async () => {
-                    const file = historicalFileInput.files[0];
+                    const file = DOM.historicalFileInput.files[0];
                     if (!file) {
                         showAlert("Por favor, selecciona un archivo Excel primero.", "warning");
                         return;
@@ -4153,17 +4210,17 @@
                             if (processedData.length === 0) return showAlert("El archivo Excel está vacío o no es válido.", "warning");
                             
                             let replace = false;
-                            if (historicalCalls.length > 0) {
-                                openModal(replaceHistoricalModal);
+                            if (state.historicalCalls.length > 0) {
+                                openModal(DOM.replaceHistoricalModal);
                                 await new Promise(resolve => {
-                                    confirmReplaceBtn.onclick = () => {
+                                    DOM.confirmReplaceBtn.onclick = () => {
                                         replace = true;
-                                        closeModal(replaceHistoricalModal);
+                                        closeModal(DOM.replaceHistoricalModal);
                                         resolve();
                                     };
-                                    cancelReplaceBtn.onclick = () => {
+                                    DOM.cancelReplaceBtn.onclick = () => {
                                         replace = false;
-                                        closeModal(replaceHistoricalModal);
+                                        closeModal(DOM.replaceHistoricalModal);
                                         resolve();
                                     };
                                 });
@@ -4172,9 +4229,9 @@
                                 }
                             }
                             await importHistoricalData(processedData);
-                            historicalFileInput.value = '';
-                            importHistoricalBtn.disabled = true;
-                            importHistoricalBtn.classList.add('hidden');                        
+                            DOM.historicalFileInput.value = '';
+                            DOM.importHistoricalBtn.disabled = true;
+                            DOM.importHistoricalBtn.classList.add('hidden');                        
                         
                         } catch (error) {
                             console.error("Error al procesar el archivo:", error);
@@ -4186,9 +4243,9 @@
             });
 
             // Registro de llamadas descargar
-            downloadExcelBtn.addEventListener('click', () => {
-                if (calls.length === 0) return showAlert("No hay datos para descargar.", "warning");
-                const data = prepareExportData(calls);
+            DOM.downloadExcelBtn.addEventListener('click', () => {
+                if (state.calls.length === 0) return showAlert("No hay datos para descargar.", "warning");
+                const data = prepareExportData(state.calls);
                 const ws = XLSX.utils.json_to_sheet(data, { header: exportHeaders });
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Llamadas");
@@ -4198,7 +4255,7 @@
             // Registro histórico descargar
             document.getElementById('download-historical-excel-btn').addEventListener('click', () => {
                 // Obtener los datos actualmente filtrados en la tabla
-                const filteredData = applyAllFilters(historicalCalls, 'historical');
+                const filteredData = applyAllFilters(state.historicalCalls, 'historical');
 
                 if (filteredData.length === 0) return showAlert("No hay datos en la tabla para descargar.", "warning");
                 const dataToExport = prepareExportData(filteredData);
@@ -4209,12 +4266,12 @@
             });
             
             // Generar Reporte Boton
-            generateReportBtn.addEventListener('click', () => openModal(reportModal));
-            closeReportModalBtn.addEventListener('click', () => closeModal(reportModal));
+            DOM.generateReportBtn.addEventListener('click', () => openModal(DOM.reportModal));
+            DOM.closeReportModalBtn.addEventListener('click', () => closeModal(DOM.reportModal));
             
 
             // Generar PDF (CORREGIDO)
-            generatePdfBtn.addEventListener('click', async () => {
+            DOM.generatePdfBtn.addEventListener('click', async () => {
                 const options = {
                     includeStatus: document.getElementById('include-status').checked,
                     includeAsunto: document.getElementById('include-asunto').checked,
@@ -4224,30 +4281,30 @@
                     includeDynamicTable: document.getElementById('include-dynamic-table').checked
                 };
                 
-                closeModal(reportModal);
+                closeModal(DOM.reportModal);
                 await generateExecutiveReport(options);
             });
             
             // slider pixeles
-            chartSizeSlider.addEventListener('input', () => {
-                const size = chartSizeSlider.value;
-                chartSizeValue.textContent = `${size}px`;
+            DOM.chartSizeSlider.addEventListener('input', () => {
+                const size = DOM.chartSizeSlider.value;
+                DOM.chartSizeValue.textContent = `${size}px`;
                 updateCharts();
             });
 
             // Iniciar modo migración
-            startMigrationBtn.addEventListener('click', () => {
+            DOM.startMigrationBtn.addEventListener('click', () => {
                 toggleMigrationMode(true);
             });
 
             // Cancelar modo migración
-            cancelMigrationBtn.addEventListener('click', () => {
+            DOM.cancelMigrationBtn.addEventListener('click', () => {
                 toggleMigrationMode(false);
             });
 
             // Confirmar migración (ahora es el botón de éxito)
-            confirmMigrationBtn.addEventListener('click', () => {
-                if (selectedCallIdsToMigrate.size === 0) return;
+            DOM.confirmMigrationBtn.addEventListener('click', () => {
+                if (state.ui.selectedCallIdsToMigrate.size === 0) return;
 
                 requirePassword(async () => {
                     await migrateSelectedCallsToHistorical();
@@ -4255,69 +4312,69 @@
             });
 
             // Lógica para seleccionar/deseleccionar llamadas
-            callLogTableBody.addEventListener('change', e => {
+            DOM.callLogTableBody.addEventListener('change', e => {
                 if (e.target.classList.contains('call-migration-checkbox')) {
                     const callId = e.target.dataset.id;
                     if (e.target.checked) {
-                        selectedCallIdsToMigrate.add(callId);
+                        state.ui.selectedCallIdsToMigrate.add(callId);
                     } else {
-                        selectedCallIdsToMigrate.delete(callId);
+                        state.ui.selectedCallIdsToMigrate.delete(callId);
                     }
-                    confirmMigrationBtn.disabled = selectedCallIdsToMigrate.size === 0;
-                    selectAllCallsCheckbox.checked = selectedCallIdsToMigrate.size === calls.length && calls.length > 0;
+                    DOM.confirmMigrationBtn.disabled = state.ui.selectedCallIdsToMigrate.size === 0;
+                    DOM.selectAllCallsCheckbox.checked = state.ui.selectedCallIdsToMigrate.size === state.calls.length && state.calls.length > 0;
                 }
             });
 
             // Lógica para "Seleccionar Todo"
-            selectAllCallsCheckbox.addEventListener('change', e => {
+            DOM.selectAllCallsCheckbox.addEventListener('change', e => {
                 const isChecked = e.target.checked;
                 document.querySelectorAll('.call-migration-checkbox').forEach(checkbox => {
                     checkbox.checked = isChecked;
                     const callId = checkbox.dataset.id;
-                    isChecked ? selectedCallIdsToMigrate.add(callId) : selectedCallIdsToMigrate.delete(callId);
+                    isChecked ? state.ui.selectedCallIdsToMigrate.add(callId) : state.ui.selectedCallIdsToMigrate.delete(callId);
                 });
-                confirmMigrationBtn.disabled = selectedCallIdsToMigrate.size === 0;
+                DOM.confirmMigrationBtn.disabled = state.ui.selectedCallIdsToMigrate.size === 0;
             });
 
             // --- INICIO: Lógica para Migración Inversa ---
 
             // Iniciar modo migración inversa
-            startReverseMigrationBtn.addEventListener('click', () => {
+            DOM.startReverseMigrationBtn.addEventListener('click', () => {
                 toggleReverseMigrationMode(true);
             });
 
             // Cancelar modo migración inversa
-            cancelReverseMigrationBtn.addEventListener('click', () => {
+            DOM.cancelReverseMigrationBtn.addEventListener('click', () => {
                 toggleReverseMigrationMode(false);
             });
 
             // Confirmar migración inversa
-            confirmReverseMigrationBtn.addEventListener('click', () => {
-                if (selectedHistoricalCallIdsToMigrate.size === 0) return;
+            DOM.confirmReverseMigrationBtn.addEventListener('click', () => {
+                if (state.ui.selectedHistoricalCallIdsToMigrate.size === 0) return;
                 requirePassword(async () => {
                     await migrateSelectedCallsToRegistry();
                 });
             });
 
             // Lógica para seleccionar/deseleccionar llamadas del histórico
-            historicalTableBody.addEventListener('change', e => {
+            DOM.historicalTableBody.addEventListener('change', e => {
                 if (e.target.classList.contains('historical-call-migration-checkbox')) {
                     const callId = e.target.dataset.id;
-                    e.target.checked ? selectedHistoricalCallIdsToMigrate.add(callId) : selectedHistoricalCallIdsToMigrate.delete(callId);
-                    confirmReverseMigrationBtn.disabled = selectedHistoricalCallIdsToMigrate.size === 0;
-                    selectAllHistoricalCallsCheckbox.checked = selectedHistoricalCallIdsToMigrate.size === historicalCalls.length && historicalCalls.length > 0;
+                    e.target.checked ? state.ui.selectedHistoricalCallIdsToMigrate.add(callId) : state.ui.selectedHistoricalCallIdsToMigrate.delete(callId);
+                    DOM.confirmReverseMigrationBtn.disabled = state.ui.selectedHistoricalCallIdsToMigrate.size === 0;
+                    DOM.selectAllHistoricalCallsCheckbox.checked = state.ui.selectedHistoricalCallIdsToMigrate.size === state.historicalCalls.length && state.historicalCalls.length > 0;
                 }
             });
 
             // Lógica para "Seleccionar Todo" en el histórico
-            selectAllHistoricalCallsCheckbox.addEventListener('change', e => {
+            DOM.selectAllHistoricalCallsCheckbox.addEventListener('change', e => {
                 const isChecked = e.target.checked;
                 document.querySelectorAll('.historical-call-migration-checkbox').forEach(checkbox => {
                     checkbox.checked = isChecked;
                     const callId = checkbox.dataset.id;
-                    isChecked ? selectedHistoricalCallIdsToMigrate.add(callId) : selectedHistoricalCallIdsToMigrate.delete(callId);
+                    isChecked ? state.ui.selectedHistoricalCallIdsToMigrate.add(callId) : state.ui.selectedHistoricalCallIdsToMigrate.delete(callId);
                 });
-                confirmReverseMigrationBtn.disabled = selectedHistoricalCallIdsToMigrate.size === 0;
+                DOM.confirmReverseMigrationBtn.disabled = state.ui.selectedHistoricalCallIdsToMigrate.size === 0;
             });
 
             // --- FIN: Lógica para Migración Inversa ---
@@ -4325,29 +4382,29 @@
             // =============================================
             // MÓDULO: Visualización de Detalles (Doble Clic)
             // =============================================
-            const viewDetailsModal = document.getElementById('view-details-modal');
-            const closeDetailsModalBtn = document.getElementById('close-details-modal-btn');
 
             function showDetailsModal(callItem) {
                 // Ocultar el tooltip de vista rápida al abrir el modal de detalles
-                if (quickViewTooltip) {
-                    quickViewTooltip.classList.remove('visible');
+                if (DOM.quickViewTooltip) {
+                    DOM.quickViewTooltip.classList.remove('visible');
                 }
 
                 if (!callItem) return;
 
-                const detailsModalContent = document.getElementById('details-modal-content');
+                const detailsModalContent = DOM.viewDetailsModal.querySelector('#details-modal-content');
 
                 // Rediseño del contenido del modal para una mejor visualización
                 detailsModalContent.innerHTML = `
                     <div class="details-header">
                         <p class="date">Fecha: ${callItem.fecha || 'No especificada'}</p>
-                        <h3 class="text-xl font-bold text-slate-800 mt-1">Institución: ${callItem.institucion || 'No especificada'}</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mt-1">Institución: ${callItem.institucion || 'No especificada'}</h3> 
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 mb-8">
                         <div class="details-section">
-                            <h4><i class="fa-solid fa-clock mr-2"></i>Horarios</h4>
+                            <h4 class="editable-header" id="details-horarios-header" title="Doble clic para editar">
+                                <i class="fa-solid fa-clock mr-2"></i>Horarios
+                            </h4>
                             <p class="text-gray-700 text-sm"><strong>Inicio:</strong> ${formatTimeWithAmPm(callItem.inicio)}</p>
                             <p class="text-gray-700 text-sm"><strong>Fin:</strong> ${formatTimeWithAmPm(callItem.fin)}</p>
                             <p class="text-gray-700 text-sm"><strong>Duración:</strong> ${formatDuration(callItem.duracion)}</p>
@@ -4381,7 +4438,13 @@
                     </div>
                 `;
 
-                openModal(viewDetailsModal);
+                openModal(DOM.viewDetailsModal);
+
+                // Añadir el listener de doble clic al título de horarios
+                const horariosHeader = detailsModalContent.querySelector('#details-horarios-header');
+                if (horariosHeader) {
+                    horariosHeader.addEventListener('dblclick', () => openEditTimestampsModal(callItem, state.ui.currentEditIsHistorical));
+                }
             }
 
             function handleRowDoubleClick(e, isHistorical) {
@@ -4391,39 +4454,48 @@
                     return; 
                 }
                 // Ocultar el tooltip al iniciar el doble clic para evitar que se quede "pegado"
-                if (quickViewTooltip) quickViewTooltip.classList.remove('visible');
+                if (DOM.quickViewTooltip) DOM.quickViewTooltip.classList.remove('visible');
 
                 const callId = row.querySelector('.edit-btn')?.dataset.id;
                 if (!callId) return;
 
-                const data = isHistorical ? historicalCalls : calls;
+                const data = isHistorical ? state.historicalCalls : state.calls;
+                state.ui.currentEditIsHistorical = isHistorical; // Guardar el contexto para la edición de horarios
                 const callItem = data.find(item => item.id === callId);
                 showDetailsModal(callItem);
             }
 
             // Asignar los listeners de doble clic a las tablas
-            callLogTableBody.addEventListener('dblclick', (e) => handleRowDoubleClick(e, false));
-            historicalTableBody.addEventListener('dblclick', (e) => handleRowDoubleClick(e, true));
+            DOM.callLogTableBody.addEventListener('dblclick', (e) => handleRowDoubleClick(e, false));
+            DOM.historicalTableBody.addEventListener('dblclick', (e) => handleRowDoubleClick(e, true));
             
             // Asignar el listener para el botón de cerrar
-            closeDetailsModalBtn.addEventListener('click', () => closeModal(viewDetailsModal));
+            DOM.closeDetailsModalBtn.addEventListener('click', () => closeModal(DOM.viewDetailsModal));
+
+            // Listeners para el modal de edición de horarios
+            DOM.closeTimestampsModalBtn.addEventListener('click', () => closeModal(DOM.editTimestampsModal));
+            DOM.cancelTimestampsBtn.addEventListener('click', () => closeModal(DOM.editTimestampsModal));
+            DOM.editTimestampsForm.addEventListener('submit', saveTimestamps);
+            DOM.timestampsStartTimeInput.addEventListener('change', calculateAndDisplayDuration);
+            DOM.timestampsEndTimeInput.addEventListener('change', calculateAndDisplayDuration);
 
             // Cierre del modal de detalles al hacer clic fuera
-            viewDetailsModal.addEventListener('click', (e) => {
-                if (e.target === viewDetailsModal) {
-                    closeModal(viewDetailsModal);
+            DOM.viewDetailsModal.addEventListener('click', (e) => {
+                if (e.target === DOM.viewDetailsModal) {
+                    closeModal(DOM.viewDetailsModal);
                 }
             });
         }
 
         function setupQuickViewTooltip() {
-            const showTooltip = (e) => {
+            const tooltip = DOM.quickViewTooltip;
+            const showTooltip = (e) => { 
                 const row = e.target.closest('tr[data-quickview="true"]');
                 if (!row) return;
 
                 const { institucion, asunto, nombre, atendio, fecha, duracion } = row.dataset;
 
-                quickViewTooltip.innerHTML = `
+                tooltip.innerHTML = `
                     <p><strong>Institución:</strong> ${institucion}</p>
                     <p><strong>Asunto:</strong> ${asunto}</p>
                     <p><strong>Solicitante:</strong> ${nombre}</p>
@@ -4431,23 +4503,22 @@
                     <p><strong>Fecha:</strong> ${fecha}</p>
                     <p><strong>Duración:</strong> ${duracion}</p>
                 `;
-                quickViewTooltip.classList.add('visible');
+                tooltip.classList.add('visible');
             };
 
             const hideTooltip = () => {
-                quickViewTooltip.classList.remove('visible');
+                tooltip.classList.remove('visible');
             };
 
             const moveTooltip = (e) => {
-                if (quickViewTooltip.classList.contains('visible')) {
+                if (tooltip.classList.contains('visible')) {
                     // Posiciona el tooltip con un desfase para no tapar el cursor
-                    quickViewTooltip.style.left = `${e.clientX + 15}px`;
-                    quickViewTooltip.style.top = `${e.clientY + 15}px`;
+                    tooltip.style.left = `${e.clientX + 15}px`;
+                    tooltip.style.top = `${e.clientY + 15}px`;
                 }
             };
 
-            // Aplicar a ambas tablas
-            [callLogTableBody, historicalTableBody].forEach(tbody => {
+            [DOM.callLogTableBody, DOM.historicalTableBody].forEach(tbody => {
                 tbody.addEventListener('mouseover', showTooltip);
                 tbody.addEventListener('mouseout', hideTooltip);
                 tbody.addEventListener('mousemove', moveTooltip);
@@ -4459,10 +4530,6 @@
         // ============================================= 
 
         function initialize() {
-            document.addEventListener('DOMContentLoaded', () => {
-                quickViewTooltip = document.getElementById('quick-view-tooltip');
-            });
-
             initializeAppWithAuth();
             setupEventListeners();
             setupAddEditButtons();
