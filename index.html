@@ -2027,6 +2027,8 @@
             let dataHistorico = [];
             if (sourceHistorico === 'historico') {
                 dataHistorico = state.historicalCalls;
+            } else if (sourceHistorico === 'registro') {
+                dataHistorico = state.calls;
             } else if (sourceHistorico === 'combinado') {
                 dataHistorico = [...state.calls, ...state.historicalCalls];
             }
