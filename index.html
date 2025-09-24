@@ -1601,13 +1601,13 @@
         function closeModal(modal) {
             modal.classList.remove('modal-enter'); 
             modal.classList.add('modal-leave');
-            modal.style.zIndex = ''; // Limpiar el z-index al cerrar
             setTimeout(() => {
                 modal.classList.add('hidden');
                 state.ui.openModalCount--;
                 if (state.ui.openModalCount === 0) {
                     document.body.classList.remove('modal-open'); // Restaurar scroll solo si no quedan modales abiertos
                 }
+                modal.style.zIndex = ''; // Limpiar el z-index DESPUÉS de que el modal se oculte
             }, 300); 
         }
 
