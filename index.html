@@ -585,21 +585,29 @@
 
         /* Estilos para el tooltip de vista rápida (replicado de la app de licitaciones) */
         #quick-view-tooltip {
-            position: fixed;
-            display: none;
-            background-color: #1f2937; /* bg-gray-800 */
-            color: white;
+            position: fixed; /* Flota sobre toda la página */
+            display: none;   /* Oculto por defecto */
+            background-color: #ffffff; /* Fondo blanco */
+            color: #374151; /* Texto oscuro (gray-700) */
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb; /* Borde sutil (gray-200) */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
             z-index: 100;
             pointer-events: none; /* Para que no interfiera con el cursor */
-            font-size: 0.8rem;
+            font-size: 0.9rem; /* Tamaño de fuente mejorado */
             line-height: 1.5;
             max-width: 350px;
             transition: opacity 0.2s ease-in-out;
             opacity: 0;
         }
+        #quick-view-tooltip .duration-highlight { 
+            font-size: 1.1rem; font-weight: 700; color: var(--secondary-color); 
+            text-align: right; border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem;
+        }
+        #quick-view-tooltip .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        #quick-view-tooltip .status-dot.saliente { background-color: #10B981; } /* success-color */
+        #quick-view-tooltip .status-dot.entrante { background-color: #3B82F6; } /* blue-500 */
         /* Estilo para el título de horarios editable */
         .editable-header {
             cursor: pointer;
@@ -610,7 +618,7 @@
             display: block;
             opacity: 1;
         }
-        #quick-view-tooltip strong { color: #A6802D; } /* text-secondary */
+        #quick-view-tooltip strong { color: var(--secondary-color); } /* Títulos en color secundario para mejor estética */
         #quick-view-tooltip p { margin-bottom: 0.25rem; }
 
         /* Estilo para resaltar el texto de búsqueda */
@@ -1763,11 +1771,13 @@
                 // Añadimos los atributos data-* para el tooltip de vista rápida. (CORREGIDO)
                 row.dataset.quickview = 'true';
                 row.dataset.institucion = call.institucion || 'N/A';
+                row.dataset.consulta = call.consulta || 'N/A';
                 row.dataset.asunto = call.asunto || 'N/A';
                 row.dataset.nombre = call.nombre || 'N/A';
-                row.dataset.atendio = call.atendio || 'N/A';
                 row.dataset.fecha = call.fecha || 'N/A';
+                row.dataset.inicio = formatTimeWithAmPm(call.inicio);
                 row.dataset.duracion = formatDuration(call.duracion);
+                row.dataset.estatus = call.estatus || 'Entrante';
 
                 let cells = headers.map(header => {
                     let content = '';
@@ -2051,6 +2061,23 @@
             const filterKey = isHistorical ? 'historical' : 'main';
             const filteredData = applyAllFilters(data, filterKey);
             renderTable(tableBody, filteredData, isHistorical);
+        }
+
+        function formatLongDate(dateString) {
+            if (!dateString || typeof dateString !== 'string' || !dateString.includes('/')) return 'Fecha no disponible';
+            try {
+                const [day, month, year] = dateString.split('/').map(Number);
+                const date = new Date(Date.UTC(year, month - 1, day));
+                
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    timeZone: 'UTC'
+                };
+                return new Intl.DateTimeFormat('es-ES', options).format(date);
+            } catch (e) { return dateString; }
         }
 
         //Actualizart el dashboard principal
@@ -4775,21 +4802,27 @@
             const tooltip = DOM.quickViewTooltip;
             const showTooltip = (e) => { 
                 const row = e.target.closest('tr[data-quickview="true"]');
-                if (!row) return;
+                if (!row) return; // Si no estamos sobre una fila válida, no hacer nada.
 
-                const { institucion, asunto, nombre, atendio, fecha, duracion } = row.dataset;
+                const { institucion, asunto, consulta, nombre, estatus, fecha, inicio, duracion } = row.dataset;
 
+                const statusClass = estatus.toLowerCase() === 'saliente' ? 'saliente' : 'entrante';
+
+                // Construcción del contenido del tooltip, ahora más limpio y profesional.
                 tooltip.innerHTML = `
                     <p><strong>Institución:</strong> ${institucion}</p>
                     <p><strong>Asunto:</strong> ${asunto}</p>
+                    <p><strong>Consulta:</strong> ${consulta}</p>
                     <p><strong>Solicitante:</strong> ${nombre}</p>
-                    <p><strong>Atendió:</strong> ${atendio}</p>
-                    <p><strong>Fecha:</strong> ${fecha}</p>
-                    <p><strong>Duración:</strong> ${duracion}</p>
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
+                        <p class="text-xs text-gray-500">${formatLongDate(fecha)} - ${inicio}</p>
+                        <p class="text-xs font-semibold ${statusClass === 'saliente' ? 'text-green-600' : 'text-blue-600'}"><span class="status-dot ${statusClass}"></span>${estatus}</p>
+                    </div>
+                    <div class="duration-highlight">${duracion}</div>
                 `;
                 tooltip.classList.add('visible');
             };
-
+            
             const hideTooltip = () => {
                 tooltip.classList.remove('visible');
             };
