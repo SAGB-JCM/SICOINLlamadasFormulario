@@ -1738,7 +1738,7 @@
 
         //Función para resaltar texto
         function highlightText(text, searchTerm) {
-            if (!searchTerm || typeof text !== 'string') {
+            if (!searchTerm || searchTerm.trim() === '' || typeof text !== 'string') {
                 return text;
             }
             // Escapar caracteres especiales en el término de búsqueda para la expresión regular
