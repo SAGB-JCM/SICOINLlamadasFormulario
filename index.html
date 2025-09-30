@@ -743,6 +743,9 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-primary">Historial de Llamadas</h2>
                         <div class="flex items-center space-x-2">
+                            <button id="clear-all-filters-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" title="Limpiar todos los filtros">
+                                <i class="fa-solid fa-broom"></i>
+                            </button>
                             <div class="relative w-full"><input type="text" id="filter-input-main" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-main" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div>
                             <button id="start-call-btn" class="bg-success hover:bg-success-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
                                 <i class="fa-solid fa-phone-alt"></i><span>Iniciar Nueva Llamada</span>
@@ -822,6 +825,9 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-primary">Registro Histórico</h2>
                         <div class="flex items-center space-x-2">
+                            <button id="clear-all-filters-historical-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" title="Limpiar todos los filtros">
+                                <i class="fa-solid fa-broom"></i>
+                            </button>
                             <div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div>
                             <button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar</span></button>
                             <label for="historical-file-input" class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-upload"></i><span>Subir Excel</span><input type="file" id="historical-file-input" class="hidden" accept=".xlsx, .xls"></label>
@@ -2047,6 +2053,29 @@
             });
         }
 
+        // Limpia todos los filtros aplicados a una tabla y la vuelve a renderizar.
+        function clearAllFilters(filterKey) {
+            // 1. Limpiar el estado de los filtros de columna
+            state.activeFilters[filterKey] = {};
+
+            // 2. Limpiar el campo de búsqueda
+            const searchInput = document.getElementById(`filter-input-${filterKey}`);
+            if (searchInput) searchInput.value = '';
+
+            // 3. Limpiar visualmente los encabezados de columna activos
+            const tableId = filterKey === 'main' ? 'main-table-header' : 'historical-table-header';
+            document.querySelectorAll(`#${tableId} .filterable-header.active`).forEach(h => h.classList.remove('active'));
+
+            // 4. Si es la tabla principal, limpiar también el filtro de día
+            if (filterKey === 'main') {
+                state.ui.activeDayFilter = null;
+                document.querySelectorAll('#dashboard .indicator-card.active-filter').forEach(card => card.classList.remove('active-filter'));
+            }
+
+            // 5. Re-renderizar la tabla correspondiente con los datos completos
+            const data = filterKey === 'main' ? state.calls : state.historicalCalls;
+            sortAndRenderTable(filterKey === 'main' ? DOM.callLogTableBody : DOM.historicalTableBody, data, filterKey === 'historical');
+        }
 
         //ordenar y renderizar tabla
         function sortAndRenderTable(tableBody, data, isHistorical) {
@@ -4416,6 +4445,12 @@
             setupFiltering('filter-input-main', () => state.calls, renderTable, false);
             setupFiltering('filter-input-historical', () => state.historicalCalls, renderTable, true);
             setupAutofill();
+
+            // Listeners para los nuevos botones de limpiar filtros
+            document.getElementById('clear-all-filters-btn').addEventListener('click', () => clearAllFilters('main'));
+            document.getElementById('clear-all-filters-historical-btn').addEventListener('click', () => clearAllFilters('historical'));
+
+
             setupWeekdayDashboardFilter();
             
             // Listener para el dashboard de la pestaña de histórico
