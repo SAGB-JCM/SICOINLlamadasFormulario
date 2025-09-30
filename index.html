@@ -22,8 +22,8 @@
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- js-xlsx para leer archivos de Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- xlsx-js-style para leer/escribir archivos de Excel con estilos -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
     
     <!-- PivotTable.js para tabla dinámica interactiva -->
     <link rel="stylesheet" type="text/css" href="https://pivottable.js.org/dist/pivot.css">
@@ -1592,6 +1592,19 @@
             document.body.appendChild(alertContainer);
             setTimeout(() => { alertContainer.remove(); }, 3000);
         }
+
+        //Genera una marca de tiempo formateada para nombres de archivo.
+        function getFormattedTimestamp() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Los meses son base 0
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${day}-${month}-${year}_${hours}h${minutes}m${seconds}s`;
+        }
+
 
         //Dar formato a Duración
                 function formatDuration(seconds) {
@@ -3864,33 +3877,129 @@
         "Estatus", "Atendió", "Comentarios"
         ];
 
+        /**
+         * Exporta datos a un archivo Excel con formato personalizado.
+         * @param {Array} data - Los datos a exportar.
+         * @param {string} sheetName - El nombre de la hoja de cálculo.
+         * @param {string} fileName - El nombre del archivo a descargar.
+         */
+        function exportToExcelWithFormatting(data, sheetName, fileName) {
+            // 1. Preparar los datos y el título
+            const dataToExport = prepareExportData(data);
+            const longDate = formatLongDate(new Date().toLocaleDateString('es-ES'));
+            const title = `Llamadas Registradas al ${longDate}`;
+
+            // 2. Definir estilos
+            const titleStyle = { 
+                font: { name: "Noto Sans", sz: 12, bold: true },
+                alignment: { horizontal: "left", vertical: "center" },
+            };
+            const headerStyle = {
+                font: { name: "Noto Sans", sz: 11, bold: true, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: "A6802D" } }, // Color primario
+                alignment: { horizontal: "center", vertical: "center" },
+                border: {
+                    // Borde para todas las celdas del encabezado
+                    top: { style: "thin", color: { auto: 1 } },
+                    bottom: { style: "thin", color: { auto: 1 } },
+                    left: { style: "thin", color: { auto: 1 } },
+                    right: { style: "thin", color: { auto: 1 } },
+                }
+            };
+            const cellStyle = {
+                font: { name: "Noto Sans", sz: 10 },
+                alignment: { horizontal: "center", vertical: "center" },
+                border: {
+                    // Borde para todas las celdas de datos
+                    top: { style: "thin", color: { auto: 1 } },
+                    bottom: { style: "thin", color: { auto: 1 } },
+                    left: { style: "thin", color: { auto: 1 } },
+                    right: { style: "thin", color: { auto: 1 } },
+                }
+            };
+
+            // 3. Crear la hoja de cálculo
+            // Se crea un array de arrays para tener control total sobre las celdas
+            const ws_data = [
+                [title], // Fila 1: Título
+                exportHeaders // Fila 2: Encabezados
+            ];
+
+            dataToExport.forEach(row => {
+                const rowData = exportHeaders.map(header => row[header]);
+                ws_data.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+            // 4. Aplicar estilos
+            // Estilo del título en A1
+            if (ws['A1']) {
+                ws['A1'].s = titleStyle;
+            }
+
+            // Estilos de encabezados (fila 2) y celdas de datos (desde fila 3)
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cell_address = { c: C, r: R };
+                    const cell_ref = XLSX.utils.encode_cell(cell_address);
+                    if (!ws[cell_ref]) continue;
+
+                    if (R === 1) { // Fila de encabezados (índice 1 en ws_data)
+                        ws[cell_ref].s = headerStyle;
+                    } else if (R > 1) { // Filas de datos
+                        ws[cell_ref].s = cellStyle;
+                    }
+                }
+            }
+
+            // 5. Ajustar anchos de columna
+            const colWidths = [
+                { wch: 5 }, // No.
+            ];
+            // Auto-ajuste para las demás columnas (opcional, pero mejora la apariencia)
+            for (let i = 1; i < exportHeaders.length; i++) { // Inicia en 1 para omitir la columna "No."
+                colWidths.push({ wch: 20 }); // Ancho estándar de 20
+            }
+            ws['!cols'] = colWidths;
+
+            // 6. Generar y descargar el archivo
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, fileName);
+        }
+
         function secondsToExcelDate(seconds) {
         // Convertir segundos a objeto Date (para que Excel lo interprete como tiempo)
         return new Date(0, 0, 0, 0, 0, seconds || 0);
         }
  
         function prepareExportData(data) {
+            // Helper para asegurar que los campos vacíos se exporten como "N/A"
+            const na = (value) => value || "N/A";
+
             return data.map((call, index) => ({
                 "No.": index + 1, 
-                "Fecha": call.fecha || "", 
-                "Inicio": formatTimeWithAmPm(call.inicio),
-                "Fin": formatTimeWithAmPm(call.fin), 
+                "Fecha": na(call.fecha), 
+                "Inicio": na(formatTimeWithAmPm(call.inicio)),
+                "Fin": na(formatTimeWithAmPm(call.fin)), 
                 "Duración": formatDuration(
                     call.duracion instanceof Date 
                         ? (call.duracion.getHours() * 3600 + call.duracion.getMinutes() * 60 + call.duracion.getSeconds()) 
                         : (Number(call.duracion) || 0)
                 ),
-                "Área": call.area || "", 
-                "Institución": call.institucion || "", 
-                "Asunto": call.asunto || "",
-                "Consulta": call.consulta || "", 
-                "Nombre": call.nombre || "", 
-                "Cargo": call.cargo || "",
-                "Correo": call.correo || "", 
-                "Teléfono": String(call.telefono || ""), 
-                "Estatus": call.estatus || "",
-                "Atendió": call.atendio || "", 
-                "Comentarios": call.comentarios || ""
+                "Área": na(call.area), 
+                "Institución": na(call.institucion), 
+                "Asunto": na(call.asunto),
+                "Consulta": na(call.consulta), 
+                "Nombre": na(call.nombre), 
+                "Cargo": na(call.cargo),
+                "Correo": na(call.correo), 
+                "Teléfono": na(String(call.telefono || "")), 
+                "Estatus": na(call.estatus),
+                "Atendió": na(call.atendio), 
+                "Comentarios": na(call.comentarios)
             }));
         }
 
@@ -4440,11 +4549,29 @@
                             const workbook = XLSX.read(e.target.result, { type: 'array', cellDates: true });
                             const sheetName = workbook.SheetNames[0];
                             const worksheet = workbook.Sheets[sheetName];
-                            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                            // --- INICIO: Lógica mejorada para detectar encabezados ---
+                            let jsonData;
+                            const titleCell = worksheet['A1'] ? worksheet['A1'].v : '';
+                            if (typeof titleCell === 'string' && titleCell.toLowerCase().includes('llamadas registradas')) {
+                                // Si hay título, los encabezados están en la fila 2.
+                                jsonData = XLSX.utils.sheet_to_json(worksheet, { range: 1 });
+                            } else {
+                                // Comportamiento por defecto: los encabezados están en la fila 1.
+                                jsonData = XLSX.utils.sheet_to_json(worksheet);
+                            }
+                            // --- FIN: Lógica mejorada para detectar encabezados ---
                             
                             if (jsonData.length === 0) return showAlert("El archivo no contiene datos válidos.", "warning");
 
                             const processedData = jsonData.map(row => {  // Corregir json a jsonData
+                                // Función para procesar cada valor: si es "N/A", lo convierte en un string vacío.
+                                const processNA = (value) => {
+                                    if (typeof value === 'string' && value.trim().toUpperCase() === 'N/A') {
+                                        return '';
+                                    }
+                                    return value;
+                                };
                                 const mapKeys = (obj, keyMap) => Object.keys(obj).reduce((acc, key) => {
                                     const newKey = keyMap[key.toLowerCase().trim()] || key.toLowerCase().trim();
                                     acc[newKey] = obj[key];
@@ -4454,11 +4581,11 @@
                                 const keyMapping = { 'no.': 'no', 'duración': 'duracion', 'área': 'area', 'institución': 'institucion', 'teléfono': 'telefono', 'atendió': 'atendio' };
                                 const mappedRow = mapKeys(row, keyMapping);
 
-                                // No asignar fechas/horas actuales si vienen vacías
-                                let fecha = mappedRow.fecha;
-                                let inicio = mappedRow.inicio;
-                                let fin = mappedRow.fin;
-                                let duracion = mappedRow.duracion;
+                                // Procesar cada campo para manejar "N/A" antes de cualquier otra lógica.
+                                let fecha = processNA(mappedRow.fecha);
+                                let inicio = processNA(mappedRow.inicio);
+                                let fin = processNA(mappedRow.fin);
+                                let duracion = processNA(mappedRow.duracion);
                                 
                                 if (fecha instanceof Date) {
                                     fecha = fecha.toLocaleDateString('es-ES');
@@ -4503,18 +4630,18 @@
                                     fecha: fecha,
                                     inicio: inicio,
                                     fin: fin,
-                                    duracion: duracion,
-                                    area: mappedRow.area || '',
-                                    institucion: mappedRow.institucion || '',
-                                    asunto: mappedRow.asunto || '',
-                                    consulta: mappedRow.consulta || '',
-                                    nombre: mappedRow.nombre || '',
-                                    cargo: mappedRow.cargo || '',
-                                    correo: mappedRow.correo || '',
-                                    telefono: String(mappedRow.telefono || ''),
-                                    estatus: mappedRow.estatus || 'Entrante',
-                                    atendio: mappedRow.atendio || '',
-                                    comentarios: mappedRow.comentarios || ''
+                                    duracion: duracion || 0,
+                                    area: processNA(mappedRow.area) || '',
+                                    institucion: processNA(mappedRow.institucion) || '',
+                                    asunto: processNA(mappedRow.asunto) || '',
+                                    consulta: processNA(mappedRow.consulta) || '',
+                                    nombre: processNA(mappedRow.nombre) || '',
+                                    cargo: processNA(mappedRow.cargo) || '',
+                                    correo: processNA(mappedRow.correo) || '',
+                                    telefono: String(processNA(mappedRow.telefono) || ''),
+                                    estatus: processNA(mappedRow.estatus) || 'Entrante',
+                                    atendio: processNA(mappedRow.atendio) || '',
+                                    comentarios: processNA(mappedRow.comentarios) || ''
                                 };
                             });
 
@@ -4556,24 +4683,19 @@
             // Registro de llamadas descargar
             DOM.downloadExcelBtn.addEventListener('click', () => {
                 if (state.calls.length === 0) return showAlert("No hay datos para descargar.", "warning");
-                const data = prepareExportData(state.calls);
-                const ws = XLSX.utils.json_to_sheet(data, { header: exportHeaders });
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Llamadas");
-                XLSX.writeFile(wb, "registro_llamadas.xlsx");
+                const timestamp = getFormattedTimestamp();
+                const fileName = `Registro de Llamadas - ${timestamp}.xlsx`;
+                exportToExcelWithFormatting(state.calls, "Registro de Llamadas", fileName);
             });
             
             // Registro histórico descargar
             document.getElementById('download-historical-excel-btn').addEventListener('click', () => {
                 // Obtener los datos actualmente filtrados en la tabla
                 const filteredData = applyAllFilters(state.historicalCalls, 'historical');
-
                 if (filteredData.length === 0) return showAlert("No hay datos en la tabla para descargar.", "warning");
-                const dataToExport = prepareExportData(filteredData);
-                const ws = XLSX.utils.json_to_sheet(dataToExport, { header: exportHeaders });
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Histórico Filtrado");
-                XLSX.writeFile(wb, "Registro_historico.xlsx");
+                const timestamp = getFormattedTimestamp();
+                const fileName = `Registro de Llamadas Históricas - ${timestamp}.xlsx`;
+                exportToExcelWithFormatting(filteredData, "Registro Histórico", fileName);
             });
             
             // Generar Reporte Boton
