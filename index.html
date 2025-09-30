@@ -903,7 +903,7 @@
 
                     <!----------------- GRÁFICOS PRINCIPALES ---------------->
                     <div class="grid grid-cols-1 md:grid-cols-2">
-                        <div class="chart-wrapper">
+                        <div class="chart-wrapper"> 
                             <h3 class="text-xl font-semibold text-slate-800 mb-2">Llamadas por Estatus</h3>
                             <canvas id="statusChart"></canvas>
                         </div>
@@ -916,8 +916,11 @@
                             <canvas id="dayOfWeekChart"></canvas>
                         </div>
                         <div class="chart-wrapper">
-                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Llamadas por Tipo de Consulta</h3>
-                            <canvas id="consultaChart"></canvas>
+                            <div class="flex items-center justify-start gap-4 mb-2 px-4">
+                                <h3 id="consulta-chart-title" class="text-xl font-semibold text-slate-800">Llamadas por Consulta</h3>
+                                <select id="consulta-asunto-filter" class="block w-auto rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-1"></select>
+                            </div>
+                            <canvas id="consultaChart" class="mt-2"></canvas>
                         </div>
                     </div>
                     
@@ -1442,6 +1445,7 @@
             dayOfWeekChartCanvas: document.getElementById('dayOfWeekChart'),
             consultaChartCanvas: document.getElementById('consultaChart'),
             dynamicChartCanvas: document.getElementById('dynamicChart'),
+            consultaAsuntoFilter: document.getElementById('consulta-asunto-filter'),
             dynamicChartVariable: document.getElementById('dynamic-chart-variable'),
             dynamicTableBody: document.getElementById('dynamic-table-body'),
             dynamicTableHeader: document.getElementById('dynamic-table-header'),
@@ -1507,6 +1511,8 @@
             timestampsStartTimeInput: document.getElementById('timestamps-start-time'),
             timestampsEndTimeInput: document.getElementById('timestamps-end-time'),
             timestampsDurationElem: document.getElementById('timestamps-duration'),
+            consultaChartHeader: document.querySelector('#consultaChart').previousElementSibling,
+            consultaChartTitle: document.getElementById('consulta-chart-title'),
             quickViewTooltip: document.getElementById('quick-view-tooltip'),
             // Nuevos elementos para la alerta de resumen
         };
@@ -1556,6 +1562,7 @@
                 isProgrammaticChange: false,
                 showChartLabels: true,
             }, 
+            consultaChartState: { showLabels: false },
             reportFilter: {
                 type: 'all', // 'all' o 'period'
                 startDate: null,
@@ -3406,19 +3413,49 @@
         //Actualizar 
         function updateCharts() {
             const data = getReportData();
-            
-            const chartWrappers = document.querySelectorAll('.chart-wrapper');
-            const chartSize = DOM.chartSizeSlider.value;
-            chartWrappers.forEach(wrapper => {
-                wrapper.style.height = `${chartSize}px`;
+
+            // --- INICIO: Poblar el nuevo selector de Asunto para el gráfico de Consulta ---
+            const asuntosUnicos = [...new Set(data.map(call => call.asunto).filter(Boolean))].sort();
+            const asuntoFilterSelect = DOM.consultaAsuntoFilter;
+            const currentAsuntoFilterValue = asuntoFilterSelect.value; // Guardar valor actual
+            asuntoFilterSelect.innerHTML = '<option value="Todos">Todos los Asuntos</option>'; // Opción por defecto
+
+            // Actualizar el título del gráfico de consulta
+            DOM.consultaChartTitle.textContent = currentAsuntoFilterValue === 'Todos' ? 'Llamadas por Consulta' : `Consultas para: ${currentAsuntoFilterValue}`;
+
+            asuntosUnicos.forEach(asunto => {
+                const option = document.createElement('option');
+                option.value = asunto;
+                option.textContent = asunto;
+                if (asunto === currentAsuntoFilterValue) {
+                    option.selected = true;
+                }
+                asuntoFilterSelect.appendChild(option);
+            });
+            // --- FIN: Poblar el nuevo selector ---
+
+            const chartSize = DOM.chartSizeSlider.value; // Se define chartSize
+            document.querySelectorAll('.chart-wrapper').forEach(wrapper => {
+                wrapper.style.height = `${chartSize}px`; // Se usa la variable correcta: chartSize
             });
 
             const statusCounts = {}, asuntoCounts = {}, dayOfWeekCounts = {}, consultaCounts = {};
+            const selectedAsunto = asuntoFilterSelect.value;
+
+            // Filtrar los datos para el gráfico de consulta ANTES del bucle principal
+            const consultaData = (selectedAsunto === 'Todos') 
+                ? data 
+                : data.filter(call => call.asunto === selectedAsunto);
+
+            consultaData.forEach(call => {
+                consultaCounts[call.consulta || 'N/A'] = (consultaCounts[call.consulta || 'N/A'] || 0) + 1;
+            });
+
             data.forEach(call => {
+                // Lógica existente para los otros gráficos (sin cambios)
                 statusCounts[call.estatus || 'N/A'] = (statusCounts[call.estatus || 'N/A'] || 0) + 1;
                 asuntoCounts[call.asunto || 'N/A'] = (asuntoCounts[call.asunto || 'N/A'] || 0) + 1;
-                consultaCounts[call.consulta || 'N/A'] = (consultaCounts[call.consulta || 'N/A'] || 0) + 1;
-
+                
                 // --- CORRECCIÓN: Usar la función getDayOfWeek para consistencia ---
                 const dayOfWeekIndex = getDayOfWeek(call.fecha); // Devuelve 1 para Lunes, 2 para Martes, etc.
                 if (dayOfWeekIndex !== -1) {
@@ -3431,7 +3468,7 @@
                 }
             });
 
-            const createOrUpdateChart = (canvas, chartInstance, type, data, labelsOrder, datasetLabel = 'Cantidad', sort = false) => {
+            const createOrUpdateChart = (canvas, chartInstance, type, data, labelsOrder, datasetLabel = 'Cantidad', sort = false, showXLabels = true) => {
                 // Destruye la instancia del gráfico si existe para evitar duplicaciones
                 if (chartInstance) chartInstance.destroy();
 
@@ -3470,6 +3507,13 @@
                     type, 
                     data: { labels, datasets: [dataset] }, 
                     options: { 
+                    scales: {
+                        x: {
+                            ticks: {
+                                display: showXLabels // Controla la visibilidad de las etiquetas del eje X
+                            }
+                        }
+                    },
                     responsive: true, 
                     maintainAspectRatio: false,
                         plugins: {
@@ -3493,7 +3537,7 @@
 
             state.charts.status = createOrUpdateChart(DOM.statusChartCanvas, state.charts.status, 'pie', statusCounts);
             state.charts.asunto = createOrUpdateChart(DOM.asuntoChartCanvas, state.charts.asunto, 'bar', asuntoCounts, null, 'Llamadas por Asunto', true);
-            state.charts.consulta = createOrUpdateChart(DOM.consultaChartCanvas, state.charts.consulta, 'bar', consultaCounts, null, 'Llamadas por Consulta', true);
+            state.charts.consulta = createOrUpdateChart(DOM.consultaChartCanvas, state.charts.consulta, 'bar', consultaCounts, null, 'Llamadas por Consulta', true, state.consultaChartState.showLabels); // Se pasa el estado para mostrar/ocultar etiquetas
             state.charts.dayOfWeek = createOrUpdateChart(DOM.dayOfWeekChartCanvas, state.charts.dayOfWeek, 'line', dayOfWeekCounts, ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'], 'Llamadas por Día', false);
                  
             // Actualizar gráfica dinámica
@@ -3517,7 +3561,7 @@
             });
         }
 
-
+        
         //Update Chart
         function updateDynamicChart() {
             const data = getReportData();
@@ -4378,8 +4422,11 @@
             DOM.dashboardDataSourceHistorico.addEventListener('change', updateAllDashboards);
             
             // Establecer "Histórico" como valor predeterminado en fuente de datos
-            DOM.reportesDataSource.addEventListener('change', updateCharts);
             DOM.reportesDataSource.value = 'historico'; 
+            DOM.reportesDataSource.addEventListener('change', updateCharts);
+
+            // Listener para el nuevo selector de asunto en el gráfico de consultas
+            DOM.consultaAsuntoFilter.addEventListener('change', updateCharts);
 
             DOM.dynamicChartVariable.addEventListener('change', updateDynamicChart);
 
@@ -4986,6 +5033,23 @@
                 tbody.addEventListener('mousemove', moveTooltip);
             });
         }
+        
+        function setupConsultaChartLabelToggle() {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded ml-2';
+            toggleBtn.innerHTML = '<i class="fa-solid fa-tag"></i>';
+            toggleBtn.title = 'Alternar visualización de etiquetas';
+        
+            // Insertar el botón en el header del gráfico de consulta
+            DOM.consultaChartHeader.appendChild(toggleBtn);
+        
+            toggleBtn.addEventListener('click', () => {
+                state.consultaChartState.showLabels = !state.consultaChartState.showLabels;
+                toggleBtn.classList.toggle('bg-primary', state.consultaChartState.showLabels);
+                toggleBtn.classList.toggle('text-white', state.consultaChartState.showLabels);
+                updateCharts(); // Re-renderizar los gráficos para aplicar el cambio
+            });
+        }
 
         // =============================================
         // MÓDULO: Inicialización
@@ -4999,6 +5063,7 @@
             setupReportConfig();
             setupSummaryAlertListeners();
             setupQuickViewTooltip(); 
+            setupConsultaChartLabelToggle();
             
             // Configurar Select2 para todos los selects
             $('#call-form select, #edit-form select').each(function() {
