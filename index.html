@@ -916,8 +916,8 @@
                             <canvas id="dayOfWeekChart"></canvas>
                         </div>
                         <div class="chart-wrapper">
-                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Llamadas atendidas por Servidor Público</h3>
-                            <canvas id="atendioChart"></canvas>
+                            <h3 class="text-xl font-semibold text-slate-800 mb-2">Llamadas por Tipo de Consulta</h3>
+                            <canvas id="consultaChart"></canvas>
                         </div>
                     </div>
                     
@@ -928,8 +928,6 @@
                             <select id="dynamic-chart-variable" class="mt-1 block w-full md:w-auto rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2">
                                 <option value="area">Área</option>
                                 <option value="institucion">Institución</option>
-                                <option value="asunto">Asunto</option>
-                                <option value="consulta">Consulta</option>
                                 <option value="nombre">Nombre</option>
                                 <option value="cargo">Cargo</option>
                                 <option value="atendio">Atendió</option>
@@ -963,7 +961,7 @@
                 <!----------------- TABLA DINÁMICA INTERACTIVA---------------->
                 <section class="bg-white p-6 rounded-xl shadow-md">
                     <h2 class="text-xl font-bold text-primary mb-4">Tabla Dinámica Interactiva</h2>
-                    <p class="text-sm text-slate-500 mb-4">Selecciona variables para cruzar datos y genera gráficos dinámicos (tablas, barras, líneas, heatmaps, etc.).</p>
+                    <p class="text-sm text-slate-500 mb-4">Por defecto se muestran llamadas por Institución y asunto, para cambiar la configuración, arrastre las variable deseada al encabezado o renglon para ajustar los datos. </p>
                     <div id="pivot-table"></div>
                 </section>
             </div>
@@ -1231,7 +1229,7 @@
                         </div>
                         <div class="flex items-center">
                             <input type="checkbox" id="include-atendio" class="rounded border-gray-300 text-primary focus:ring-primary">
-                            <label for="include-atendio" class="ml-2 block text-sm text-gray-700">Llamadas por Servidor Público</label>
+                            <label for="include-atendio" class="ml-2 block text-sm text-gray-700">Llamadas por Consulta</label>
                         </div>
                         <div class="flex items-center">
                             <input type="checkbox" id="include-status" class="rounded border-gray-300 text-primary focus:ring-primary">
@@ -1442,7 +1440,7 @@
             statusChartCanvas: document.getElementById('statusChart'),
             asuntoChartCanvas: document.getElementById('asuntoChart'),
             dayOfWeekChartCanvas: document.getElementById('dayOfWeekChart'),
-            atendioChartCanvas: document.getElementById('atendioChart'),
+            consultaChartCanvas: document.getElementById('consultaChart'),
             dynamicChartCanvas: document.getElementById('dynamicChart'),
             dynamicChartVariable: document.getElementById('dynamic-chart-variable'),
             dynamicTableBody: document.getElementById('dynamic-table-body'),
@@ -1557,7 +1555,7 @@
                 activeDayFilter: null, // null o un número de 1 a 5 para el día
                 isProgrammaticChange: false,
                 showChartLabels: true,
-            },
+            }, 
             reportFilter: {
                 type: 'all', // 'all' o 'period'
                 startDate: null,
@@ -1568,7 +1566,7 @@
                 historical: {}
             },
             charts: {
-                status: null, asunto: null, dayOfWeek: null, atendio: null, dynamic: null
+                status: null, asunto: null, dayOfWeek: null, consulta: null, dynamic: null
             }
         };
 
@@ -3415,11 +3413,12 @@
                 wrapper.style.height = `${chartSize}px`;
             });
 
-            const statusCounts = {}, asuntoCounts = {}, dayOfWeekCounts = {}, atendioCounts = {};
+            const statusCounts = {}, asuntoCounts = {}, dayOfWeekCounts = {}, consultaCounts = {};
             data.forEach(call => {
                 statusCounts[call.estatus || 'N/A'] = (statusCounts[call.estatus || 'N/A'] || 0) + 1;
                 asuntoCounts[call.asunto || 'N/A'] = (asuntoCounts[call.asunto || 'N/A'] || 0) + 1;
-                atendioCounts[call.atendio || 'N/A'] = (atendioCounts[call.atendio || 'N/A'] || 0) + 1;
+                consultaCounts[call.consulta || 'N/A'] = (consultaCounts[call.consulta || 'N/A'] || 0) + 1;
+
                 // --- CORRECCIÓN: Usar la función getDayOfWeek para consistencia ---
                 const dayOfWeekIndex = getDayOfWeek(call.fecha); // Devuelve 1 para Lunes, 2 para Martes, etc.
                 if (dayOfWeekIndex !== -1) {
@@ -3432,15 +3431,20 @@
                 }
             });
 
-            const createOrUpdateChart = (canvas, chartInstance, type, data, labelsOrder, datasetLabel = 'Cantidad') => {
+            const createOrUpdateChart = (canvas, chartInstance, type, data, labelsOrder, datasetLabel = 'Cantidad', sort = false) => {
                 // Destruye la instancia del gráfico si existe para evitar duplicaciones
                 if (chartInstance) chartInstance.destroy();
 
                 // Obtiene las etiquetas de los datos
                 let labels = Object.keys(data);
+                let sortedData = { ...data };
                 
-                // Ordena las etiquetas si se proporciona un orden
-                if (labelsOrder) {
+                if (sort) {
+                    labels = Object.keys(data).sort((a, b) => data[b] - data[a]);
+                    sortedData = {};
+                    labels.forEach(label => sortedData[label] = data[label]);
+                } else if (labelsOrder) {
+                    // Ordena las etiquetas si se proporciona un orden
                     labels.sort((a, b) => labelsOrder.indexOf(a) - labelsOrder.indexOf(b));
                 }
 
@@ -3484,26 +3488,32 @@
             if (state.charts.status) state.charts.status.destroy();
             if (state.charts.asunto) state.charts.asunto.destroy();
             if (state.charts.dayOfWeek) state.charts.dayOfWeek.destroy();
-            if (state.charts.atendio) state.charts.atendio.destroy();
+            if (state.charts.consulta) state.charts.consulta.destroy();
             if (state.charts.dynamic) state.charts.dynamic.destroy();
 
             state.charts.status = createOrUpdateChart(DOM.statusChartCanvas, state.charts.status, 'pie', statusCounts);
-            state.charts.asunto = createOrUpdateChart(DOM.asuntoChartCanvas, state.charts.asunto, 'bar', asuntoCounts, null, 'Llamadas por Asunto');
-            state.charts.atendio = createOrUpdateChart(DOM.atendioChartCanvas, state.charts.atendio, 'bar', atendioCounts, null, 'Llamadas Atendidas');
-            state.charts.dayOfWeek = createOrUpdateChart(DOM.dayOfWeekChartCanvas, state.charts.dayOfWeek, 'line', dayOfWeekCounts, ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'], 'Llamadas por Día');
+            state.charts.asunto = createOrUpdateChart(DOM.asuntoChartCanvas, state.charts.asunto, 'bar', asuntoCounts, null, 'Llamadas por Asunto', true);
+            state.charts.consulta = createOrUpdateChart(DOM.consultaChartCanvas, state.charts.consulta, 'bar', consultaCounts, null, 'Llamadas por Consulta', true);
+            state.charts.dayOfWeek = createOrUpdateChart(DOM.dayOfWeekChartCanvas, state.charts.dayOfWeek, 'line', dayOfWeekCounts, ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'], 'Llamadas por Día', false);
                  
             // Actualizar gráfica dinámica
             updateDynamicChart();
 
-            $.pivotUtilities.locales.es = {
-                localeStrings: { renderError: "Error al renderizar.", computeError: "Error al calcular.", uiRenderError: "Error de UI.", selectAll: "Seleccionar Todo", selectNone: "Seleccionar Ninguno", tooMany: "(demasiados)", filterResults: "Filtrar", apply: "Aplicar", cancel: "Cancelar", totals: "Totales", vs: "vs", by: "por" },
-                aggregators: { "Conteo": "Conteo", "Suma": "Suma", "Promedio": "Promedio", "Mínimo": "Mínimo", "Máximo": "Máximo" },
-                renderers: { "Tabla": "Tabla", "Gráfico de Barras": "Gráfico de Barras", "Gráfico de Líneas": "Gráfico de Líneas", "Mapa de Calor": "Mapa de Calor" }
-            };
+            // 1. Simplificar los datos eliminando atributos no deseados para la tabla dinámica.
+            const pivotData = data.map(call => {
+                const { id, fin, telefono, importedAt, correo, inicio, comentarios, fecha, createdAt, updatedAt, migratedAt, originalId, ...rest } = call;
+                return rest;
+            });
 
             $(DOM.pivotTableContainer).pivotUI(data, {
-                rows: ["area"], cols: ["estatus"], vals: ["duracion"],
-                aggregatorName: "Conteo", rendererName: "Tabla", locale: "es"
+                // 2. Establecer la configuración por defecto.
+                cols: ["asunto"],
+                rows: ["institucion"], 
+                aggregatorName: "Count", 
+                rendererName: "Table", // Por defecto se mostrará la tabla.
+                locale: "es",
+                // 3. Ocultar atributos para simplificar la interfaz de la tabla dinámica.
+                hiddenAttributes: ["id", "fin", "telefono", "importedAt", "correo", "inicio", "comentarios", "fecha", "createdAt", "updatedAt", "migratedAt", "originalId"]
             });
         }
 
@@ -3546,12 +3556,15 @@
             let totalEntrante = 0;
             let granTotal = 0;
 
-            Object.entries(variableStatusCounts).forEach(([value, counts]) => {
-                const total = (counts.Saliente || 0) + (counts.Entrante || 0);
-                totalSaliente += (counts.Saliente || 0);
-                totalEntrante += (counts.Entrante || 0);
-                granTotal += total;
+            // Ordenar los datos de la tabla de mayor a menor por el total de llamadas
+            const sortedVariableStatusCounts = Object.entries(variableStatusCounts).sort(([, a], [, b]) => {
+                const totalA = (a.Saliente || 0) + (a.Entrante || 0);
+                const totalB = (b.Saliente || 0) + (b.Entrante || 0);
+                return totalB - totalA;
+            });
 
+            sortedVariableStatusCounts.forEach(([value, counts]) => {
+                const total = (counts.Saliente || 0) + (counts.Entrante || 0);
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${value}</td>
@@ -3560,7 +3573,13 @@
                     <td>${total}</td>
                 `;
                 DOM.dynamicTableBody.appendChild(row);
+
+                totalSaliente += (counts.Saliente || 0);
+                totalEntrante += (counts.Entrante || 0);
+                granTotal += total;
             });
+
+
 
             // Añadir fila de totales al tfoot
             tfoot.innerHTML = `
@@ -3575,12 +3594,16 @@
             // Actualizar gráfico
             if (state.charts.dynamic) state.charts.dynamic.destroy();
             
-            const labels = Object.keys(variableCounts);
-            const chartData = Object.values(variableCounts);
+            // Ordenar los datos del gráfico de mayor a menor
+            const sortedChartData = Object.entries(variableCounts).sort(([, a], [, b]) => b - a);
+
+            const labels = sortedChartData.map(([label]) => label);
+            const chartData = sortedChartData.map(([, count]) => count);
             
             state.charts.dynamic = new Chart(DOM.dynamicChartCanvas, {
                 type: 'bar',
                 data: {
+
                     labels: labels,
                     datasets: [{
                         label: 'Cantidad',
@@ -3695,7 +3718,7 @@
                 { condition: includeStatus, title: "Distribución por Estatus", data: getReportData(), key: 'estatus', type: 'pie' },
                 { condition: includeAsunto, title: "Llamadas por Asunto", data: getReportData(), key: 'asunto', type: 'bar' },
                 { condition: includeDay, title: "Tendencia Semanal", data: getReportData(), key: 'fecha', type: 'line' },
-                { condition: includeAtendio, title: "Distribución por Servidor Público", data: getReportData(), key: 'atendio', type: 'bar' },
+                { condition: includeAtendio, title: "Llamadas por Consulta", data: getReportData(), key: 'consulta', type: 'bar' },
                 { condition: includeDynamicChart, title: `Análisis por ${DOM.dynamicChartVariable.value}`, data: getReportData(), key: DOM.dynamicChartVariable.value, type: 'bar' }
             ];
 
@@ -4403,7 +4426,7 @@
             // Reemplazar la función handleEditClick con esta versión corregida
             function handleEditClick(event) {
                 requirePassword(() => {
-                    const button = event.currentTarget;
+                    const button = event.currentTarget; 
                     const callId = button.getAttribute('data-id');
                     const isHistorical = button.getAttribute('data-is-historical') === 'true';
 
@@ -4462,7 +4485,7 @@
                 if (buttonTarget) {
                     if (buttonTarget.classList.contains('edit-btn')) handleEditClick({ currentTarget: buttonTarget });
                     if (buttonTarget.classList.contains('delete-btn')) handleDeleteClick({ currentTarget: buttonTarget });
-                    if (buttonTarget.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: buttonTarget });
+                    if (buttonTarget.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: buttonTarget }); 
                     return;
                 }
 
@@ -4489,7 +4512,7 @@
                 if (buttonTarget) {
                     if (buttonTarget.classList.contains('edit-btn')) handleEditClick({ currentTarget: buttonTarget });
                     if (buttonTarget.classList.contains('delete-btn')) handleDeleteClick({ currentTarget: buttonTarget });
-                    if (buttonTarget.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: buttonTarget });
+                    if (buttonTarget.classList.contains('toggle-status-btn')) handleStatusToggle({ currentTarget: buttonTarget }); 
                     return;
                 }
 
