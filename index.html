@@ -1616,6 +1616,22 @@
             return `${day}-${month}-${year}_${hours}h${minutes}m${seconds}s`;
         }
 
+        /**
+         * Crea una versión "debounced" de una función que retrasa su ejecución
+         * hasta que haya pasado un tiempo determinado sin que se vuelva a llamar.
+         * @param {Function} func La función a "debouncear".
+         * @param {number} delay El retraso en milisegundos.
+         * @returns {Function} La nueva función "debounced".
+         */
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
 
         //Dar formato a Duración
                 function formatDuration(seconds) {
@@ -5009,6 +5025,16 @@
             
             // Asignar el listener para el botón de cerrar
             DOM.closeDetailsModalBtn.addEventListener('click', () => closeModal(DOM.viewDetailsModal));
+
+            // Listener para el evento de redimensionamiento de la ventana (para el zoom)
+            // Se usa debounce para evitar que la función se ejecute demasiadas veces y afecte el rendimiento.
+            window.addEventListener('resize', debounce(() => {
+                // Solo actualiza los gráficos si la pestaña de reportes está activa.
+                const reportesTab = document.getElementById('tab-content-reportes');
+                if (reportesTab && !reportesTab.classList.contains('hidden')) {
+                    updateCharts();
+                }
+            }, 250)); // 250ms de retraso
 
             // Listeners para el modal de edición de horarios
             DOM.closeTimestampsModalBtn.addEventListener('click', () => closeModal(DOM.editTimestampsModal));
