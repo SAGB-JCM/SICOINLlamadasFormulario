@@ -627,13 +627,66 @@
             border-radius: 2px;
         }
 
+        /*Estilo para el contenedor de ventanas minimizadas*/
+        .minimized-window {
+            width: 280px;
+            height: 40px;
+            background-color: #fff;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px 0 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: all;
+        }
+        .minimized-window:hover {
+            background-color: #f9fafb;
+        }
+        .minimized-window-title {
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .minimized-window-controls button {
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .minimized-window-controls button:hover {
+            background-color: #e5e7eb;
+        }
+        .minimized-window-controls button.close-btn:hover {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        #minimized-timer {
+            margin-right: auto;
+            margin-left: 12px;
+        }
+        .modal-header-controls button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            cursor: pointer;
+        }
+
         /* Estilos para la Alerta de Resumen (copiado de Licitaciones) */
         #summary-alert-container.alert-enter { animation: slideInUp 0.5s ease-out forwards; }
         #summary-alert-container.alert-leave { animation: slideOutDown 0.5s ease-in forwards; }
 
         @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideOutDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
-
 
     </style>
     
@@ -678,6 +731,16 @@
             padding: 0.75rem;
             border-bottom: 1px solid #f3f4f6;
         }
+        .quick-history-header .flex.items-center.space-x-2 button {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
     </style>
     <!-- Configuración de Tailwind con nueva paleta de colores -->
     <script>
@@ -1018,12 +1081,26 @@
             </div>
         </div>
     </div>
-    
-    <!----------------- MODAL NUEVA LLAMADA ---------------->
+
+        <!----------------- MODAL NUEVA LLAMADA ---------------->
     <div id="call-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center wide-modal">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-6xl mx-4">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
-            <div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold text-primary">Detalles de la Llamada</h3><div class="text-right"><p class="text-sm font-medium text-slate-500">TIEMPO DE LLAMADA ACTUAL</p><p id="modal-timer" class="text-2xl font-bold text-primary tracking-wider">00:00:00</p></div></div>
+            <!-- Encabezado del Modal Mejorado -->
+            <div id="call-modal-header" class="flex justify-between items-center pb-4 mb-4 border-b cursor-move">
+                <h3 class="text-2xl font-bold text-primary">Detalles de la Llamada</h3>
+                <div class="modal-header-controls flex items-center space-x-2">
+                    <button id="minimize-call-modal-btn" class="text-gray-500 hover:bg-gray-200 rounded transition-colors" title="Minimizar"><i class="fa-solid fa-window-minimize"></i></button>
+                    <button id="close-modal-btn" class="text-gray-500 hover:bg-red-500 hover:text-white rounded transition-colors" title="Cerrar"><i class="fa-solid fa-times"></i></button>
+                </div>
+            </div>
+
+            <!-- Temporizador -->
+            <div class="text-right mb-6">
+                <p class="text-sm font-medium text-slate-500">TIEMPO DE LLAMADA ACTUAL</p>
+                <p id="modal-timer" class="text-2xl font-bold text-primary tracking-wider">00:00:00</p>
+            </div>
+
+            <!-- Contenido del Formulario -->
             <div class="call-form-container">
                 <form id="call-form" class="space-y-6" novalidate>
                     <div> 
@@ -1120,8 +1197,14 @@
     <!----------------- MODAL EDITAR LLAMADA ---------------->
     <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center wide-modal">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-6xl mx-4">
-            <button id="close-edit-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-times-circle fa-lg"></i></button>
-            <h3 class="text-2xl font-bold text-primary mb-6">Editar Llamada</h3>
+            <!-- Encabezado del Modal Mejorado -->
+            <div id="edit-modal-header" class="flex justify-between items-center pb-4 mb-6 border-b cursor-move">
+                <h3 class="text-2xl font-bold text-primary">Editar Llamada</h3>
+                <div class="modal-header-controls flex items-center space-x-2">
+                    <button id="minimize-edit-modal-btn" class="text-gray-500 hover:bg-gray-200 rounded transition-colors" title="Minimizar"><i class="fa-solid fa-window-minimize"></i></button>
+                    <button id="close-edit-modal-btn" class="text-gray-500 hover:bg-red-500 hover:text-white rounded transition-colors" title="Cerrar"><i class="fa-solid fa-times"></i></button>
+                </div>
+            </div>
             <div class="call-form-container">
                 <form id="edit-form" class="space-y-6" novalidate>
                     <input type="hidden" id="edit-id">
@@ -1411,9 +1494,12 @@
                 <i class="fa-solid fa-history mr-2"></i>
                 Historial Rápido
             </h4>
-            <button id="close-quick-history-btn" class="text-gray-400 hover:text-gray-600">
-                <i class="fa-solid fa-times"></i>
-            </button>
+            <div class="flex items-center space-x-2">
+                <button id="minimize-quick-history-btn" class="text-gray-500 hover:bg-gray-200 rounded transition-colors" title="Minimizar">
+                    <i class="fa-solid fa-window-minimize"></i>
+                </button>
+                <button id="close-quick-history-btn" class="close-btn text-gray-500 hover:bg-red-500 hover:text-white rounded transition-colors" title="Cerrar"><i class="fa-solid fa-times"></i></button>
+            </div>
         </div>
         <div id="quick-history-content" class="quick-history-content">
             <!-- El contenido se generará dinámicamente -->
@@ -1421,6 +1507,11 @@
     </div>
     <!-- Tooltip para vista rápida en tablas -->
     <div id="quick-view-tooltip"></div>
+
+    <!----------------- CONTENEDOR DE VENTANAS MINIMIZADAS ---------------->
+    <div id="minimized-windows-container" class="fixed bottom-0 left-0 w-full h-12 bg-transparent z-[90] pointer-events-none flex items-center px-4 gap-3">
+        <!-- Las ventanas minimizadas se añadirán aquí dinámicamente -->
+    </div>
 
     <!-- Contenedor para la Alerta de Resumen Semanal (adaptado de Licitaciones) -->
     <div id="summary-alert-container" class="hidden fixed bottom-4 right-4 w-full max-w-sm z-40">
@@ -1518,6 +1609,7 @@
             editModal: document.getElementById('edit-modal'),
             editForm: document.getElementById('edit-form'),
             modalTimerElem: document.getElementById('modal-timer'),
+            minimizeEditModalBtn: document.getElementById('minimize-edit-modal-btn'),
             closeEditModalBtn: document.getElementById('close-edit-modal-btn'),
             confirmModal: document.getElementById('confirm-modal'),
             cancelDeleteBtn: document.getElementById('cancel-delete-btn'),
@@ -1579,6 +1671,7 @@
             quickViewTooltip: document.getElementById('quick-view-tooltip'),
             quickHistoryPanel: document.getElementById('quick-history-panel'),
             quickHistoryContent: document.getElementById('quick-history-content'),
+            minimizeQuickHistoryBtn: document.getElementById('minimize-quick-history-btn'),
             closeQuickHistoryBtn: document.getElementById('close-quick-history-btn'),
             // Nuevos elementos para la alerta de resumen
         };
@@ -1616,6 +1709,7 @@
                 callStartTime: null,
                 openModalCount: 0,
                 currentFilterDropdown: null,
+                isCallModalActive: false, // Nuevo estado para rastrear si el modal de llamada está activo
                 isMigrationModeActive: false,
                 selectedCallIdsToMigrate: new Set(),
                 isReverseMigrationModeActive: false,
@@ -1798,10 +1892,16 @@
                 }
                 modal.style.zIndex = ''; // Limpiar el z-index DESPUÉS de que el modal se oculte
             }, 300);
- 
+
             // Si se cierra el modal de nueva llamada, ocultamos el panel de historial
-            if (modal === DOM.callModal) {
+            if (modal === DOM.callModal || modal === DOM.editModal) {
                 DOM.quickHistoryPanel.classList.add('hidden');
+                // También nos aseguramos de que la ventana minimizada se elimine si existe
+                const minimizedCallWindow = document.getElementById('minimized-call-window');
+                if (minimizedCallWindow) {
+                    minimizedCallWindow.remove();
+                }
+                toggleCallActiveState(false);
             }
         }
 
@@ -2288,10 +2388,11 @@
         // =============================================
         // MÓDULO: Gestión de llamadas
         // =============================================
-        
+
         //Empieza a contar tiempo de llamada
         function startTimer() {
             DOM.callForm.reset();
+            toggleCallActiveState(true); // Activar el estado de llamada activa
             // Reset all select2 fields
             $('#call-form select').val(null).trigger('change');
             openModal(DOM.callModal);
@@ -2312,6 +2413,31 @@
                 const elapsed = Math.floor((Date.now() - state.ui.callStartTime) / 1000);
                 DOM.modalTimerElem.textContent = formatDuration(elapsed);
             }, 1000);
+        }
+
+        // Activa o desactiva el estado de "llamada activa", deshabilitando botones de acción.
+        function toggleCallActiveState(isActive) {
+            state.ui.isCallModalActive = isActive;
+        
+            const buttonsToDisable = [
+                // Botones de la tabla principal
+                DOM.startCallBtn,
+                ...document.querySelectorAll('#call-log .edit-btn'),
+                ...document.querySelectorAll('#call-log .delete-btn'),
+                DOM.downloadExcelBtn,
+                DOM.startMigrationBtn,
+                // Botones de la tabla histórica
+                ...document.querySelectorAll('#historical-log .edit-btn'),
+                ...document.querySelectorAll('#historical-log .delete-btn'),
+                document.getElementById('download-historical-excel-btn'),
+                document.getElementById('historical-file-input').parentElement, // El label
+                DOM.importHistoricalBtn,
+                DOM.startReverseMigrationBtn,
+            ];
+        
+            buttonsToDisable.forEach(btn => {
+                if (btn) btn.disabled = isActive;
+            });
         }
         
         //Detiene el contador de tiempo de llamada
@@ -2528,6 +2654,7 @@
 
                 // 5) Abrir modal después de todo (para evitar race conditions visuales)
                 openModal(DOM.editModal);
+
             });
         }
 
@@ -4586,17 +4713,20 @@
             let callToDeleteIsHistorical = false;
 
             function handleDeleteClick(e) {
+                const button = e.currentTarget;
+                if (button.disabled) return; // Evitar acción si el botón está deshabilitado
                 requirePassword(() => {
-                    callToDeleteId = e.currentTarget.dataset.id;
-                    state.ui.callToDeleteIsHistorical = e.currentTarget.dataset.isHistorical === 'true';
+                    callToDeleteId = button.dataset.id;
+                    state.ui.callToDeleteIsHistorical = button.dataset.isHistorical === 'true';
                     openModal(DOM.confirmModal);
                 });
             }
 
             // Reemplazar la función handleEditClick con esta versión corregida
             function handleEditClick(event) {
+                const button = event.currentTarget;
+                if (button.disabled) return; // Evitar acción si el botón está deshabilitado
                 requirePassword(() => {
-                    const button = event.currentTarget; 
                     const callId = button.getAttribute('data-id');
                     const isHistorical = button.getAttribute('data-is-historical') === 'true';
 
@@ -4636,11 +4766,15 @@
                     }, 100);
 
                     openModal(DOM.editModal);
+                    // Bloquear acciones de fondo al abrir el modal de edición
+                    toggleCallActiveState(true);
+
                 });
             }
 
             // Funcion para actualizar estatus
             async function handleStatusToggle(e) {
+                if (e.currentTarget.disabled) return; // Evitar acción si el botón está deshabilitado
                 const button = e.currentTarget;
                 const callId = button.dataset.id;
                 const isHistorical = button.dataset.isHistorical === 'true';
@@ -5118,6 +5252,10 @@
             // Cierre del modal de detalles al hacer clic fuera
             DOM.viewDetailsModal.addEventListener('click', (e) => {
                 if (e.target === DOM.viewDetailsModal) {
+                    // Antes de cerrar, verificar si el modal de edición de horarios está abierto
+                    if (!DOM.editTimestampsModal.classList.contains('hidden')) {
+                        return; // No cerrar si el modal de horarios está encima
+                    }
                     closeModal(DOM.viewDetailsModal);
                 }
             });
@@ -5224,6 +5362,11 @@
             // Lógica para cerrar el panel
             DOM.closeQuickHistoryBtn.addEventListener('click', () => {
                 panel.classList.add('hidden');
+                // Asegurarse de que la ventana minimizada también se elimine
+                const minimizedHistoryWindow = document.getElementById('minimized-history-window');
+                if (minimizedHistoryWindow) {
+                    minimizedHistoryWindow.remove();
+                }
             });
 
             // Lógica para hacerlo arrastrable (draggable)
@@ -5261,7 +5404,167 @@
                 document.addEventListener('touchmove', move);
                 document.addEventListener('touchend', stopDrag);
             });
+
+            // Lógica de Minimizar/Restaurar para el modal de llamada
+            const minimizeCallBtn = document.getElementById('minimize-call-modal-btn');
+            minimizeCallBtn.addEventListener('click', () => {
+                minimizeWindow('call-modal', 'Llamada en curso...', 'minimized-call-window');
+            });
+
+            // Lógica de Minimizar/Restaurar para el modal de edición
+            DOM.minimizeEditModalBtn.addEventListener('click', () => {
+                minimizeWindow('edit-modal', 'Editando Llamada', 'minimized-edit-window');
+            });
+
+            // Lógica de Minimizar/Restaurar para el panel de historial
+            DOM.minimizeQuickHistoryBtn.addEventListener('click', () => {
+                minimizeWindow('quick-history-panel', 'Historial Rápido', 'minimized-history-window');
+            });
+
+            // Hacer el modal de llamada arrastrable
+            const callModalHeader = document.getElementById('call-modal-header');
+            const callModal = DOM.callModal.querySelector('.relative'); 
+
+            callModalHeader.addEventListener('mousedown', (e) => {
+                // Evitar iniciar el arrastre si se hace clic en un botón
+                if (e.target.closest('button')) return;
+
+                state.ui.isDragging = true;
+                // La posición del modal es 'relative', pero su contenedor flex lo centra.
+                // Para moverlo, necesitamos cambiarlo a 'absolute' y calcular su posición inicial.
+                const rect = callModal.getBoundingClientRect();
+                callModal.style.position = 'absolute';
+                callModal.style.left = `${rect.left}px`;
+                callModal.style.top = `${rect.top}px`;
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                document.addEventListener('mousemove', moveCallModal);
+                document.addEventListener('mouseup', stopDragCallModal);
+            });
+
+            const moveCallModal = (e) => {
+                if (!state.ui.isDragging) return;
+                e.preventDefault();
+                callModal.style.left = `${e.clientX - offsetX}px`;
+                callModal.style.top = `${e.clientY - offsetY}px`;
+            };
+
+            const stopDragCallModal = () => {
+                state.ui.isDragging = false;
+                document.removeEventListener('mousemove', moveCallModal);
+                document.removeEventListener('mouseup', stopDragCallModal);
+            };
+
+            // Hacer el modal de edición arrastrable
+            const editModalHeader = document.getElementById('edit-modal-header');
+            const editModal = DOM.editModal.querySelector('.relative');
+
+            editModalHeader.addEventListener('mousedown', (e) => {
+                // Evitar iniciar el arrastre si se hace clic en un botón
+                if (e.target.closest('button')) return;
+
+                state.ui.isDragging = true;
+                const rect = editModal.getBoundingClientRect();
+                editModal.style.position = 'absolute';
+                editModal.style.left = `${rect.left}px`;
+                editModal.style.top = `${rect.top}px`;
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                document.addEventListener('mousemove', moveEditModal);
+                document.addEventListener('mouseup', stopDragEditModal);
+            });
+
+            const moveEditModal = (e) => {
+                if (!state.ui.isDragging) return;
+                e.preventDefault();
+                editModal.style.left = `${e.clientX - offsetX}px`;
+                editModal.style.top = `${e.clientY - offsetY}px`;
+            };
+
+            const stopDragEditModal = () => {
+                state.ui.isDragging = false;
+                document.removeEventListener('mousemove', moveEditModal);
+                document.removeEventListener('mouseup', stopDragEditModal);
+            };
         }
+
+        function minimizeWindow(elementId, title, minimizedId) {
+            const element = document.getElementById(elementId);
+            if (!element || element.classList.contains('hidden')) return;
+
+            // Ocultar el modal/panel principal
+            element.classList.add('hidden');
+
+            // Crear la ventana minimizada si no existe
+            if (!document.getElementById(minimizedId)) {
+                const container = document.getElementById('minimized-windows-container');
+                const minimizedWindow = document.createElement('div');
+                minimizedWindow.id = minimizedId;
+                minimizedWindow.className = 'minimized-window';
+                minimizedWindow.dataset.target = elementId;
+
+                let timerHTML = '';
+                if (elementId === 'call-modal') {
+                    timerHTML = `<span id="minimized-timer" class="text-sm font-mono text-primary">${DOM.modalTimerElem.textContent}</span>`;
+                }
+
+                minimizedWindow.innerHTML = `
+                    <span class="minimized-window-title">${title}</span>
+                    ${timerHTML}
+                    <div class="minimized-window-controls">
+                        <button class="restore-btn" title="Restaurar"><i class="fa-solid fa-window-restore"></i></button>
+                        <button class="close-btn" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+                container.appendChild(minimizedWindow);
+
+                // Evento para restaurar (haciendo clic en cualquier parte excepto los botones)
+                minimizedWindow.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        restoreWindow(minimizedId);
+                    }
+                });
+
+                // Eventos para los botones
+                minimizedWindow.querySelector('.restore-btn').addEventListener('click', () => restoreWindow(minimizedId));
+                minimizedWindow.querySelector('.close-btn').addEventListener('click', () => {
+                    const targetId = minimizedWindow.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    if (targetId === 'call-modal') {
+                        closeModal(targetElement);
+                        stopTimer(false);
+                    } else if (targetId === 'edit-modal') {
+                        closeModal(targetElement);
+                    } else {
+                        targetElement.classList.add('hidden');
+                    }
+                    minimizedWindow.remove();
+                });
+            }
+        }
+
+        function restoreWindow(minimizedId) {
+            const minimizedWindow = document.getElementById(minimizedId);
+            if (!minimizedWindow) return;
+
+            const targetId = minimizedWindow.dataset.target;
+            const targetElement = document.getElementById(targetId);
+
+            targetElement.classList.remove('hidden');
+            minimizedWindow.remove();
+        }
+
+        // Sincronizar el temporizador en la ventana minimizada
+        setInterval(() => {
+            const minimizedTimer = document.getElementById('minimized-timer');
+            if (minimizedTimer) {
+                minimizedTimer.textContent = DOM.modalTimerElem.textContent;
+            }
+        }, 1000);
 
         function updateQuickHistoryPanel() {
             const selectedInstitution = $('#caller-institution').val();
