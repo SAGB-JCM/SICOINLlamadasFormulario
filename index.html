@@ -637,6 +637,48 @@
 
     </style>
     
+    <!-- Nuevos estilos para el panel de historial rápido -->
+    <style>
+        #quick-history-panel {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            width: 400px;
+            max-height: calc(100vh - 140px);
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            z-index: 55; /* Por encima del overlay del modal, pero debajo de otros modales como el de contraseña */
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        #quick-history-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        .quick-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: move;
+            background-color: #f9fafb;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+        .quick-history-content {
+            overflow-y: auto;
+            padding: 1rem;
+            flex-grow: 1;
+        }
+        .quick-history-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+    </style>
     <!-- Configuración de Tailwind con nueva paleta de colores -->
     <script>
         tailwind.config = {
@@ -1362,6 +1404,21 @@
         </div>
     </div>
 
+    <!----------------- PANEL DE HISTORIAL RÁPIDO ---------------->
+    <div id="quick-history-panel" class="hidden">
+        <div class="quick-history-header">
+            <h4 class="text-md font-bold text-primary flex items-center">
+                <i class="fa-solid fa-history mr-2"></i>
+                Historial Rápido
+            </h4>
+            <button id="close-quick-history-btn" class="text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div id="quick-history-content" class="quick-history-content">
+            <!-- El contenido se generará dinámicamente -->
+        </div>
+    </div>
     <!-- Tooltip para vista rápida en tablas -->
     <div id="quick-view-tooltip"></div>
 
@@ -1520,6 +1577,9 @@
             consultaChartHeader: document.querySelector('#consultaChart').previousElementSibling,
             consultaChartTitle: document.getElementById('consulta-chart-title'),
             quickViewTooltip: document.getElementById('quick-view-tooltip'),
+            quickHistoryPanel: document.getElementById('quick-history-panel'),
+            quickHistoryContent: document.getElementById('quick-history-content'),
+            closeQuickHistoryBtn: document.getElementById('close-quick-history-btn'),
             // Nuevos elementos para la alerta de resumen
         };
         
@@ -1566,6 +1626,7 @@
                 pendingAction: null,
                 activeDayFilter: null, // null o un número de 1 a 5 para el día
                 isProgrammaticChange: false,
+                isDragging: false,
                 showChartLabels: true,
             }, 
             consultaChartState: { showLabels: false },
@@ -1717,13 +1778,17 @@
                 } else if (modal === DOM.callModal) {
                     $('#caller-institution').select2('open');
                 }
+                // Al abrir el modal de nueva llamada, revisamos si hay que mostrar el historial
+                if (modal === DOM.callModal) {
+                    updateQuickHistoryPanel();
+                }
             }, 400); // 400ms es suficiente para que la animación de entrada comience.
             // --- FIN: Lógica de Autofoco ---
         } 
 
         //Cerrar modal
         function closeModal(modal) {
-            modal.classList.remove('modal-enter'); 
+            modal.classList.remove('modal-enter');
             modal.classList.add('modal-leave');
             setTimeout(() => {
                 modal.classList.add('hidden');
@@ -1732,7 +1797,12 @@
                     document.body.classList.remove('modal-open'); // Restaurar scroll solo si no quedan modales abiertos
                 }
                 modal.style.zIndex = ''; // Limpiar el z-index DESPUÉS de que el modal se oculte
-            }, 300); 
+            }, 300);
+ 
+            // Si se cierra el modal de nueva llamada, ocultamos el panel de historial
+            if (modal === DOM.callModal) {
+                DOM.quickHistoryPanel.classList.add('hidden');
+            }
         }
 
         // Función auxiliar para esperar a que un gráfico se renderice completamente
@@ -3007,6 +3077,8 @@
                     commentsSelect.append(new Option(comment, comment));
                 });
                 commentsSelect.val(null).trigger('change.select2'); // Resetear selección y actualizar
+
+                updateQuickHistoryPanel();
             });
 
             // Evento para institución (formulario de edición)
@@ -5124,6 +5196,7 @@
             setupReportConfig();
             setupSummaryAlertListeners();
             setupQuickViewTooltip(); 
+            setupQuickHistoryPanel();
             setupConsultaChartLabelToggle();
             
             // Configurar Select2 para todos los selects
@@ -5140,6 +5213,103 @@
         // Iniciar la aplicación
         initialize();
 
+        // =============================================
+        // MÓDULO: Panel de Historial Rápido
+        // =============================================
+
+        function setupQuickHistoryPanel() {
+            const panel = DOM.quickHistoryPanel;
+            const header = panel.querySelector('.quick-history-header');
+
+            // Lógica para cerrar el panel
+            DOM.closeQuickHistoryBtn.addEventListener('click', () => {
+                panel.classList.add('hidden');
+            });
+
+            // Lógica para hacerlo arrastrable (draggable)
+            let offsetX, offsetY;
+
+            const move = (e) => {
+                if (!state.ui.isDragging) return;
+                e.preventDefault();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                panel.style.left = `${clientX - offsetX}px`;
+                panel.style.top = `${clientY - offsetY}px`;
+            };
+
+            const stopDrag = () => {
+                state.ui.isDragging = false;
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('touchmove', move);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            };
+
+            header.addEventListener('mousedown', (e) => {
+                state.ui.isDragging = true;
+                offsetX = e.clientX - panel.offsetLeft;
+                offsetY = e.clientY - panel.offsetTop;
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', stopDrag);
+            });
+            
+            header.addEventListener('touchstart', (e) => {
+                state.ui.isDragging = true;
+                offsetX = e.touches[0].clientX - panel.offsetLeft;
+                offsetY = e.touches[0].clientY - panel.offsetTop;
+                document.addEventListener('touchmove', move);
+                document.addEventListener('touchend', stopDrag);
+            });
+        }
+
+        function updateQuickHistoryPanel() {
+            const selectedInstitution = $('#caller-institution').val();
+            const panel = DOM.quickHistoryPanel;
+            const contentDiv = DOM.quickHistoryContent;
+
+            if (!selectedInstitution || DOM.callModal.classList.contains('hidden')) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const allCalls = [...state.calls, ...state.historicalCalls];
+            const institutionCalls = allCalls
+                .filter(call => call.institucion === selectedInstitution)
+                .sort((a, b) => {
+                    // Ordenar por fecha y hora descendente (más reciente primero)
+                    const dateA = new Date(a.fecha.split('/').reverse().join('-') + 'T' + convertTo24HourFormat(a.inicio));
+                    const dateB = new Date(b.fecha.split('/').reverse().join('-') + 'T' + convertTo24HourFormat(b.inicio));
+                    return dateB - dateA;
+                })
+                .slice(0, 10); // Tomar las últimas 10
+
+            if (institutionCalls.length === 0) {
+                contentDiv.innerHTML = `<p class="text-center text-sm text-slate-500 p-4">No hay llamadas anteriores para esta institución.</p>`;
+            } else {
+                contentDiv.innerHTML = institutionCalls.map(call => {
+                    const statusClass = call.estatus === 'Saliente' ? 'text-green-500' : 'text-blue-500';
+                    const statusIcon = call.estatus === 'Saliente' ? 'fa-arrow-up-from-bracket' : 'fa-inbox';
+                    return `
+                        <div class="quick-history-item">
+                            <div class="flex justify-between items-center mb-1">
+                                <p class="text-xs text-slate-500">${formatLongDate(call.fecha)} - ${formatTimeWithAmPm(call.inicio)}</p>
+                                <span class="text-xs font-semibold ${statusClass}"><i class="fa-solid ${statusIcon} mr-1"></i>${call.estatus}</span>
+                            </div>
+                            <p class="font-semibold text-slate-800">${call.nombre || 'N/A'}</p>
+                            <p class="text-sm text-slate-600"><strong>Asunto:</strong> ${call.asunto || 'N/A'}</p>
+                            <p class="text-sm text-slate-600"><strong>Consulta:</strong> ${call.consulta || 'N/A'}</p>
+                            ${call.comentarios ? `
+                                <details class="mt-2 text-xs">
+                                    <summary class="cursor-pointer text-primary hover:underline">Ver comentarios</summary>
+                                    <p class="italic text-slate-500 bg-slate-50 p-2 rounded mt-1 border">${call.comentarios}</p>
+                                </details>
+                            ` : ''}
+                        </div>`;
+                }).join('');
+            }
+            panel.classList.remove('hidden');
+        }
     </script>
 </body> 
 </html> 
