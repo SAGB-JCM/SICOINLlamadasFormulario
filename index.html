@@ -40,55 +40,66 @@
     
     <!-- Hoja de estilos personalizada -->
     <style>
+        /* ============================================= */
+        /* === ESTILOS GLOBALES Y PALETA DE COLORES === */
+        /* ============================================= */
+
         html { font-size: 60%; } /* Ajusta la escala base de la página para simular un zoom del 90% */
         body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; }
         
-        /* Nueva paleta de colores */
+        /* Paleta de colores principal (usada en header, botones primarios) */
         .bg-primary { background-color: #9C2348; }
         .text-primary { color: #9C2348; }
         .border-primary { border-color: #9C2348; }
         .focus\:ring-primary:focus { --tw-ring-color: #9C2348; }
         
+        /* Paleta de colores secundaria (usada en botones de edición) */
         .bg-secondary { background-color: #A6802D; }
         .text-secondary { color: #A6802D; }
         .border-secondary { border-color: #A6802D; }
         
+        /* Paleta de colores de acento (usada en botones de migración, tooltips) */
         .bg-accent { background-color: #1E5B4F; }
         .text-accent { color: #1E5B4F; }
         .border-accent { border-color: #1E5B4F; }
         
+        /* Colores de estado: Éxito */
         .bg-success { background-color: #10B981; }
         .hover\:bg-success-dark:hover { background-color: #059669; }
         
+        /* Colores de estado: Peligro/Error */
         .bg-danger { background-color: #EF4444; }
         .hover\:bg-danger-dark:hover { background-color: #DC2626; }
         
+        /* Variable CSS para colores dinámicos (usada en highlights) */
         :root {
             --primary-color: #A6802D; /* Color primario por defecto */
         }
 
-        /* Estilos para los indicadores de día de la semana */
-        .indicator-card.active-filter {
-            /* Estilo homologado con la app de licitaciones */
-            box-shadow: 0 0 0 2px var(--primary-color), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transform: translateY(-2px);
+        /* ============================================= */
+        /* === LAYOUT Y ESTRUCTURA PRINCIPAL === */
+        /* ============================================= */
+
+        /* Aumenta el ancho máximo del contenedor principal para ocupar más pantalla */
+        .max-w-7xl {
+            max-width: 100% !important;
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
 
-        .indicator-card.current-day-highlight {
-            /* Estilo homologado con la app de licitaciones */
-            border-bottom: 3px solid var(--primary-color);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            background-color: #fcfdff;
-        }
+        /* Ajustes para la barra de pestañas y el header pegajoso */
+        .bg-white.shadow-sm.sticky { margin-top: -1px !important; }
+        #tabs { margin-top: 0 !important; }
+        header + div { top: 56px !important; } /* Elimina hueco entre header y tabs */
 
-        .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
-        .modal-leave { animation: fadeOut 0.3s ease-in forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
-        
-        .hidden { display: none; }
-        .tab-btn.active { border-color: #9C2348; color: #9C2348; font-weight: bold; }
-        
+        /* Estilos para los títulos de sección en los formularios */
+        .section-title { font-weight: bold; color: #9C2348; margin-bottom: 1rem; }
+
+        /* ============================================= */
+        /* === COMPONENTES DE UI GENERALES === */
+        /* ============================================= */
+
+        /* Loader/Spinner de carga inicial */
         .loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: rgba(255, 255, 255, 0.9); z-index: 9999; 
@@ -99,67 +110,131 @@
             border-left-color: #9C2348; animation: spin 1s ease infinite; 
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .table-container { 
-            overflow-x: auto; 
-            max-height: 430px; /* Altura máxima reducida para scroll vertical (aprox 15% menos) */
-            overflow-y: auto;
-        }
 
-        /* Estilo específico para la altura de la tabla de histórico */
-        #historical-table-container {
-            max-height: 425px; /* <-- Puedes ajustar este valor a tu preferencia */
-        }
-        
-        .table-container::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        .table-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .table-container::-webkit-scrollbar-thumb {
-            background: #c5c5c5;
-            border-radius: 10px;
-        }
-        
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* Mejora para encabezados de tabla fijos */
-        .table-container thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background-color: #f1f5f9; /* Color de bg-slate-100 para evitar transparencia */
-        }
+        /* Pestañas de navegación (Registro, Histórico, Reportes) */
+        .tab-btn.active { border-color: #9C2348; color: #9C2348; font-weight: bold; }
 
+        /* Botones de estado (Saliente/Entrante) en las tablas */
         .status-button {
             transition: background-color 0.3s ease, transform 0.2s ease;
             cursor: pointer; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem;
             line-height: 1.25rem; font-weight: 500; text-align: center; user-select: none; border: 1px solid transparent;
         }
-        .status-saliente { background-color: #10B981; color: #fff; border-color: #059669; } /* Verde para acción completada */
-        .status-entrante { background-color: #3B82F6; color: #fff; border-color: #2563EB; } /* Azul para estado informativo */
+        .status-saliente { background-color: #10B981; color: #fff; border-color: #059669; } /* Verde */
+        .status-entrante { background-color: #3B82F6; color: #fff; border-color: #2563EB; } /* Azul */
+
+        /* Botón de migración */
+        .migrate-btn { background-color: #1E5B4F !important; }
+        .migrate-btn:hover { background-color: #16463c !important; }
+
+        /* ============================================= */
+        /* === DASHBOARD Y TARJETAS INDICADORAS === */
+        /* ============================================= */
+
+        /* Estilo para la tarjeta de día cuando está seleccionada como filtro */
+        .indicator-card.active-filter {
+            box-shadow: 0 0 0 2px var(--primary-color), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        /* Estilo para resaltar la tarjeta del día actual */
+        .indicator-card.current-day-highlight {
+            border-bottom: 3px solid var(--primary-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            background-color: #fcfdff;
+        }
+
+        /* ============================================= */
+        /* === MODALES === */
+        /* ============================================= */
+
+        /* Animaciones de entrada y salida para modales */
+        .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-leave { animation: fadeOut 0.3s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
         
+        /* Clase para bloquear el scroll del body cuando un modal está abierto */
+        body.modal-open { overflow: hidden; }
+
+        /* Ancho para modales grandes (Nueva/Editar llamada, Ver Detalles) */
+        .wide-modal .relative { max-width: 76rem !important; }
+
+        /* Contenedor con scroll para formularios largos dentro de modales */
+        .call-form-container {
+            max-height: 75vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .call-form-container::-webkit-scrollbar { width: 6px; }
+        .call-form-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .call-form-container::-webkit-scrollbar-thumb { background: #c5c5c5; border-radius: 10px; }
+        .call-form-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* Estilos para el modal de detalles de la llamada */
+        .details-modal-content {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        .details-header {
+            border-bottom: 2px solid #9C2348;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .details-header .date { font-size: 1rem; color: #6b7280; font-weight: 500; }
+        .details-section { margin-bottom: 1.5rem; }
+        .details-section h4 { font-size: 1.125rem; font-weight: 600; color: #9C2348; margin-bottom: 0.75rem; }
+        .editable-header { cursor: pointer; transition: color 0.2s ease-in-out; }
+        .editable-header:hover { color: #A6802D; } /* Color primario al pasar el ratón */
+
+        /* ============================================= */
+        /* === COMPONENTES DE TABLA === */
+        /* ============================================= */
+
+        /* Contenedor principal de las tablas con scroll */
+        .table-container { 
+            overflow-x: auto; 
+            max-height: 430px; 
+            overflow-y: auto;
+            width: 100%;
+        }
+        #historical-table-container { max-height: 425px; } /* Altura específica para tabla de histórico */
+
+        /* Ancho de la tabla interna para evitar compresión de columnas */
+        .table-container table {
+            width: 100%;
+            min-width: 1300px; 
+        }
+
+        /* Encabezados de tabla fijos (sticky) */
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f1f5f9; /* Evita transparencia al hacer scroll */
+        }
+
+        /* Estilos para la barra de scroll de las tablas */
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb { background: #c5c5c5; border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* ============================================= */
+        /* === FILTROS DE TABLA === */
+        /* ============================================= */
+
+        /* Encabezados de columna con capacidad de filtro */
         .filterable-header { 
             cursor: pointer; 
             position: relative;
         }
-        .filterable-header .filter-icon {
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
+        .filterable-header .filter-icon { opacity: 0.5; transition: opacity 0.2s; }
         .filterable-header:hover .filter-icon,
-        .filterable-header.active .filter-icon {
-            opacity: 1;
-            color: #9C2348;
-        }
+        .filterable-header.active .filter-icon { opacity: 1; color: #9C2348; }
 
+        /* Menú desplegable para filtros de columna */
         .filter-dropdown {
             position: absolute;
             background-color: white;
@@ -171,95 +246,57 @@
             overflow-y: auto;
             min-width: 200px;
         }
-        
+
+        /* Resaltado para el texto de búsqueda en las tablas */
+        .highlight {
+            background-color: #ffd966;
+            border-radius: 2px;
+        }
+
+        /* ============================================= */
+        /* === FORMULARIOS Y CAMPOS (Select2) === */
+        /* ============================================= */
+
+        /* Estilo para campos de formulario inválidos */
         input:invalid, select:invalid { border-color: #ef4444; }
-        
-        .section-title { font-weight: bold; color: #9C2348; margin-bottom: 1rem; }
-        header + div { top: 56px !important; } /* Ajuste para eliminar hueco entre header y tabs */
 
-        /* Aumentar el ancho máximo del contenedor principal */
-        .max-w-7xl {
-            max-width: 100% !important;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
+        /* Grid para la disposición de campos en formularios */
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 640px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
 
-        /* Ajustar el ancho de las tablas */
-        .table-container table {
-            width: 100%;
-            min-width: 1300px; /* Ancho mínimo generoso para evitar compresión de columnas */
-        }
+        .form-field { margin-bottom: 0.5rem; }
+        .form-field label { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; }
 
-        /* Asegurar que el contenedor de la tabla ocupe todo el ancho */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-
-        .flex-with-buttons {
-        max-width: 340px; /* Ajusta este valor según necesites */
-        min-width: 340px; /* Evita que se reduzca */
-        max-width: 340px; /* Evita que se expanda */
-        }
-
-        .select2-selection__rendered {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        }
-
+        /* Contenedor para un campo Select2 y sus botones de acción (editar) */
         .flex-with-buttons {
             display: flex;
             align-items: flex-end;
+            max-width: 340px;
+            min-width: 340px;
         }
-
-        .flex-with-buttons .select2-container {
-            flex-grow: 1;
-            margin-bottom: 1px;
-            min-width: 0;
-        }
-
+        .flex-with-buttons .select2-container { flex-grow: 1; margin-bottom: 1px; min-width: 0; }
         .flex-with-buttons button {
-            height: 38px;
-            width: 38px;
+            height: 38px; width: 38px;
             margin-bottom: 1px; /* Alineación vertical */
             flex-shrink: 0;
             border-radius: 0.25rem;
             padding: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             border: none;
             cursor: pointer;
         }
+        .flex-with-buttons button.edit-btn { background-color: #A6802D; color: white; }
+        .flex-with-buttons button.edit-btn:hover { background-color: #8a6b22; }
 
-        .flex-with-buttons button.edit-btn {
-            background-color: #A6802D; /* Color secundario */
-            color: white;
-        }
-
-        .flex-with-buttons button.edit-btn:hover {
-            background-color: #8a6b22; /* Color secundario más oscuro */
-        }
-
+        /* Estilos para normalizar la apariencia de Select2 con Tailwind */
         .select2-container--default .select2-selection--single {
-            height: 38px;
-            padding: 5px;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
+            height: 38px; padding: 5px; border: 1px solid #d1d5db; border-radius: 0.375rem;
         }
+        .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 26px; }
+        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+        .select2-container { width: 100% !important; }
 
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 26px;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px;
-        }
-
-        /* Solución para truncar texto largo en los campos Select2 */
+        /* Truncar texto largo en los campos Select2 para evitar desbordamiento */
         .select2-container .select2-selection--single .select2-selection__rendered {
             display: block;
             padding-left: 8px;
@@ -268,136 +305,17 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-
-        .select2-container {
-            width: 100% !important; /* Ocupa todo el ancho del contenedor */
-        }
-
-        .select2-selection__rendered {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: block;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        @media (min-width: 640px) {
-            .form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .form-field {
-            margin-bottom: 0.5rem;
-        }
-
-        .form-field label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        /* Mejoras para el formulario de llamada */
-        .call-form-container {
-            max-height: 75vh;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-
-        .call-form-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .call-form-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .call-form-container::-webkit-scrollbar-thumb {
-            background: #c5c5c5;
-            border-radius: 10px;
-        }
-
-        .call-form-container::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        /* Estilos para el reporte ejecutivo */
-        .reporte-ejecutivo {
-            padding: 20px;
-            background: white;
-            font-family: 'Inter', sans-serif;
-        }
         
-        .reporte-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #9C2348;
-            padding-bottom: 20px;
-        }
-        
-        .reporte-metricas {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .metrica {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #9C2348;
-        }
-        
-        .graficas-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .grafica {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .tabla-datos {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        
-        .tabla-datos th, .tabla-datos td {
-            border: 1px solid #e5e7eb;
-            padding: 8px;
-            text-align: left;
-        }
-        
-        .tabla-datos th {
-            background-color: #f9fafb;
-        }
-        
-        /* Nuevos estilos para la versión 1.1 */
+        /* ============================================= */
+        /* === REPORTES Y GRÁFICOS === */
+        /* ============================================= */
+
+        /* Configuración del grid para el modal de configuración de reportes */
         .config-report-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem;
         }
-        
         @media (min-width: 640px) {
-            .config-report-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .config-report-grid { grid-template-columns: repeat(2, 1fr); }
         }
         
         .config-option {
@@ -405,51 +323,20 @@
             align-items: center;
             margin-bottom: 0.5rem;
         }
-        
-        .config-option input[type="checkbox"] {
-            margin-right: 0.5rem;
-        }
+        .config-option input[type="checkbox"] { margin-right: 0.5rem; }
 
-        .wide-modal .relative {
-            max-width: 76rem !important; /* ancho de modal nueva y editar llamada */
-        }
-
-        .bg-white.shadow-sm.sticky {
-            margin-top: -1px !important;
-        }
-        
-        #tabs {
-            margin-top: 0 !important;
-        }
-        
-        header + div {
-            top: 56px !important;
-        }
-        
+        /* Controles de tamaño para los gráficos en la pestaña de reportes */
         .chart-size-control {
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin: 15px 0; display: flex; align-items: center; gap: 10px;
         }
-        
-        .chart-size-control label {
-            font-size: 14px;
-            color: #374151;
-        }
-        
-        .chart-size-control input {
-            width: 150px;
-        }
+        .chart-size-control label { font-size: 14px; color: #374151; }
+        .chart-size-control input { width: 150px; }
 
-        .chart-wrapper {
-            position: relative;
-            height: 300px; /* Altura por defecto, se ajustará con JS */
-        }
-
+        /* Contenedor de cada gráfico */
+        .chart-wrapper { position: relative; height: 300px; /* Altura por defecto, se ajustará con JS */ }
         #reportes .grid {
-            gap: 3rem 2rem; /* Aumenta el gap vertical y horizontal */
-            margin-bottom: 2rem; /* Espacio extra al final */
+            gap: 3rem 2rem; 
+            margin-bottom: 2rem; 
         }
 
         /* Nuevos estilos para la versión 1.3 */
@@ -462,6 +349,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
+        /* Encabezado del contenedor del gráfico dinámico (con selector de variable) */
         .dynamic-chart-header {
             display: flex;
             align-items: center;
@@ -469,6 +357,7 @@
             gap: 1rem;
         }
         
+        /* Contenido del gráfico dinámico (gráfico a la izquierda, tabla a la derecha) */
         .dynamic-chart-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -483,6 +372,7 @@
             overflow-y: auto;
         }
         
+        /* Tabla de datos que acompaña al gráfico dinámico */
         .dynamic-table {
             width: 100%;
             border-collapse: collapse;
@@ -503,6 +393,21 @@
         .dynamic-table tr:nth-child(even) {
             background-color: #f3f4f6;
         }
+
+        /* Botón para alternar etiquetas en el gráfico dinámico */
+        #toggle-labels-btn { transition: all 0.3s ease; }
+        #toggle-labels-btn.bg-primary { background-color: #9C2348 !important; }
+
+        /* Estilos para el reporte ejecutivo en PDF */
+        .reporte-ejecutivo { padding: 20px; background: white; font-family: 'Inter', sans-serif; }
+        .reporte-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #9C2348; padding-bottom: 20px; }
+        .reporte-metricas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .metrica { background: #f9fafb; padding: 15px; border-radius: 8px; border-left: 4px solid #9C2348; }
+        .graficas-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .grafica { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tabla-datos { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .tabla-datos th, .tabla-datos td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
+        .tabla-datos th { background-color: #f9fafb; }
         
         .info-tooltip {
             position: relative;
@@ -532,56 +437,10 @@
             visibility: visible;
             opacity: 1;
         }
-        
-        .migrate-btn {
-            background-color: #1E5B4F !important;
-        }
-        
-        .migrate-btn:hover {
-            background-color: #16463c !important;
-        }
 
-
-        /* Añadir al final de la sección de estilos */
-        #toggle-labels-btn {
-            transition: all 0.3s ease;
-        }
-
-        #toggle-labels-btn.bg-primary {
-            background-color: #9C2348 !important;
-        }
-
-        /* Estilos para el modal de detalles de la llamada */
-        .details-modal-content {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            padding: 2rem;
-            background-color: #f9fafb;
-        }
-        .details-header {
-            border-bottom: 2px solid #9C2348;
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .details-header .date {
-            font-size: 1rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        .details-section {
-            margin-bottom: 1.5rem;
-        }
-        .details-section h4 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #9C2348;
-            margin-bottom: 0.75rem;
-        }
-
-        /* Clase para bloquear el scroll del body cuando un modal está abierto */
-        body.modal-open {
-            overflow: hidden;
-        }
+        /* ============================================= */
+        /* === TOOLTIPS Y VISTAS RÁPIDAS === */
+        /* ============================================= */
 
         /* Estilos para el tooltip de vista rápida (replicado de la app de licitaciones) */
         #quick-view-tooltip {
@@ -608,26 +467,21 @@
         #quick-view-tooltip .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
         #quick-view-tooltip .status-dot.saliente { background-color: #10B981; } /* success-color */
         #quick-view-tooltip .status-dot.entrante { background-color: #3B82F6; } /* blue-500 */
-        /* Estilo para el título de horarios editable */
-        .editable-header {
-            cursor: pointer;
-            transition: color 0.2s ease-in-out;
-        }
-        .editable-header:hover { color: #A6802D; } /* Color primario al pasar el ratón */
         #quick-view-tooltip.visible {
             display: block;
             opacity: 1;
         }
         #quick-view-tooltip strong { color: var(--secondary-color); } /* Títulos en color secundario para mejor estética */
         #quick-view-tooltip p { margin-bottom: 0.25rem; }
+        
+        /* ============================================= */
+        /* === VENTANAS MINIMIZABLES Y DRAGGABLES === */
+        /* ============================================= */
 
-        /* Estilo para resaltar el texto de búsqueda */
-        .highlight {
-            background-color: #ffd966; /* Tailwind yellow-100 */
-            border-radius: 2px;
-        }
+        /* Controles en la cabecera de los modales (minimizar, cerrar) */
+        .modal-header-controls button { width: 32px; height: 32px; border: none; cursor: pointer; }
 
-        /*Estilo para el contenedor de ventanas minimizadas*/
+        /* Estilo para una ventana minimizada en la barra inferior */
         .minimized-window {
             width: 280px;
             height: 40px;
@@ -669,29 +523,12 @@
             background-color: #fee2e2;
             color: #ef4444;
         }
+        #minimized-timer { margin-right: auto; margin-left: 12px; }
 
-        #minimized-timer {
-            margin-right: auto;
-            margin-left: 12px;
-        }
-        .modal-header-controls button {
-            width: 32px;
-            height: 32px;
-            border: none;
-            cursor: pointer;
-        }
+        /* ============================================= */
+        /* === PANELES FLOTANTES (Quick History) === */
+        /* ============================================= */
 
-        /* Estilos para la Alerta de Resumen (copiado de Licitaciones) */
-        #summary-alert-container.alert-enter { animation: slideInUp 0.5s ease-out forwards; }
-        #summary-alert-container.alert-leave { animation: slideOutDown 0.5s ease-in forwards; }
-
-        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideOutDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
-
-    </style>
-    
-    <!-- Nuevos estilos para el panel de historial rápido -->
-    <style>
         #quick-history-panel {
             position: fixed;
             top: 120px;
@@ -701,47 +538,41 @@
             background-color: #fff;
             border-radius: 0.75rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            z-index: 55; /* Por encima del overlay del modal, pero debajo de otros modales como el de contraseña */
+            z-index: 55; /* Por encima del overlay del modal, pero debajo de otros modales */
             display: flex;
             flex-direction: column;
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
         }
-        #quick-history-panel.hidden {
-            opacity: 0;
-            transform: translateX(100%);
-            pointer-events: none;
-        }
+        #quick-history-panel.hidden { opacity: 0; transform: translateX(100%); pointer-events: none; }
         .quick-history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            cursor: move;
-            background-color: #f9fafb;
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
-        }
-        .quick-history-content {
-            overflow-y: auto;
-            padding: 1rem;
-            flex-grow: 1;
-        }
-        .quick-history-item {
-            padding: 0.75rem;
-            border-bottom: 1px solid #f3f4f6;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb;
+            cursor: move; background-color: #f9fafb;
+            border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;
         }
         .quick-history-header .flex.items-center.space-x-2 button {
-            width: 32px;
-            height: 32px;
-            border-radius: 0.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 32px; height: 32px; border-radius: 0.25rem;
+            display: flex; align-items: center; justify-content: center;
             transition: background-color 0.2s;
         }
+        .quick-history-content { overflow-y: auto; padding: 1rem; flex-grow: 1; }
+        .quick-history-item { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; }
+
+        /* ============================================= */
+        /* === ALERTAS Y NOTIFICACIONES === */
+        /* ============================================= */
+
+        #summary-alert-container.alert-enter { animation: slideInUp 0.5s ease-out forwards; }
+        #summary-alert-container.alert-leave { animation: slideOutDown 0.5s ease-in forwards; }
+
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideOutDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
     </style>
+
+    <!-- Utilidad para ocultar elementos -->
+    <style> .hidden { display: none; } </style>
+
     <!-- Configuración de Tailwind con nueva paleta de colores -->
     <script>
         tailwind.config = {
@@ -1694,7 +1525,6 @@
             updateDynamicChart();
         });
 
-
         // Centralized Application State
         const state = {
             userId: null,
@@ -1771,13 +1601,7 @@
             return `${day}-${month}-${year}_${hours}h${minutes}m${seconds}s`;
         }
 
-        /**
-         * Crea una versión "debounced" de una función que retrasa su ejecución
-         * hasta que haya pasado un tiempo determinado sin que se vuelva a llamar.
-         * @param {Function} func La función a "debouncear".
-         * @param {number} delay El retraso en milisegundos.
-         * @returns {Function} La nueva función "debounced".
-         */
+        //Función de apoyo para el Zoom en navefador
         function debounce(func, delay) {
             let timeout;
             return function(...args) {
@@ -1787,8 +1611,7 @@
             };
         }
 
-
-        //Dar formato a Duración
+        //Función para dar formato al campo de Duración
                 function formatDuration(seconds) {
             if (isNaN(seconds) || seconds < 0) seconds = 0;
             const h = Math.floor(seconds / 3600);
@@ -1860,7 +1683,6 @@
             modal.classList.add('modal-enter');
             // Bloquear el scroll del body siempre que haya al menos un modal abierto.
             document.body.classList.add('modal-open');
-
 
             // --- INICIO: Lógica de Autofoco ---
             // Se añade un pequeño retardo para asegurar que el modal sea visible antes de intentar enfocar el campo.
@@ -2041,6 +1863,7 @@
             });
         }
 
+        //Funcipon para obtener los días de la semana
         function getDayOfWeek(dateString) {
             if (!dateString || typeof dateString !== 'string') return -1;
             try {
@@ -2055,6 +1878,7 @@
             }
         }
 
+        //Función para aplicar filtros
         function applyAllFilters(data, filterKey) {
             const searchInput = document.getElementById(`filter-input-${filterKey}`);
             const searchText = searchInput ? searchInput.value.toLowerCase() : '';
@@ -2224,6 +2048,7 @@
             }, true);
         }
         
+        //Función de apoyo para filtrado
         function setupFiltering(inputId, dataProvider, renderFunc, isHistorical = false) {
             const filterInput = document.getElementById(inputId);
             const filterKey = isHistorical ? 'historical' : 'main';
@@ -2239,7 +2064,7 @@
             });
         }
 
-        // Limpia todos los filtros aplicados a una tabla y la vuelve a renderizar.
+        // Función para limpiar todos los filtros aplicados a una tabla y la vuelve a renderizar.
         function clearAllFilters(filterKey) {
             // 1. Limpiar el estado de los filtros de columna
             state.activeFilters[filterKey] = {};
@@ -2296,6 +2121,7 @@
             renderTable(tableBody, filteredData, isHistorical);
         }
 
+        //Función para obtener fecha larga
         function formatLongDate(dateString) {
             if (!dateString || typeof dateString !== 'string' || !dateString.includes('/')) return 'Fecha no disponible';
             try {
@@ -2329,6 +2155,7 @@
             updateSingleDashboard(dataHistorico, DOM.totalCallsElemHistorico, DOM.avgDurationElemHistorico, DOM.salientesCountElemHistorico, DOM.entrantesCountElemHistorico);
         }
 
+        //Función para actualizar Dashboard de llamadas por día de la semana
         function updateWeekdayDashboard() {
             const dayCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }; // Lunes a Viernes
             const dayIds = { 1: 'lunes', 2: 'martes', 3: 'miercoles', 4: 'jueves', 5: 'viernes' };
@@ -2371,7 +2198,6 @@
         }
         
         //Actualiza los elementos de un dashboard específico con los datos proporcionados.
-        
         function updateSingleDashboard(data, totalElem, avgElem, salientesElem, entrantesElem) {
             const totalCalls = data.length;
             const salientes = data.filter(c => c.estatus === 'Saliente').length;
@@ -2512,7 +2338,6 @@
             }
         }
 
-
         // Eliminar llamadaa
         async function deleteCall(id, isHistorical) {
             if (!id) {
@@ -2539,7 +2364,6 @@
                 showAlert(`Error al eliminar: ${error.message}`, "error");
             }
         }
-
 
         // Función Para editar llamada
         function handleEditClick(button) {
@@ -2654,11 +2478,10 @@
 
                 // 5) Abrir modal después de todo (para evitar race conditions visuales)
                 openModal(DOM.editModal);
-
             });
         }
 
-
+        //Evento para cerrar el boton de editar registro
         DOM.closeEditModalBtn.addEventListener('click', () => closeModal(DOM.editModal));
 
         // Manejar cambio de estado
@@ -2681,8 +2504,7 @@
             }
         }
 
-
-        // Manejar clic en eliminar
+        // Función para manejar clic en eliminar
         function handleDeleteClick(button) {
             requirePassword(() => {
                 callToDeleteId = button.getAttribute('data-id');
@@ -2712,7 +2534,6 @@
             await batch.commit(); 
         }
 
-
         // Mejorar importación de histórico con manejo correcto de fechas y duraciones
         async function importHistoricalData(data) {
             try {
@@ -2727,7 +2548,6 @@
                 // Forzar actualización de opciones y render
                 updateDynamicSelectOptions();
                 renderTable(DOM.historicalTableBody, state.historicalCalls, true);
-
 
             } catch (error) {
                 console.error("Error al importar datos históricos:", error);
@@ -3030,29 +2850,20 @@
             "ASOCIACIÓN MEXICANA - Asociación Mexicana",
             "MUJERES - Secretaría de las Mujeres"
         ];
-
-
         
         //Actualiza las opciones de todos los selectores dinámicos de la aplicación.
-
         function updateDynamicSelectOptions() {
             const allData = [...state.calls, ...state.historicalCalls];
-        
-            // --- Lógica Específica para Instituciones (con normalización) ---
             // 1. Extraer todas las instituciones existentes en los registros.
             const historicalInstitutions = allData.map(c => c.institucion).filter(Boolean).map(i => i.trim());
             
             // 2. Fusionar el catálogo oficial con las instituciones históricas.
-            //    - Se utiliza `new Set()` para eliminar duplicados de forma automática y eficiente.
-            //      (p. ej., si una institución del historial ya existe en el catálogo).
-            //    - Se ordena alfabéticamente para una mejor experiencia de usuario.
             const combinedInstitutions = [...new Set([...catalogoInstitucionesHomologado, ...historicalInstitutions])].sort();
             
             // 3. Actualizar el estado global y el selector de UI.
             state.fieldOptions.instituciones = combinedInstitutions;
             updateSelectOptions('instituciones', state.fieldOptions.instituciones);
         
-            // --- Lógica General para los demás campos (sin cambios) ---
             // Se extraen los valores únicos de los datos existentes, se normalizan y se ordenan.
             state.fieldOptions.areas = [...new Set(allData.map(c => c.area).filter(Boolean).map(v => v.trim()))].sort();
             state.fieldOptions.asuntos = [...new Set(allData.map(c => c.asunto).filter(Boolean).map(v => v.trim()))].sort();
@@ -3130,7 +2941,6 @@
                     }
                 });
             }
-
         }
 
         // Función para el autocompletado inteligente
@@ -3444,9 +3254,6 @@
             }
         }
 
-        
-        //Añadir o Editar (Botones)
-
         // Variable global para mantener el contexto del <select> que está siendo modificado.
         // Se gestiona su ciclo de vida: se establece al iniciar y se limpia al finalizar o cancelar.
         let activeSelectElement = null;
@@ -3539,9 +3346,8 @@
              });
         }
 
-
         // =============================================
-        // MÓDULO: Autenticación y seguridad
+        // MÓDULO PRINCIPAL: Autenticación y listeners
         // =============================================
 
         //Verificar contraseña
@@ -3563,6 +3369,7 @@
             }
         }
 
+        //Función complementaria para verificar contraseña
         function setupPasswordVerification() {
             DOM.confirmPasswordBtn.addEventListener('click', verifyPassword);
             DOM.cancelPasswordBtn.addEventListener('click', () => {
@@ -3581,11 +3388,11 @@
             }
         }
 
+        //Función para solicitar contraseña
         function requirePassword(action) {
             state.ui.pendingAction = action;
             openModal(DOM.passwordModal);
         }
-
 
         //Authenticación de firestore
         async function initializeAppWithAuth() {
@@ -3806,7 +3613,7 @@
         }
 
         
-        //Update Chart
+        //Update Dynamic Chart
         function updateDynamicChart() {
             const data = getReportData();
             
@@ -3867,8 +3674,6 @@
                 granTotal += total;
             });
 
-
-
             // Añadir fila de totales al tfoot
             tfoot.innerHTML = `
                 <tr class="bg-slate-200 font-bold">
@@ -3918,7 +3723,7 @@
             });
         }
         
-        //Botón de Configuración
+        //Botón de Configuración (Reportes)
         function setupReportConfig() {
             DOM.configReportBtn.addEventListener('click', () => openModal(DOM.configReportModal));
             DOM.closeConfigReportModalBtn.addEventListener('click', () => closeModal(DOM.configReportModal));
@@ -4188,12 +3993,7 @@
         "Estatus", "Atendió", "Comentarios"
         ];
 
-        /**
-         * Exporta datos a un archivo Excel con formato personalizado.
-         * @param {Array} data - Los datos a exportar.
-         * @param {string} sheetName - El nombre de la hoja de cálculo.
-         * @param {string} fileName - El nombre del archivo a descargar.
-         */
+        //Exporta datos a un archivo Excel con formato personalizado.
         function exportToExcelWithFormatting(data, sheetName, fileName) {
             // 1. Preparar los datos y el título
             const dataToExport = prepareExportData(data);
@@ -4285,7 +4085,8 @@
         // Convertir segundos a objeto Date (para que Excel lo interprete como tiempo)
         return new Date(0, 0, 0, 0, 0, seconds || 0);
         }
- 
+
+        //Prepara exportación
         function prepareExportData(data) {
             // Helper para asegurar que los campos vacíos se exporten como "N/A"
             const na = (value) => value || "N/A";
@@ -4338,6 +4139,7 @@
             openModal(DOM.editTimestampsModal);
         }
 
+        //Cálculo de duración
         function calculateAndDisplayDuration() {
             const start = DOM.timestampsStartTimeInput.value;
             const end = DOM.timestampsEndTimeInput.value;
@@ -4351,6 +4153,7 @@
             }
         }
 
+        //Guardar
         async function saveTimestamps(e) {
             e.preventDefault();
             requirePassword(async () => {
@@ -4378,6 +4181,7 @@
             });
         }
 
+        //Funciones para filtros de indicadores de llamadas por día de la semana
         function setupWeekdayDashboardFilter() {
             const indicators = document.querySelectorAll('#dashboard .indicator-card');
 
@@ -4418,11 +4222,12 @@
         }
 
         // =============================================
-        // MÓDULO: Notificación de Resumen Semanal (Adaptado de Licitaciones)
+        // MÓDULO: Notificación de Resumen Semanal
         // =============================================
         let summaryAlertShown = false;
         let summaryAlertTimeout;
 
+        //Obtener rango de la semana
         function getWeekRange() {
             const now = new Date();
             const dayOfWeek = now.getDay(); // 0 (Dom) - 6 (Sáb)
@@ -4438,6 +4243,7 @@
             return { start: startOfWeek, end: endOfWeek };
         }
 
+        //Mostrar Alerta/Notificaicón
         function checkAndShowSummaryAlert() {
             if (summaryAlertShown) return;
 
@@ -4479,6 +4285,7 @@
             }
         }
 
+        //Determina el tiempo que dura la notificación
         function startSummaryAlertTimeout() {
             clearTimeout(summaryAlertTimeout);
             summaryAlertTimeout = setTimeout(() => {
@@ -4487,6 +4294,7 @@
             }, 15000); // 15 segundos
         }
 
+        //Reconoce el clic en la notificación para aplicar filtro
         function setupSummaryAlertListeners() {
             document.body.addEventListener('click', (e) => {
                 if (e.target && e.target.id === 'view-summary-btn') {
@@ -4645,9 +4453,275 @@
         }
 
         // =============================================
+        // MÓDULO: Panel de Historial Rápido
+        // =============================================
+
+        function setupQuickHistoryPanel() {
+            const panel = DOM.quickHistoryPanel;
+            const header = panel.querySelector('.quick-history-header');
+
+            // Lógica para cerrar el panel
+            DOM.closeQuickHistoryBtn.addEventListener('click', () => {
+                panel.classList.add('hidden');
+                // Asegurarse de que la ventana minimizada también se elimine
+                const minimizedHistoryWindow = document.getElementById('minimized-history-window');
+                if (minimizedHistoryWindow) {
+                    minimizedHistoryWindow.remove();
+                }
+            });
+
+            // Lógica para hacerlo arrastrable (draggable)
+            let offsetX, offsetY;
+
+            const move = (e) => {
+                if (!state.ui.isDragging) return;
+                e.preventDefault();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                panel.style.left = `${clientX - offsetX}px`;
+                panel.style.top = `${clientY - offsetY}px`;
+            };
+
+            const stopDrag = () => {
+                state.ui.isDragging = false;
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('touchmove', move);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            };
+
+            header.addEventListener('mousedown', (e) => {
+                state.ui.isDragging = true;
+                offsetX = e.clientX - panel.offsetLeft;
+                offsetY = e.clientY - panel.offsetTop;
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', stopDrag);
+            });
+            
+            header.addEventListener('touchstart', (e) => {
+                state.ui.isDragging = true;
+                offsetX = e.touches[0].clientX - panel.offsetLeft;
+                offsetY = e.touches[0].clientY - panel.offsetTop;
+                document.addEventListener('touchmove', move);
+                document.addEventListener('touchend', stopDrag);
+            });
+
+            // Lógica de Minimizar/Restaurar para el modal de llamada
+            const minimizeCallBtn = document.getElementById('minimize-call-modal-btn');
+            minimizeCallBtn.addEventListener('click', () => {
+                minimizeWindow('call-modal', 'Llamada en curso...', 'minimized-call-window');
+            });
+
+            // Lógica de Minimizar/Restaurar para el modal de edición
+            DOM.minimizeEditModalBtn.addEventListener('click', () => {
+                minimizeWindow('edit-modal', 'Editando Llamada', 'minimized-edit-window');
+            });
+
+            // Lógica de Minimizar/Restaurar para el panel de historial
+            DOM.minimizeQuickHistoryBtn.addEventListener('click', () => {
+                minimizeWindow('quick-history-panel', 'Historial Rápido', 'minimized-history-window');
+            });
+
+            // Hacer el modal de llamada arrastrable
+            const callModalHeader = document.getElementById('call-modal-header');
+            const callModal = DOM.callModal.querySelector('.relative'); 
+
+            callModalHeader.addEventListener('mousedown', (e) => {
+                // Evitar iniciar el arrastre si se hace clic en un botón
+                if (e.target.closest('button')) return;
+
+                state.ui.isDragging = true;
+                // La posición del modal es 'relative', pero su contenedor flex lo centra.
+                // Para moverlo, necesitamos cambiarlo a 'absolute' y calcular su posición inicial.
+                const rect = callModal.getBoundingClientRect();
+                callModal.style.position = 'absolute';
+                callModal.style.left = `${rect.left}px`;
+                callModal.style.top = `${rect.top}px`;
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                document.addEventListener('mousemove', moveCallModal);
+                document.addEventListener('mouseup', stopDragCallModal);
+            });
+
+            const moveCallModal = (e) => {
+                if (!state.ui.isDragging) return;
+                e.preventDefault();
+                callModal.style.left = `${e.clientX - offsetX}px`;
+                callModal.style.top = `${e.clientY - offsetY}px`;
+            };
+
+            const stopDragCallModal = () => {
+                state.ui.isDragging = false;
+                document.removeEventListener('mousemove', moveCallModal);
+                document.removeEventListener('mouseup', stopDragCallModal);
+            };
+
+            // Hacer el modal de edición arrastrable
+            const editModalHeader = document.getElementById('edit-modal-header');
+            const editModal = DOM.editModal.querySelector('.relative');
+
+            editModalHeader.addEventListener('mousedown', (e) => {
+                // Evitar iniciar el arrastre si se hace clic en un botón
+                if (e.target.closest('button')) return;
+
+                state.ui.isDragging = true;
+                const rect = editModal.getBoundingClientRect();
+                editModal.style.position = 'absolute';
+                editModal.style.left = `${rect.left}px`;
+                editModal.style.top = `${rect.top}px`;
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                document.addEventListener('mousemove', moveEditModal);
+                document.addEventListener('mouseup', stopDragEditModal);
+            });
+
+            const moveEditModal = (e) => {
+                if (!state.ui.isDragging) return;
+                e.preventDefault();
+                editModal.style.left = `${e.clientX - offsetX}px`;
+                editModal.style.top = `${e.clientY - offsetY}px`;
+            };
+
+            const stopDragEditModal = () => {
+                state.ui.isDragging = false;
+                document.removeEventListener('mousemove', moveEditModal);
+                document.removeEventListener('mouseup', stopDragEditModal);
+            };
+        }
+
+        //Función para minimizar ventana
+        function minimizeWindow(elementId, title, minimizedId) {
+            const element = document.getElementById(elementId);
+            if (!element || element.classList.contains('hidden')) return;
+
+            // Ocultar el modal/panel principal
+            element.classList.add('hidden');
+
+            // Crear la ventana minimizada si no existe
+            if (!document.getElementById(minimizedId)) {
+                const container = document.getElementById('minimized-windows-container');
+                const minimizedWindow = document.createElement('div');
+                minimizedWindow.id = minimizedId;
+                minimizedWindow.className = 'minimized-window';
+                minimizedWindow.dataset.target = elementId;
+
+                let timerHTML = '';
+                if (elementId === 'call-modal') {
+                    timerHTML = `<span id="minimized-timer" class="text-sm font-mono text-primary">${DOM.modalTimerElem.textContent}</span>`;
+                }
+
+                minimizedWindow.innerHTML = `
+                    <span class="minimized-window-title">${title}</span>
+                    ${timerHTML}
+                    <div class="minimized-window-controls">
+                        <button class="restore-btn" title="Restaurar"><i class="fa-solid fa-window-restore"></i></button>
+                        <button class="close-btn" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+                container.appendChild(minimizedWindow);
+
+                // Evento para restaurar (haciendo clic en cualquier parte excepto los botones)
+                minimizedWindow.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        restoreWindow(minimizedId);
+                    }
+                });
+
+                // Eventos para los botones
+                minimizedWindow.querySelector('.restore-btn').addEventListener('click', () => restoreWindow(minimizedId));
+                minimizedWindow.querySelector('.close-btn').addEventListener('click', () => {
+                    const targetId = minimizedWindow.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    if (targetId === 'call-modal') {
+                        closeModal(targetElement);
+                        stopTimer(false);
+                    } else if (targetId === 'edit-modal') {
+                        closeModal(targetElement);
+                    } else {
+                        targetElement.classList.add('hidden');
+                    }
+                    minimizedWindow.remove();
+                });
+            }
+        }
+
+        //Función para restaurar ventana minimizada
+        function restoreWindow(minimizedId) {
+            const minimizedWindow = document.getElementById(minimizedId);
+            if (!minimizedWindow) return;
+
+            const targetId = minimizedWindow.dataset.target;
+            const targetElement = document.getElementById(targetId);
+
+            targetElement.classList.remove('hidden');
+            minimizedWindow.remove();
+        }
+
+        // Sincronizar el temporizador en la ventana minimizada
+        setInterval(() => {
+            const minimizedTimer = document.getElementById('minimized-timer');
+            if (minimizedTimer) {
+                minimizedTimer.textContent = DOM.modalTimerElem.textContent;
+            }
+        }, 1000);
+
+        function updateQuickHistoryPanel() {
+            const selectedInstitution = $('#caller-institution').val();
+            const panel = DOM.quickHistoryPanel;
+            const contentDiv = DOM.quickHistoryContent;
+
+            if (!selectedInstitution || DOM.callModal.classList.contains('hidden')) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const allCalls = [...state.calls, ...state.historicalCalls];
+            const institutionCalls = allCalls
+                .filter(call => call.institucion === selectedInstitution)
+                .sort((a, b) => {
+                    // Ordenar por fecha y hora descendente (más reciente primero)
+                    const dateA = new Date(a.fecha.split('/').reverse().join('-') + 'T' + convertTo24HourFormat(a.inicio));
+                    const dateB = new Date(b.fecha.split('/').reverse().join('-') + 'T' + convertTo24HourFormat(b.inicio));
+                    return dateB - dateA;
+                })
+                .slice(0, 10); // Tomar las últimas 10
+
+            if (institutionCalls.length === 0) {
+                contentDiv.innerHTML = `<p class="text-center text-sm text-slate-500 p-4">No hay llamadas anteriores para esta institución.</p>`;
+            } else {
+                contentDiv.innerHTML = institutionCalls.map(call => {
+                    const statusClass = call.estatus === 'Saliente' ? 'text-green-500' : 'text-blue-500';
+                    const statusIcon = call.estatus === 'Saliente' ? 'fa-arrow-up-from-bracket' : 'fa-inbox';
+                    return `
+                        <div class="quick-history-item">
+                            <div class="flex justify-between items-center mb-1">
+                                <p class="text-xs text-slate-500">${formatLongDate(call.fecha)} - ${formatTimeWithAmPm(call.inicio)}</p>
+                                <span class="text-xs font-semibold ${statusClass}"><i class="fa-solid ${statusIcon} mr-1"></i>${call.estatus}</span>
+                            </div>
+                            <p class="font-semibold text-slate-800">${call.nombre || 'N/A'}</p>
+                            <p class="text-sm text-slate-600"><strong>Asunto:</strong> ${call.asunto || 'N/A'}</p>
+                            <p class="text-sm text-slate-600"><strong>Consulta:</strong> ${call.consulta || 'N/A'}</p>
+                            ${call.comentarios ? `
+                                <details class="mt-2 text-xs">
+                                    <summary class="cursor-pointer text-primary hover:underline">Ver comentarios</summary>
+                                    <p class="italic text-slate-500 bg-slate-50 p-2 rounded mt-1 border">${call.comentarios}</p>
+                                </details>
+                            ` : ''}
+                        </div>`;
+                }).join('');
+            }
+            panel.classList.remove('hidden');
+        }
+
+        // =============================================
         // MÓDULO: Configuración de eventos 
         // =============================================
         
+        //Función de eventos
         function setupEventListeners() {
             setupTabs();
             // Modificación: El dataProvider para los filtros de columna ahora puede ser dinámico.
@@ -5143,6 +5217,7 @@
             // MÓDULO: Visualización de Detalles (Doble Clic)
             // =============================================
 
+            //Mostrar detalles de llamada - modal
             function showDetailsModal(callItem) {
                 // Ocultar el tooltip de vista rápida al abrir el modal de detalles
                 if (DOM.quickViewTooltip) {
@@ -5207,6 +5282,7 @@
                 }
             }
 
+            //Edición de orarios con doble clic
             function handleRowDoubleClick(e, isHistorical) {
                 const row = e.target.closest('tr');
                 // IMPORTANTE: No abrir si se hace clic en un botón (editar, borrar, estatus)
@@ -5249,6 +5325,20 @@
             DOM.timestampsStartTimeInput.addEventListener('change', calculateAndDisplayDuration);
             DOM.timestampsEndTimeInput.addEventListener('change', calculateAndDisplayDuration);
 
+            // --- INICIO: Minimizar modales al hacer clic fuera ---
+            DOM.callModal.addEventListener('click', (e) => {
+                if (e.target === DOM.callModal) { // Clic en el fondo del modal
+                    minimizeWindow('call-modal', 'Llamada en curso...', 'minimized-call-window');
+                }
+            });
+
+            DOM.editModal.addEventListener('click', (e) => {
+                if (e.target === DOM.editModal) { // Clic en el fondo del modal
+                    minimizeWindow('edit-modal', 'Editando Llamada', 'minimized-edit-window');
+                }
+            });
+            // --- FIN: Minimizar modales al hacer clic fuera ---
+
             // Cierre del modal de detalles al hacer clic fuera
             DOM.viewDetailsModal.addEventListener('click', (e) => {
                 if (e.target === DOM.viewDetailsModal) {
@@ -5261,6 +5351,7 @@
             });
         }
 
+        //Configuración del tooltip de vista rápida
         function setupQuickViewTooltip() {
             const tooltip = DOM.quickViewTooltip;
             const showTooltip = (e) => { 
@@ -5304,7 +5395,8 @@
                 tbody.addEventListener('mousemove', moveTooltip);
             });
         }
-        
+
+        //Funcionalidad del grafico de consulta...        
         function setupConsultaChartLabelToggle() {
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded ml-2';
@@ -5351,268 +5443,6 @@
         // Iniciar la aplicación
         initialize();
 
-        // =============================================
-        // MÓDULO: Panel de Historial Rápido
-        // =============================================
-
-        function setupQuickHistoryPanel() {
-            const panel = DOM.quickHistoryPanel;
-            const header = panel.querySelector('.quick-history-header');
-
-            // Lógica para cerrar el panel
-            DOM.closeQuickHistoryBtn.addEventListener('click', () => {
-                panel.classList.add('hidden');
-                // Asegurarse de que la ventana minimizada también se elimine
-                const minimizedHistoryWindow = document.getElementById('minimized-history-window');
-                if (minimizedHistoryWindow) {
-                    minimizedHistoryWindow.remove();
-                }
-            });
-
-            // Lógica para hacerlo arrastrable (draggable)
-            let offsetX, offsetY;
-
-            const move = (e) => {
-                if (!state.ui.isDragging) return;
-                e.preventDefault();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                panel.style.left = `${clientX - offsetX}px`;
-                panel.style.top = `${clientY - offsetY}px`;
-            };
-
-            const stopDrag = () => {
-                state.ui.isDragging = false;
-                document.removeEventListener('mousemove', move);
-                document.removeEventListener('touchmove', move);
-                document.removeEventListener('mouseup', stopDrag);
-                document.removeEventListener('touchend', stopDrag);
-            };
-
-            header.addEventListener('mousedown', (e) => {
-                state.ui.isDragging = true;
-                offsetX = e.clientX - panel.offsetLeft;
-                offsetY = e.clientY - panel.offsetTop;
-                document.addEventListener('mousemove', move);
-                document.addEventListener('mouseup', stopDrag);
-            });
-            
-            header.addEventListener('touchstart', (e) => {
-                state.ui.isDragging = true;
-                offsetX = e.touches[0].clientX - panel.offsetLeft;
-                offsetY = e.touches[0].clientY - panel.offsetTop;
-                document.addEventListener('touchmove', move);
-                document.addEventListener('touchend', stopDrag);
-            });
-
-            // Lógica de Minimizar/Restaurar para el modal de llamada
-            const minimizeCallBtn = document.getElementById('minimize-call-modal-btn');
-            minimizeCallBtn.addEventListener('click', () => {
-                minimizeWindow('call-modal', 'Llamada en curso...', 'minimized-call-window');
-            });
-
-            // Lógica de Minimizar/Restaurar para el modal de edición
-            DOM.minimizeEditModalBtn.addEventListener('click', () => {
-                minimizeWindow('edit-modal', 'Editando Llamada', 'minimized-edit-window');
-            });
-
-            // Lógica de Minimizar/Restaurar para el panel de historial
-            DOM.minimizeQuickHistoryBtn.addEventListener('click', () => {
-                minimizeWindow('quick-history-panel', 'Historial Rápido', 'minimized-history-window');
-            });
-
-            // Hacer el modal de llamada arrastrable
-            const callModalHeader = document.getElementById('call-modal-header');
-            const callModal = DOM.callModal.querySelector('.relative'); 
-
-            callModalHeader.addEventListener('mousedown', (e) => {
-                // Evitar iniciar el arrastre si se hace clic en un botón
-                if (e.target.closest('button')) return;
-
-                state.ui.isDragging = true;
-                // La posición del modal es 'relative', pero su contenedor flex lo centra.
-                // Para moverlo, necesitamos cambiarlo a 'absolute' y calcular su posición inicial.
-                const rect = callModal.getBoundingClientRect();
-                callModal.style.position = 'absolute';
-                callModal.style.left = `${rect.left}px`;
-                callModal.style.top = `${rect.top}px`;
-
-                offsetX = e.clientX - rect.left;
-                offsetY = e.clientY - rect.top;
-
-                document.addEventListener('mousemove', moveCallModal);
-                document.addEventListener('mouseup', stopDragCallModal);
-            });
-
-            const moveCallModal = (e) => {
-                if (!state.ui.isDragging) return;
-                e.preventDefault();
-                callModal.style.left = `${e.clientX - offsetX}px`;
-                callModal.style.top = `${e.clientY - offsetY}px`;
-            };
-
-            const stopDragCallModal = () => {
-                state.ui.isDragging = false;
-                document.removeEventListener('mousemove', moveCallModal);
-                document.removeEventListener('mouseup', stopDragCallModal);
-            };
-
-            // Hacer el modal de edición arrastrable
-            const editModalHeader = document.getElementById('edit-modal-header');
-            const editModal = DOM.editModal.querySelector('.relative');
-
-            editModalHeader.addEventListener('mousedown', (e) => {
-                // Evitar iniciar el arrastre si se hace clic en un botón
-                if (e.target.closest('button')) return;
-
-                state.ui.isDragging = true;
-                const rect = editModal.getBoundingClientRect();
-                editModal.style.position = 'absolute';
-                editModal.style.left = `${rect.left}px`;
-                editModal.style.top = `${rect.top}px`;
-
-                offsetX = e.clientX - rect.left;
-                offsetY = e.clientY - rect.top;
-
-                document.addEventListener('mousemove', moveEditModal);
-                document.addEventListener('mouseup', stopDragEditModal);
-            });
-
-            const moveEditModal = (e) => {
-                if (!state.ui.isDragging) return;
-                e.preventDefault();
-                editModal.style.left = `${e.clientX - offsetX}px`;
-                editModal.style.top = `${e.clientY - offsetY}px`;
-            };
-
-            const stopDragEditModal = () => {
-                state.ui.isDragging = false;
-                document.removeEventListener('mousemove', moveEditModal);
-                document.removeEventListener('mouseup', stopDragEditModal);
-            };
-        }
-
-        function minimizeWindow(elementId, title, minimizedId) {
-            const element = document.getElementById(elementId);
-            if (!element || element.classList.contains('hidden')) return;
-
-            // Ocultar el modal/panel principal
-            element.classList.add('hidden');
-
-            // Crear la ventana minimizada si no existe
-            if (!document.getElementById(minimizedId)) {
-                const container = document.getElementById('minimized-windows-container');
-                const minimizedWindow = document.createElement('div');
-                minimizedWindow.id = minimizedId;
-                minimizedWindow.className = 'minimized-window';
-                minimizedWindow.dataset.target = elementId;
-
-                let timerHTML = '';
-                if (elementId === 'call-modal') {
-                    timerHTML = `<span id="minimized-timer" class="text-sm font-mono text-primary">${DOM.modalTimerElem.textContent}</span>`;
-                }
-
-                minimizedWindow.innerHTML = `
-                    <span class="minimized-window-title">${title}</span>
-                    ${timerHTML}
-                    <div class="minimized-window-controls">
-                        <button class="restore-btn" title="Restaurar"><i class="fa-solid fa-window-restore"></i></button>
-                        <button class="close-btn" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                `;
-                container.appendChild(minimizedWindow);
-
-                // Evento para restaurar (haciendo clic en cualquier parte excepto los botones)
-                minimizedWindow.addEventListener('click', (e) => {
-                    if (!e.target.closest('button')) {
-                        restoreWindow(minimizedId);
-                    }
-                });
-
-                // Eventos para los botones
-                minimizedWindow.querySelector('.restore-btn').addEventListener('click', () => restoreWindow(minimizedId));
-                minimizedWindow.querySelector('.close-btn').addEventListener('click', () => {
-                    const targetId = minimizedWindow.dataset.target;
-                    const targetElement = document.getElementById(targetId);
-                    if (targetId === 'call-modal') {
-                        closeModal(targetElement);
-                        stopTimer(false);
-                    } else if (targetId === 'edit-modal') {
-                        closeModal(targetElement);
-                    } else {
-                        targetElement.classList.add('hidden');
-                    }
-                    minimizedWindow.remove();
-                });
-            }
-        }
-
-        function restoreWindow(minimizedId) {
-            const minimizedWindow = document.getElementById(minimizedId);
-            if (!minimizedWindow) return;
-
-            const targetId = minimizedWindow.dataset.target;
-            const targetElement = document.getElementById(targetId);
-
-            targetElement.classList.remove('hidden');
-            minimizedWindow.remove();
-        }
-
-        // Sincronizar el temporizador en la ventana minimizada
-        setInterval(() => {
-            const minimizedTimer = document.getElementById('minimized-timer');
-            if (minimizedTimer) {
-                minimizedTimer.textContent = DOM.modalTimerElem.textContent;
-            }
-        }, 1000);
-
-        function updateQuickHistoryPanel() {
-            const selectedInstitution = $('#caller-institution').val();
-            const panel = DOM.quickHistoryPanel;
-            const contentDiv = DOM.quickHistoryContent;
-
-            if (!selectedInstitution || DOM.callModal.classList.contains('hidden')) {
-                panel.classList.add('hidden');
-                return;
-            }
-
-            const allCalls = [...state.calls, ...state.historicalCalls];
-            const institutionCalls = allCalls
-                .filter(call => call.institucion === selectedInstitution)
-                .sort((a, b) => {
-                    // Ordenar por fecha y hora descendente (más reciente primero)
-                    const dateA = new Date(a.fecha.split('/').reverse().join('-') + 'T' + convertTo24HourFormat(a.inicio));
-                    const dateB = new Date(b.fecha.split('/').reverse().join('-') + 'T' + convertTo24HourFormat(b.inicio));
-                    return dateB - dateA;
-                })
-                .slice(0, 10); // Tomar las últimas 10
-
-            if (institutionCalls.length === 0) {
-                contentDiv.innerHTML = `<p class="text-center text-sm text-slate-500 p-4">No hay llamadas anteriores para esta institución.</p>`;
-            } else {
-                contentDiv.innerHTML = institutionCalls.map(call => {
-                    const statusClass = call.estatus === 'Saliente' ? 'text-green-500' : 'text-blue-500';
-                    const statusIcon = call.estatus === 'Saliente' ? 'fa-arrow-up-from-bracket' : 'fa-inbox';
-                    return `
-                        <div class="quick-history-item">
-                            <div class="flex justify-between items-center mb-1">
-                                <p class="text-xs text-slate-500">${formatLongDate(call.fecha)} - ${formatTimeWithAmPm(call.inicio)}</p>
-                                <span class="text-xs font-semibold ${statusClass}"><i class="fa-solid ${statusIcon} mr-1"></i>${call.estatus}</span>
-                            </div>
-                            <p class="font-semibold text-slate-800">${call.nombre || 'N/A'}</p>
-                            <p class="text-sm text-slate-600"><strong>Asunto:</strong> ${call.asunto || 'N/A'}</p>
-                            <p class="text-sm text-slate-600"><strong>Consulta:</strong> ${call.consulta || 'N/A'}</p>
-                            ${call.comentarios ? `
-                                <details class="mt-2 text-xs">
-                                    <summary class="cursor-pointer text-primary hover:underline">Ver comentarios</summary>
-                                    <p class="italic text-slate-500 bg-slate-50 p-2 rounded mt-1 border">${call.comentarios}</p>
-                                </details>
-                            ` : ''}
-                        </div>`;
-                }).join('');
-            }
-            panel.classList.remove('hidden');
-        }
     </script>
 </body> 
 </html> 
