@@ -53,16 +53,6 @@
         .border-primary { border-color: #9C2348; }
         .focus\:ring-primary:focus { --tw-ring-color: #9C2348; }
         
-        /* Paleta de colores secundaria (usada en botones de edición) */
-        .bg-secondary { background-color: #A6802D; }
-        .text-secondary { color: #A6802D; }
-        .border-secondary { border-color: #A6802D; }
-        
-        /* Paleta de colores de acento (usada en botones de migración, tooltips) */
-        .bg-accent { background-color: #1E5B4F; }
-        .text-accent { color: #1E5B4F; }
-        .border-accent { border-color: #1E5B4F; }
-        
         /* Colores de estado: Éxito */
         .bg-success { background-color: #10B981; }
         .hover\:bg-success-dark:hover { background-color: #059669; }
@@ -408,35 +398,6 @@
         .tabla-datos { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         .tabla-datos th, .tabla-datos td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
         .tabla-datos th { background-color: #f9fafb; }
-        
-        .info-tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-        }
-        
-        .info-tooltip .tooltip-text {
-            visibility: hidden;
-            width: 250px;
-            background-color: #1E5B4F;
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -125px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-        }
-        
-        .info-tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
 
         /* ============================================= */
         /* === TOOLTIPS Y VISTAS RÁPIDAS === */
@@ -687,18 +648,18 @@
                                 <i class="fa-solid fa-phone-alt"></i><span>Iniciar Nueva Llamada</span>
                             </button>
                             <button id="download-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar Excel</span></button>
-                        <button id="start-migration-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
-                            <i class="fa-solid fa-database"></i>
-                            <span>Migrar Llamadas</span>
-                        </button>
-                        <button id="confirm-migration-btn" class="hidden bg-success hover:bg-success-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" disabled>
-                            <i class="fa-solid fa-check"></i>
-                            <span>Confirmar</span>
-                        </button>
-                        <button id="cancel-migration-btn" class="hidden bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
-                            <i class="fa-solid fa-times"></i>
-                            <span>Cancelar</span>
-                        </button>
+                            <button id="start-migration-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                                <i class="fa-solid fa-database"></i>
+                                <span>Migrar Llamadas</span>
+                            </button>
+                            <button id="confirm-migration-btn" class="hidden bg-success hover:bg-success-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" disabled>
+                                <i class="fa-solid fa-check"></i>
+                                <span>Confirmar</span>
+                            </button>
+                            <button id="cancel-migration-btn" class="hidden bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                                <i class="fa-solid fa-times"></i>
+                                <span>Cancelar</span>
+                            </button>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl shadow-md table-container">
@@ -767,7 +728,17 @@
                             <div class="relative w-full"><input type="text" id="filter-input-historical" placeholder="Buscar..." class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i><button id="clear-filter-btn-historical" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden"><i class="fa-solid fa-times-circle"></i></button></div>
                             <button id="download-historical-excel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Descargar</span></button>
                             <label for="historical-file-input" class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap"><i class="fa-solid fa-file-upload"></i><span>Subir Excel</span><input type="file" id="historical-file-input" class="hidden" accept=".xlsx, .xls"></label>
-                            <button id="import-historical-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out hidden items-center space-x-2 whitespace-nowrap" disabled><i class="fa-solid fa-database"></i><span>Subir Excel</span></button>
+                            
+                            <button id="confirm-import-historical-btn" class="hidden bg-success hover:bg-success-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap" disabled>
+                               <i class="fa-solid fa-check"></i>
+                               <span>Confirmar</span>
+                           </button>
+    
+                            <button id="cancel-import-historical-btn" class="hidden bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
+                                <i class="fa-solid fa-times"></i>
+                                <span>Cancelar</span>
+                            </button> 
+                            
                             <button id="start-reverse-migration-btn" class="migrate-btn text-white font-bold py-2 px-4 rounded-lg shadow transition-all duration-200 ease-in-out flex items-center space-x-2 whitespace-nowrap">
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Migrar a Registro</span>
@@ -1136,11 +1107,6 @@
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center"><h3 class="text-xl font-bold text-slate-800 mb-4">Confirmar Eliminación</h3><p class="text-slate-600 mb-6">¿Estás seguro de que deseas eliminar este registro?</p><div class="flex justify-center space-x-4"><button id="cancel-delete-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancelar</button><button id="confirm-delete-btn" class="bg-danger hover:bg-danger-dark text-white font-bold py-2 px-4 rounded-lg">Eliminar</button></div></div>
     </div>
     
-    <!----------------- MODAL DE CONFIRMACIÓN DE REEMPLAZAR HISTÓRICO ---------------->
-    <div id="replace-historical-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center"><h3 class="text-xl font-bold text-primary mb-4">Reemplazar Histórico</h3><p class="text-slate-600 mb-6">¿Desea reemplazar el histórico actual?</p><div class="flex justify-center space-x-4"><button id="cancel-replace-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">No</button><button id="confirm-replace-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Sí</button></div></div>
-    </div>
-    
     <!----------------- MODAL DE CONFIRMACIÓN DE EDITAR OPCIÓN DE LISTA ---------------->
     <div id="edit-option-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center">
@@ -1267,19 +1233,6 @@
         </div>
     </div>
 
-    <!----------------- MODAL DE CONFIRMACIÓN DE MIGRACIÓN DE LLAMADAS (DE HISTORIAL A HISTÓRICO)  ---------------->
-    <div id="migrate-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm mx-4 text-center">
-            <h3 class="text-xl font-bold text-primary mb-4">Migrar Llamadas</h3>
-            <p class="text-slate-600 mb-6">¿Está seguro de que desea migrar todas las llamadas de Registro y Control al Histórico? Esta acción no se puede deshacer.</p>
-            <div class="flex justify-center space-x-4">
-                <button id="cancel-migrate-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancelar</button>
-                <button id="confirm-migrate-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Migrar</button>
-            </div>
-        </div>
-    </div>
-
-
     <!----------------- MODAL VER DETALLES DE LLAMADA ---------------->
     <div id="view-details-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center wide-modal">
         <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl mx-4">
@@ -1376,11 +1329,17 @@
         // MÓDULO: Configuración de Firebase
         // =============================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; // Autenticación
         import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, serverTimestamp, writeBatch, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Datos del Proyecto
+        /**
+         * Configuración de Firebase para la conexión con la base de datos y autenticación.
+         * Contiene las claves y endpoints del proyecto en Firebase.
+         */
         const firebaseConfig = {
+            // NOTA DE SEGURIDAD: En un entorno de producción real, estas claves deberían gestionarse
+            // a través de variables de entorno o un servicio de configuración seguro para evitar
+            // exponerlas directamente en el código del cliente.
             apiKey: "AIzaSyBcuK6zAUnX09wEZ-hSfBP8A66kltUvBls",
             authDomain: "sicoinllamadasformulario.firebaseapp.com",
             projectId: "sicoinllamadasformulario",
@@ -1390,27 +1349,31 @@
             measurementId: "G-F47JLWW4NY"
         };
 
+        // Inicialización de la aplicación Firebase y servicios.
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
         // =============================================
         // MÓDULO: Variables globales y estado de la aplicación
+        // Descripción: Centraliza las referencias al DOM, el estado de la aplicación y las
+        // referencias a las colecciones de Firestore para un acceso y manejo consistentes.
         // =============================================
+
+        // Referencias a las colecciones de Firestore.
         const callsCollectionRef = collection(db, "calls");
         const historicalCallsCollectionRef = collection(db, "historicalCalls");
         
-        // Centralized DOM Elements
+        /**
+         * Objeto `DOM` que centraliza todas las referencias a elementos del DOM.
+         * Facilita el acceso y la modificación de la interfaz de usuario.
+         */
         const DOM = {
             loader: document.getElementById('loader'),
             appContainer: document.getElementById('app'),
             userInfo: document.getElementById('user-info'),
             tabsContainer: document.getElementById('tabs'),
             tabContents: document.querySelectorAll('.tab-content'),
-            totalCallsElem: document.getElementById('total-calls'),
-            avgDurationElem: document.getElementById('avg-duration'),
-            salientesCountElem: document.getElementById('salientes-count'),
-            entrantesCountElem: document.getElementById('entrantes-count'),
             dashboardDataSourceHistorico: document.getElementById('dashboard-data-source-historico'),
             totalCallsElemHistorico: document.getElementById('total-calls-historico'),
             avgDurationElemHistorico: document.getElementById('avg-duration-historico'),
@@ -1423,7 +1386,8 @@
             historicalTableBody: document.getElementById('historical-table-body'),
             noHistoricalMessage: document.getElementById('no-historical-message'),
             historicalFileInput: document.getElementById('historical-file-input'),
-            importHistoricalBtn: document.getElementById('import-historical-btn'),
+            confirmImportHistoricalBtn: document.getElementById('confirm-import-historical-btn'),
+            cancelImportHistoricalBtn: document.getElementById('cancel-import-historical-btn'),
             reportesDataSource: document.getElementById('reportes-data-source'),
             statusChartCanvas: document.getElementById('statusChart'),
             asuntoChartCanvas: document.getElementById('asuntoChart'),
@@ -1446,9 +1410,6 @@
             cancelDeleteBtn: document.getElementById('cancel-delete-btn'),
             confirmDeleteBtn: document.getElementById('confirm-delete-btn'),
             pivotTableContainer: document.getElementById('pivot-table'),
-            replaceHistoricalModal: document.getElementById('replace-historical-modal'),
-            cancelReplaceBtn: document.getElementById('cancel-replace-btn'),
-            confirmReplaceBtn: document.getElementById('confirm-replace-btn'),
             editOptionModal: document.getElementById('edit-option-modal'),
             editOptionInput: document.getElementById('edit-option-input'),
             cancelEditOptionBtn: document.getElementById('cancel-edit-option-btn'),
@@ -1478,13 +1439,10 @@
             confirmMigrationBtn: document.getElementById('confirm-migration-btn'),
             cancelMigrationBtn: document.getElementById('cancel-migration-btn'),
             selectAllCallsCheckbox: document.getElementById('select-all-calls-checkbox'),
-            migrateModal: document.getElementById('migrate-modal'),
             startReverseMigrationBtn: document.getElementById('start-reverse-migration-btn'),
             confirmReverseMigrationBtn: document.getElementById('confirm-reverse-migration-btn'),
             cancelReverseMigrationBtn: document.getElementById('cancel-reverse-migration-btn'),
             selectAllHistoricalCallsCheckbox: document.getElementById('select-all-historical-calls-checkbox'),
-            cancelMigrateBtn: document.getElementById('cancel-migrate-btn'),
-            confirmMigrateBtn: document.getElementById('confirm-migrate-btn'),
             viewDetailsModal: document.getElementById('view-details-modal'),
             closeDetailsModalBtn: document.getElementById('close-details-modal-btn'),
             includeDynamicChartCheckbox: document.getElementById('include-dynamic-chart'),
@@ -1524,8 +1482,11 @@
             toggleLabelsBtn.classList.toggle('text-white', state.ui.showChartLabels);
             updateDynamicChart();
         });
-
-        // Centralized Application State
+        
+        /**
+         * Objeto `state` que centraliza el estado de la aplicación.
+         * Mantiene los datos de llamadas, opciones de campos, estado de la UI y filtros.
+         */
         const state = {
             userId: null,
             calls: [],
@@ -1537,14 +1498,14 @@
             ui: {
                 timerInterval: null,
                 callStartTime: null,
-                openModalCount: 0,
-                currentFilterDropdown: null,
-                isCallModalActive: false, // Nuevo estado para rastrear si el modal de llamada está activo
-                isMigrationModeActive: false,
-                selectedCallIdsToMigrate: new Set(),
-                isReverseMigrationModeActive: false,
-                selectedHistoricalCallIdsToMigrate: new Set(),
-                currentEditIsHistorical: false,
+                openModalCount: 0, // Contador de modales abiertos para gestionar el scroll del body.
+                currentFilterDropdown: null, // Referencia al menú desplegable de filtro activo.
+                isCallModalActive: false, // Indica si el modal de "Nueva Llamada" está activo para deshabilitar otras acciones.
+                isMigrationModeActive: false, // Indica si el modo de migración de 'Registro' a 'Histórico' está activo.
+                selectedCallIdsToMigrate: new Set(), // IDs de llamadas seleccionadas para migrar.
+                isReverseMigrationModeActive: false, // Indica si el modo de migración inversa está activo.
+                selectedHistoricalCallIdsToMigrate: new Set(), // IDs de llamadas históricas seleccionadas para migrar.
+                currentEditIsHistorical: false, // Contexto para saber si la llamada que se edita es del histórico.
                 currentEditingField: null,
                 currentEditingValue: null,
                 pendingAction: null,
@@ -1553,11 +1514,11 @@
                 isDragging: false,
                 showChartLabels: true,
             }, 
-            consultaChartState: { showLabels: false },
+            consultaChartState: { showLabels: false }, // Estado específico para el gráfico de consultas.
             reportFilter: {
                 type: 'all', // 'all' o 'period'
                 startDate: null,
-                endDate: null
+                endDate: null,
             },
             activeFilters: {
                 main: {},
@@ -1570,26 +1531,38 @@
 
         // =============================================
         // MÓDULO: Gestión de Modales (con contador para anidamiento)
+        // Descripción: Funciones para controlar la visibilidad y el comportamiento de los modales.
         // =============================================
         let openModalCount = 0;
         const z_INDEX_BASE = 50; // Base para el z-index de los modales
         
-        //Mostrar app
+        /**
+         * Oculta el loader inicial y muestra el contenido principal de la aplicación.
+         */
         function showApp() {
             DOM.loader.classList.add('hidden');
             DOM.appContainer.classList.remove('hidden');
         }
 
+        /**
+         * Muestra una notificación flotante (toast) en la esquina inferior derecha.
+         * @param {string} message - El mensaje a mostrar.
+         * @param {'info'|'success'|'warning'|'error'} [type='info'] - El tipo de alerta, que determina su color.
+         */
         function showAlert(message, type = 'info') {
             const alertContainer = document.createElement('div');
             const colors = { success: 'bg-green-500', error: 'bg-red-500', warning: 'bg-yellow-500', info: 'bg-gray-500' };
             alertContainer.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 z-[100] ${colors[type]}`;
             alertContainer.textContent = message;
             document.body.appendChild(alertContainer);
+            // La alerta se elimina automáticamente después de 3 segundos.
             setTimeout(() => { alertContainer.remove(); }, 3000);
         }
 
-        //Genera una marca de tiempo formateada para nombres de archivo.
+        /**
+         * Genera una marca de tiempo formateada para usar en nombres de archivo.
+         * @returns {string} Una cadena con el formato `DD-MM-YYYY_HHhMMmSSs`.
+         */
         function getFormattedTimestamp() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
@@ -1601,7 +1574,12 @@
             return `${day}-${month}-${year}_${hours}h${minutes}m${seconds}s`;
         }
 
-        //Función de apoyo para el Zoom en navefador
+        /**
+         * Función de utilidad (debounce) que retrasa la ejecución de una función.
+         * Es útil para eventos que se disparan con frecuencia, como `resize` o `scroll`.
+         * @param {Function} func - La función a ejecutar.
+         * @param {number} delay - El tiempo de espera en milisegundos.
+         */
         function debounce(func, delay) {
             let timeout;
             return function(...args) {
@@ -1611,7 +1589,11 @@
             };
         }
 
-        //Función para dar formato al campo de Duración
+        /**
+         * Formatea una cantidad de segundos en un formato de tiempo HH:MM:SS.
+         * @param {number} seconds - La duración en segundos.
+         * @returns {string} La duración formateada como "HH:MM:SS".
+         */
                 function formatDuration(seconds) {
             if (isNaN(seconds) || seconds < 0) seconds = 0;
             const h = Math.floor(seconds / 3600);
@@ -1620,7 +1602,11 @@
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
         
-        //Dar formato a.m. p.m. a las Horas de Inicio y Fin
+        /**
+         * Convierte una cadena de tiempo en formato 24h (HH:MM:SS) a formato 12h con a.m./p.m.
+         * @param {string} timeString - La cadena de tiempo en formato 24h.
+         * @returns {string} El tiempo formateado como "HH:MM:SS a. m." o "HH:MM:SS p. m.".
+         */
         function formatTimeWithAmPm(timeString) {
             if (!timeString || typeof timeString !== 'string') return 'N/A';
             if (timeString.toLowerCase().includes('a. m.') || timeString.toLowerCase().includes('p. m.')) {
@@ -1642,7 +1628,11 @@
             }
         }
 
-        // Convierte una hora en formato 12h (con a.m./p.m.) a formato 24h (HH:mm:ss)
+        /**
+         * Convierte una cadena de tiempo en formato 12h (con a.m./p.m.) a formato 24h (HH:mm:ss).
+         * @param {string} timeStr - La cadena de tiempo en formato 12h.
+         * @returns {string} El tiempo convertido a formato "HH:mm:ss".
+         */
         function convertTo24HourFormat(timeStr) {
             if (!timeStr || typeof timeStr !== 'string') return '00:00:00';
             const lcTime = timeStr.toLowerCase();
@@ -1675,7 +1665,10 @@
             return `${String(h).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
-        //Abrir modal
+        /**
+         * Abre un modal, gestionando el z-index y bloqueando el scroll del body.
+         * @param {HTMLElement} modal - El elemento del modal a abrir.
+         */
         function openModal(modal) {
             state.ui.openModalCount++;
             modal.style.zIndex = z_INDEX_BASE + state.ui.openModalCount;
@@ -1702,7 +1695,10 @@
             // --- FIN: Lógica de Autofoco ---
         } 
 
-        //Cerrar modal
+        /**
+         * Cierra un modal, gestionando el z-index y restaurando el scroll del body si es necesario.
+         * @param {HTMLElement} modal - El elemento del modal a cerrar.
+         */
         function closeModal(modal) {
             modal.classList.remove('modal-enter');
             modal.classList.add('modal-leave');
@@ -1727,33 +1723,15 @@
             }
         }
 
-        // Función auxiliar para esperar a que un gráfico se renderice completamente
-        function waitForChartRender(canvasElement) {
-            return new Promise(resolve => {
-                if (!canvasElement) return resolve();
-                
-                // Función para truncar texto, inspirada en la app de trenes
-                function truncateText(text, maxLength = 30) {
-                    if (!text) return 'N/A';
-                    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-                }
-                const checkRender = () => {
-                    if (canvasElement.width > 0 && canvasElement.height > 0) {
-                        resolve();
-                    } else {
-                        setTimeout(checkRender, 100);
-                    }
-                };
-                
-                checkRender();
-            });
-        }
-
         // =============================================
         // MÓDULO: Interfaz de usuario
+        // Descripción: Funciones relacionadas con la manipulación y actualización de la interfaz,
+        // como pestañas, tablas, filtros y dashboards.
         // =============================================
         
-        //Configuración de Pestañas
+        /**
+         * Configura la navegación por pestañas (Registro, Histórico, Reportes).
+         */
         function setupTabs() {
             DOM.tabsContainer.addEventListener('click', (e) => {
                 if (e.target.matches('.tab-btn')) {
@@ -1768,7 +1746,12 @@
             });
         }
 
-        //Función para resaltar texto
+        /**
+         * Resalta las coincidencias de un término de búsqueda dentro de un texto.
+         * @param {string} text - El texto original.
+         * @param {string} searchTerm - El término a buscar y resaltar.
+         * @returns {string} El texto con las coincidencias envueltas en un span con la clase 'highlight'.
+         */
         function highlightText(text, searchTerm) {
             if (!searchTerm || searchTerm.trim() === '' || typeof text !== 'string') {
                 return text;
@@ -1778,7 +1761,13 @@
             const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
             return text.replace(regex, `<span class="highlight">$1</span>`);
         }
-        //Renderizar tablas
+
+        /**
+         * Renderiza las filas de una tabla (principal o histórica) con los datos proporcionados.
+         * @param {HTMLTableSectionElement} tableBody - El `<tbody>` de la tabla a poblar.
+         * @param {Array<Object>} data - El array de objetos de llamada.
+         * @param {boolean} [isHistorical=false] - Indica si la tabla es la del histórico.
+         */
         function renderTable(tableBody, data, isHistorical = false) {
             const noDataMessage = isHistorical ? DOM.noHistoricalMessage : DOM.noCallsMessage;
             tableBody.innerHTML = '';
@@ -1863,7 +1852,11 @@
             });
         }
 
-        //Funcipon para obtener los días de la semana
+        /**
+         * Obtiene el día de la semana (1=Lunes, ..., 7=Domingo, 0=Domingo en getDay()) a partir de una fecha en formato DD/MM/YYYY.
+         * @param {string} dateString - La fecha en formato "DD/MM/YYYY".
+         * @returns {number} El número del día de la semana (1-7) o -1 si hay un error.
+         */
         function getDayOfWeek(dateString) {
             if (!dateString || typeof dateString !== 'string') return -1;
             try {
@@ -1878,7 +1871,12 @@
             }
         }
 
-        //Función para aplicar filtros
+        /**
+         * Aplica todos los filtros activos (búsqueda general, filtros de columna, filtro de día) a un conjunto de datos.
+         * @param {Array<Object>} data - El conjunto de datos a filtrar.
+         * @param {'main'|'historical'} filterKey - La clave que identifica el conjunto de filtros a usar ('main' o 'historical').
+         * @returns {Array<Object>} Los datos filtrados.
+         */
         function applyAllFilters(data, filterKey) {
             const searchInput = document.getElementById(`filter-input-${filterKey}`);
             const searchText = searchInput ? searchInput.value.toLowerCase() : '';
@@ -1915,9 +1913,9 @@
 
         /**
          * Obtiene los datos pre-filtrados por todas las columnas excepto la especificada.
-         * Esto es crucial para que los dropdowns de filtro muestren solo opciones relevantes.
+         * Esto es crucial para que los menús desplegables de filtro muestren solo opciones relevantes.
          * @param {function} dataProvider - Función que devuelve el conjunto de datos completo.
-         * @param {string} filterKey - 'main' o 'historical'.
+         * @param {'main'|'historical'} filterKey - 'main' o 'historical'.
          * @param {string} excludeColumn - La clave de la columna a excluir del filtrado.
          * @returns {Array} - Los datos filtrados.
          */
@@ -1939,6 +1937,15 @@
             });
         }
 
+        /**
+         * Configura los manejadores de eventos para los encabezados de columna filtrables.
+         * Crea y gestiona los menús desplegables de filtro.
+         * @param {string} headerId - El ID del `<tr>` que contiene los encabezados.
+         * @param {Function} dataProvider - Una función que devuelve los datos a filtrar.
+         * @param {Function} renderFunc - La función que renderiza la tabla.
+         * @param {'main'|'historical'} filterKey - La clave del conjunto de filtros.
+         * @param {Function} [dayFilterProvider] - Proveedor opcional para datos pre-filtrados por día.
+         */
         function setupColumnFilters(headerId, dataProvider, renderFunc, filterKey, dayFilterProvider) {
             const headerRow = document.getElementById(headerId);
             headerRow.addEventListener('click', e => {
@@ -2048,7 +2055,13 @@
             }, true);
         }
         
-        //Función de apoyo para filtrado
+        /**
+         * Configura el campo de búsqueda general para una tabla.
+         * @param {string} inputId - El ID del campo de input para la búsqueda.
+         * @param {Function} dataProvider - Función que devuelve los datos a filtrar.
+         * @param {Function} renderFunc - La función que renderiza la tabla.
+         * @param {boolean} [isHistorical=false] - Indica si es la tabla histórica.
+         */
         function setupFiltering(inputId, dataProvider, renderFunc, isHistorical = false) {
             const filterInput = document.getElementById(inputId);
             const filterKey = isHistorical ? 'historical' : 'main';
@@ -2064,7 +2077,10 @@
             });
         }
 
-        // Función para limpiar todos los filtros aplicados a una tabla y la vuelve a renderizar.
+        /**
+         * Limpia todos los filtros aplicados a una tabla (búsqueda, columnas, día) y la vuelve a renderizar.
+         * @param {'main'|'historical'} filterKey - La clave de la tabla cuyos filtros se limpiarán.
+         */
         function clearAllFilters(filterKey) {
             // 1. Limpiar el estado de los filtros de columna
             state.activeFilters[filterKey] = {};
@@ -2088,7 +2104,12 @@
             sortAndRenderTable(filterKey === 'main' ? DOM.callLogTableBody : DOM.historicalTableBody, data, filterKey === 'historical');
         }
 
-        //ordenar y renderizar tabla
+        /**
+         * Ordena los datos por fecha y hora de inicio (más recientes primero) y luego los renderiza en la tabla.
+         * @param {HTMLTableSectionElement} tableBody - El `<tbody>` de la tabla.
+         * @param {Array<Object>} data - El array de datos de llamadas.
+         * @param {boolean} isHistorical - Indica si son datos históricos.
+         */
         function sortAndRenderTable(tableBody, data, isHistorical) {
             // Ordenar los datos por fecha y luego por hora de inicio (más recientes primero)
             data.sort((a, b) => {
@@ -2121,7 +2142,11 @@
             renderTable(tableBody, filteredData, isHistorical);
         }
 
-        //Función para obtener fecha larga
+        /**
+         * Formatea una fecha en formato "DD/MM/YYYY" a un formato largo (ej. "lunes, 1 de enero de 2024").
+         * @param {string} dateString - La fecha en formato "DD/MM/YYYY".
+         * @returns {string} La fecha en formato largo.
+         */
         function formatLongDate(dateString) {
             if (!dateString || typeof dateString !== 'string' || !dateString.includes('/')) return 'Fecha no disponible';
             try {
@@ -2139,7 +2164,9 @@
             } catch (e) { return dateString; }
         }
 
-        //Actualizart el dashboard principal
+        /**
+         * Actualiza todos los dashboards de la aplicación (resumen por día y resumen general).
+         */
         function updateAllDashboards() {            
             updateWeekdayDashboard();
             // Dashboard de Histórico (fuente variable)
@@ -2155,7 +2182,9 @@
             updateSingleDashboard(dataHistorico, DOM.totalCallsElemHistorico, DOM.avgDurationElemHistorico, DOM.salientesCountElemHistorico, DOM.entrantesCountElemHistorico);
         }
 
-        //Función para actualizar Dashboard de llamadas por día de la semana
+        /**
+         * Actualiza el dashboard de resumen operativo que muestra el total de llamadas por día de la semana.
+         */
         function updateWeekdayDashboard() {
             const dayCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }; // Lunes a Viernes
             const dayIds = { 1: 'lunes', 2: 'martes', 3: 'miercoles', 4: 'jueves', 5: 'viernes' };
@@ -2197,7 +2226,14 @@
             });
         }
         
-        //Actualiza los elementos de un dashboard específico con los datos proporcionados.
+        /**
+         * Actualiza los elementos de un dashboard específico (tarjetas de métricas) con los datos proporcionados.
+         * @param {Array<Object>} data - Los datos de llamadas a analizar.
+         * @param {HTMLElement} totalElem - Elemento para el total de llamadas.
+         * @param {HTMLElement} avgElem - Elemento para la duración promedio.
+         * @param {HTMLElement} salientesElem - Elemento para el total de llamadas salientes.
+         * @param {HTMLElement} entrantesElem - Elemento para el total de llamadas entrantes.
+         */
         function updateSingleDashboard(data, totalElem, avgElem, salientesElem, entrantesElem) {
             const totalCalls = data.length;
             const salientes = data.filter(c => c.estatus === 'Saliente').length;
@@ -2213,9 +2249,13 @@
 
         // =============================================
         // MÓDULO: Gestión de llamadas
+        // Descripción: Funciones para el ciclo de vida de una llamada: iniciar, detener, guardar,
+        // actualizar, eliminar y editar.
         // =============================================
 
-        //Empieza a contar tiempo de llamada
+        /**
+         * Inicia una nueva llamada: abre el modal, resetea el formulario y comienza el temporizador.
+         */
         function startTimer() {
             DOM.callForm.reset();
             toggleCallActiveState(true); // Activar el estado de llamada activa
@@ -2241,7 +2281,10 @@
             }, 1000);
         }
 
-        // Activa o desactiva el estado de "llamada activa", deshabilitando botones de acción.
+        /**
+         * Activa o desactiva el estado de "llamada activa", deshabilitando botones de acción en toda la app.
+         * @param {boolean} isActive - `true` para activar el estado, `false` para desactivar.
+         */
         function toggleCallActiveState(isActive) {
             state.ui.isCallModalActive = isActive;
         
@@ -2257,7 +2300,7 @@
                 ...document.querySelectorAll('#historical-log .delete-btn'),
                 document.getElementById('download-historical-excel-btn'),
                 document.getElementById('historical-file-input').parentElement, // El label
-                DOM.importHistoricalBtn,
+                DOM.confirmImportHistoricalBtn,
                 DOM.startReverseMigrationBtn,
             ];
         
@@ -2266,7 +2309,10 @@
             });
         }
         
-        //Detiene el contador de tiempo de llamada
+        /**
+         * Detiene el temporizador de la llamada y, si se indica, guarda los datos.
+         * @param {boolean} [shouldSave=true] - Si es `true`, los datos del formulario se guardan.
+         */
         function stopTimer(shouldSave = true) {
             clearInterval(state.ui.timerInterval);
             if (shouldSave) {
@@ -2285,12 +2331,19 @@
             resetTimer();
         }
 
-        //Resetear contados
+        /**
+         * Resetea el temporizador del modal a "00:00:00".
+         */
         function resetTimer() {
             DOM.modalTimerElem.textContent = '00:00:00';
         }
         
-        //Guardar llamada
+        /**
+         * Guarda un nuevo registro de llamada en la colección 'calls' de Firestore.
+         * Incluye un mecanismo de respaldo en localStorage si falla la conexión.
+         * @param {Object} callData - El objeto con los datos de la llamada a guardar.
+         * @returns {Promise<void>}
+         */
         async function saveCall(callData) {
             try {
                 await addDoc(callsCollectionRef, { ...callData, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
@@ -2311,7 +2364,13 @@
             }
         }
 
-        // Actualizar llamada
+        /**
+         * Actualiza un registro de llamada existente en Firestore.
+         * @param {string} id - El ID del documento a actualizar.
+         * @param {Object} updateData - El objeto con los campos a actualizar.
+         * @param {boolean} isHistorical - `true` si la llamada está en la colección histórica.
+         * @returns {Promise<void>}
+         */
         async function updateCall(id, updateData, isHistorical) {
             if (!id) {
                 console.error("ID no válido para actualización");
@@ -2338,7 +2397,12 @@
             }
         }
 
-        // Eliminar llamadaa
+        /**
+         * Elimina un registro de llamada de Firestore.
+         * @param {string} id - El ID del documento a eliminar.
+         * @param {boolean} isHistorical - `true` si la llamada está en la colección histórica.
+         * @returns {Promise<void>}
+         */
         async function deleteCall(id, isHistorical) {
             if (!id) {
                 console.error("ID no válido para eliminación");
@@ -2365,7 +2429,10 @@
             }
         }
 
-        // Función Para editar llamada
+        /**
+         * Maneja el evento de clic en el botón de editar de una fila de la tabla.
+         * @param {HTMLElement} button - El botón que fue presionado.
+         */
         function handleEditClick(button) {
             requirePassword(() => {
                 const callId = button.getAttribute('data-id');
@@ -2484,7 +2551,10 @@
         //Evento para cerrar el boton de editar registro
         DOM.closeEditModalBtn.addEventListener('click', () => closeModal(DOM.editModal));
 
-        // Manejar cambio de estado
+        /**
+         * Maneja el cambio de estatus (Saliente/Entrante) de una llamada.
+         * @param {HTMLElement} button - El botón de estatus que fue presionado.
+         */
         async function handleStatusToggle(button) {
             try {
                 const callId = button.getAttribute('data-id');
@@ -2504,7 +2574,10 @@
             }
         }
 
-        // Función para manejar clic en eliminar
+        /**
+         * Maneja el evento de clic en el botón de eliminar de una fila de la tabla.
+         * @param {HTMLElement} button - El botón que fue presionado.
+         */
         function handleDeleteClick(button) {
             requirePassword(() => {
                 callToDeleteId = button.getAttribute('data-id');
@@ -2522,9 +2595,13 @@
 
         // =============================================
         // MÓDULO: Gestión de datos históricos
+        // Descripción: Funciones para importar y gestionar la colección de datos históricos.
         // =============================================
         
-        //Eliminar toto el históroco
+        /**
+         * Elimina todos los documentos de la colección 'historicalCalls'.
+         * @returns {Promise<void>}
+         */
         async function deleteAllHistorical() {
             const batch = writeBatch(db);
             state.historicalCalls.forEach(call => {
@@ -2534,7 +2611,10 @@
             await batch.commit(); 
         }
 
-        // Mejorar importación de histórico con manejo correcto de fechas y duraciones
+        /**
+         * Importa un lote de registros de llamadas a la colección 'historicalCalls'.
+         * @param {Array<Object>} data - Un array de objetos de llamada para importar.
+         */
         async function importHistoricalData(data) {
             try {
                 const batch = writeBatch(db);
@@ -2557,9 +2637,13 @@
 
         // =============================================
         // MÓDULO: Gestión de opciones dinámicas y autocompletado (Lista de Instituciones Homologada)
+        // Descripción: Funciones para poblar, actualizar y gestionar las opciones de los
+        // selectores dinámicos (Select2), incluyendo el autocompletado inteligente.
         // =============================================
 
-        //Lista de Instituciones
+        /**
+         * Catálogo base de instituciones. Se combina con las instituciones existentes en la base de datos.
+         */
         const catalogoInstitucionesHomologado = [
             "AGN - Archivo General de la Nación",
             "CEPROPIE - Centro de Producción de Programas Informativos y Especiales",
@@ -2851,7 +2935,10 @@
             "MUJERES - Secretaría de las Mujeres"
         ];
         
-        //Actualiza las opciones de todos los selectores dinámicos de la aplicación.
+        /**
+         * Actualiza las opciones de todos los selectores dinámicos de la aplicación.
+         * Extrae valores únicos de los datos existentes y los fusiona con catálogos base.
+         */
         function updateDynamicSelectOptions() {
             const allData = [...state.calls, ...state.historicalCalls];
             // 1. Extraer todas las instituciones existentes en los registros.
@@ -2887,7 +2974,12 @@
             updateSelectOptions('comentarios', state.fieldOptions.comentarios);
         }
         
-        //Actualizar opciones despues de editar una lista desplegable
+        /**
+         * Actualiza las opciones de un conjunto de selectores Select2.
+         * @param {string} field - La clave del campo (ej. 'instituciones', 'areas').
+         * @param {Array<string|Object>} options - El array de nuevas opciones.
+         * @param {string|null} [selectedId=null] - El ID de la opción que debe quedar seleccionada.
+         */
         function updateSelectOptions(field, options, selectedId = null) {
             const fieldToSelectMap = {
                 'instituciones': ['caller-institution', 'edit-caller-institution'],
@@ -2943,7 +3035,10 @@
             }
         }
 
-        // Función para el autocompletado inteligente
+        /**
+         * Configura la lógica de autocompletado inteligente para los formularios.
+         * Por ejemplo, al seleccionar una institución, filtra los nombres de contacto asociados.
+         */
         function setupAutofill() {
             // Función para cargar los detalles del contacto
             function loadContactDetails(name, institution, isEditModal) {
@@ -3131,9 +3226,16 @@
 
         // =============================================
         // INICIO: Bloque de código para preservar estado del formulario
+        // Descripción: Funciones para capturar y restaurar el estado de un formulario,
+        // útil cuando se realizan operaciones en segundo plano (como editar una opción)
+        // y se quiere mantener lo que el usuario ya había llenado.
         // =============================================
         
-        // Nuevo helper function: getFormState
+        /**
+         * Captura el estado actual de un formulario (valores y etiquetas de Select2).
+         * @param {string} formId - El ID del formulario.
+         * @returns {Object|null} Un objeto que representa el estado del formulario.
+         */
         function getFormState(formId) {
             const form = document.getElementById(formId);
             if (!form) return null;
@@ -3155,7 +3257,11 @@
             return state;
         }
 
-        // Nuevo helper function: restoreFormState
+        /**
+         * Restaura el estado de un formulario a partir de un objeto de estado guardado.
+         * @param {string} formId - El ID del formulario a restaurar.
+         * @param {Object} state - El objeto de estado previamente guardado con `getFormState`.
+         */
         function restoreFormState(formId, state) {
             const form = document.getElementById(formId);
             if (!form || !state) return;
@@ -3179,7 +3285,15 @@
             });
         }
 
-        //Función para reemplazar opciones actualizadas, en la base de datos
+        /**
+         * Busca y reemplaza un valor en un campo específico en todos los registros de la base de datos.
+         * Se utiliza para actualizar en masa cuando se edita una opción de un selector.
+         * @param {string} field - La clave del campo (ej. 'instituciones').
+         * @param {string} oldValue - El valor antiguo a reemplazar.
+         * @param {string} newValue - El nuevo valor.
+         * @param {string} activeFormId - El ID del formulario activo para restaurar su estado.
+         * @param {Object} formStateBeforeEdit - El estado del formulario antes de la edición.
+         */
         async function findAndReplaceInDatabase(field, oldValue, newValue, activeFormId, formStateBeforeEdit) {
             const fieldToDbFieldMap = {
                 'instituciones': 'institucion', 
@@ -3226,39 +3340,14 @@
             }
         }
 
-        // Nuevo helper function: updateSelectOptionsPreservingState
-        async function updateSelectOptionsPreservingState(field, newValue, activeModalStates) {
-            // Actualizar opciones globales
-            state.fieldOptions[field] = [...new Set([...state.fieldOptions[field], newValue])].sort();
-            
-            // Actualizar selects sin destruir estado
-            $('select[name="' + field + '"]').each(function() {
-                const select = $(this);
-                const currentValue = select.val();
-                
-                // Agregar nueva opción si no existe
-                if (!select.find('option[value="' + newValue + '"]').length) {
-                    select.append(new Option(newValue, newValue));
-                }
-                
-                // Mantener selección actual
-                select.val(currentValue).trigger('change');
-            });
-            
-            // Restaurar estado de modales
-            if (activeModalStates.editModal) {
-                restoreFormState(DOM.editForm.id, activeModalStates.editModal);
-            }
-            if (activeModalStates.callModal) {
-                restoreFormState(DOM.callForm.id, activeModalStates.callModal);
-            }
-        }
-
         // Variable global para mantener el contexto del <select> que está siendo modificado.
         // Se gestiona su ciclo de vida: se establece al iniciar y se limpia al finalizar o cancelar.
         let activeSelectElement = null;
 
-        //Función que configura todos los manejadores de eventos para los botones de añadir (+) y editar (lápiz)
+        /**
+         * Configura los manejadores de eventos para los botones de edición (lápiz)
+         * asociados a cada campo de tipo Select2 en los formularios.
+         */
         function setupAddEditButtons() {
              const buttonToFieldMap = {
                  'edit-institution-btn': 'instituciones',
@@ -3348,9 +3437,13 @@
 
         // =============================================
         // MÓDULO PRINCIPAL: Autenticación y listeners
+        // Descripción: Lógica de autenticación, verificación de contraseña y configuración
+        // de los listeners de datos en tiempo real de Firestore.
         // =============================================
 
-        //Verificar contraseña
+        /**
+         * Verifica la contraseña introducida en el modal de seguridad.
+         */
         function verifyPassword() {
             const password = DOM.passwordInput.value;
 
@@ -3369,7 +3462,9 @@
             }
         }
 
-        //Función complementaria para verificar contraseña
+        /**
+         * Configura los manejadores de eventos para el modal de verificación de contraseña.
+         */
         function setupPasswordVerification() {
             DOM.confirmPasswordBtn.addEventListener('click', verifyPassword);
             DOM.cancelPasswordBtn.addEventListener('click', () => {
@@ -3388,13 +3483,19 @@
             }
         }
 
-        //Función para solicitar contraseña
+        /**
+         * Muestra el modal de contraseña y guarda la acción a ejecutar tras una verificación exitosa.
+         * @param {Function} action - La función a ejecutar si la contraseña es correcta.
+         */
         function requirePassword(action) {
             state.ui.pendingAction = action;
             openModal(DOM.passwordModal);
         }
 
-        //Authenticación de firestore
+        /**
+         * Inicializa la autenticación anónima de Firebase.
+         * Una vez autenticado, configura los listeners en tiempo real.
+         */
         async function initializeAppWithAuth() {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -3408,7 +3509,10 @@
             });
         }
         
-        //Realtime Listas de llamadas e histórico
+        /**
+         * Configura los listeners de Firestore (`onSnapshot`) para recibir actualizaciones
+         * en tiempo real de las colecciones 'calls' y 'historicalCalls'.
+         */
         function setupRealtimeListeners() {
             onSnapshot(query(callsCollectionRef), (snapshot) => {
                 state.calls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -3434,9 +3538,14 @@
 
         // =============================================
         // MÓDULO: Gráficos y reportes
+        // Descripción: Funciones para generar, actualizar y configurar los gráficos y reportes
+        // de la aplicación.
         // =============================================
         
-        // Obtiene los datos para los reportes según la fuente y el filtro de fecha.
+        /**
+         * Obtiene los datos para los reportes según la fuente seleccionada y el filtro de fecha configurado.
+         * @returns {Array<Object>} Un array con los datos de llamadas filtrados.
+         */
         function getReportData() {
             const source = DOM.reportesDataSource.value;
             let data = [];
@@ -3461,7 +3570,9 @@
             return data;
         }
         
-        //Actualizar 
+        /**
+         * Actualiza todos los gráficos y la tabla dinámica en la pestaña de "Reportes".
+         */
         function updateCharts() {
             const data = getReportData();
 
@@ -3613,7 +3724,9 @@
         }
 
         
-        //Update Dynamic Chart
+        /**
+         * Actualiza el gráfico dinámico y su tabla de distribución de datos asociada.
+         */
         function updateDynamicChart() {
             const data = getReportData();
             
@@ -3723,7 +3836,9 @@
             });
         }
         
-        //Botón de Configuración (Reportes)
+        /**
+         * Configura los manejadores de eventos para el modal de configuración de reportes.
+         */
         function setupReportConfig() {
             DOM.configReportBtn.addEventListener('click', () => openModal(DOM.configReportModal));
             DOM.closeConfigReportModalBtn.addEventListener('click', () => closeModal(DOM.configReportModal));
@@ -3754,8 +3869,13 @@
 
         // =============================================
         // MÓDULO: Genera un reporte ejecutivo en formato PDF.
+        // Descripción: Funciones para la generación de reportes en PDF utilizando `html2pdf.js`.
         // =============================================
 
+        /**
+         * Genera un reporte ejecutivo en formato PDF a partir de los datos y gráficos actuales.
+         * @param {Object} options - Opciones que indican qué elementos incluir en el reporte.
+         */
         async function generateExecutiveReport(options) {
             const { includeStatus, includeAsunto, includeDay, includeAtendio, includeDynamicChart, includeDynamicTable } = options;
             const data = getReportData();
@@ -3874,7 +3994,11 @@
         }
 
         
-        //Genera una imagen de un gráfico de forma aislada y la devuelve como un Data URL.
+        /**
+         * Genera una imagen de un gráfico de forma aislada y la devuelve como un Data URL (Base64).
+         * @param {Object} config - Configuración del gráfico a generar.
+         * @returns {Promise<string>} Una promesa que se resuelve con la imagen en formato Data URL.
+         */
         async function generateChartImage({ data, key, type, title }) {
             const canvas = document.createElement('canvas');
             canvas.width = 1400; // Resolución aumentada
@@ -3973,27 +4097,27 @@
             });
         }
 
-        const globalColorPalette = {
-            primary: ['#9C2348', '#7c1d3a', '#d946ef', '#8b5cf6'],
-            secondary: ['#1E5B4F', '#059669', '#0d9488', '#14b8a6'],
-            accent: ['#A6802D', '#d97706', '#f59e0b', '#fbbf24'],
-            status: ['#EF4444', '#dc2626', '#f87171', '#fca5a5'],
-            neutral: ['#6366f1', '#8b5cf6', '#a855f7', '#c084fc']
-        };
-
-
         // =============================================
         // MÓDULO: Exportación/Importación
+        // Descripción: Funciones para exportar datos a Excel con formato y para importar
+        // datos desde archivos Excel.
         // =============================================
 
-        // Encabezados de exportación (orden correcto)
+        /**
+         * Define el orden y los nombres de las columnas para la exportación a Excel.
+         */
         const exportHeaders = [
         "No.", "Fecha", "Inicio", "Fin", "Duración", "Área", "Institución",
         "Asunto", "Consulta", "Nombre", "Cargo", "Correo", "Teléfono",
         "Estatus", "Atendió", "Comentarios"
         ];
 
-        //Exporta datos a un archivo Excel con formato personalizado.
+        /**
+         * Exporta un conjunto de datos a un archivo Excel con formato personalizado.
+         * @param {Array<Object>} data - Los datos de llamadas a exportar.
+         * @param {string} sheetName - El nombre de la hoja en el archivo Excel.
+         * @param {string} fileName - El nombre del archivo a descargar.
+         */
         function exportToExcelWithFormatting(data, sheetName, fileName) {
             // 1. Preparar los datos y el título
             const dataToExport = prepareExportData(data);
@@ -4081,12 +4205,19 @@
             XLSX.writeFile(wb, fileName);
         }
 
+        /**
+         * Convierte segundos a un objeto Date que Excel puede interpretar como formato de tiempo.
+         * @param {number} seconds - La duración en segundos.
+         * @returns {Date}
+         */
         function secondsToExcelDate(seconds) {
         // Convertir segundos a objeto Date (para que Excel lo interprete como tiempo)
         return new Date(0, 0, 0, 0, 0, seconds || 0);
         }
 
-        //Prepara exportación
+        /**
+         * Prepara los datos para la exportación, asegurando el formato y el orden correctos.
+         */
         function prepareExportData(data) {
             // Helper para asegurar que los campos vacíos se exporten como "N/A"
             const na = (value) => value || "N/A";
@@ -4117,7 +4248,13 @@
 
         // =============================================
         // MÓDULO: Edición de Horarios
+        // Descripción: Funciones para el modal de edición de fecha y horas de una llamada.
         // =============================================
+        /**
+         * Abre el modal para editar los timestamps (fecha, inicio, fin) de una llamada.
+         * @param {Object} callItem - El objeto de la llamada a editar.
+         * @param {boolean} isHistorical - `true` si la llamada es del histórico.
+         */
         function openEditTimestampsModal(callItem, isHistorical) {
             // Poblar el formulario
             DOM.editTimestampsForm.querySelector('#timestamps-call-id').value = callItem.id;
@@ -4139,7 +4276,9 @@
             openModal(DOM.editTimestampsModal);
         }
 
-        //Cálculo de duración
+        /**
+         * Calcula y muestra la duración en el modal de edición de horarios.
+         */
         function calculateAndDisplayDuration() {
             const start = DOM.timestampsStartTimeInput.value;
             const end = DOM.timestampsEndTimeInput.value;
@@ -4153,7 +4292,10 @@
             }
         }
 
-        //Guardar
+        /**
+         * Guarda los cambios de fecha y hora de una llamada.
+         * @param {Event} e - El evento de submit del formulario.
+         */
         async function saveTimestamps(e) {
             e.preventDefault();
             requirePassword(async () => {
@@ -4181,7 +4323,9 @@
             });
         }
 
-        //Funciones para filtros de indicadores de llamadas por día de la semana
+        /**
+         * Configura los filtros del dashboard de días de la semana.
+         */
         function setupWeekdayDashboardFilter() {
             const indicators = document.querySelectorAll('#dashboard .indicator-card');
 
@@ -4223,11 +4367,15 @@
 
         // =============================================
         // MÓDULO: Notificación de Resumen Semanal
+        // Descripción: Funcionalidad para mostrar una alerta con el resumen de actividad de la semana actual.
         // =============================================
         let summaryAlertShown = false;
         let summaryAlertTimeout;
 
-        //Obtener rango de la semana
+        /**
+         * Obtiene el rango de fechas para la semana actual (de Lunes a Domingo).
+         * @returns {{start: Date, end: Date}}
+         */
         function getWeekRange() {
             const now = new Date();
             const dayOfWeek = now.getDay(); // 0 (Dom) - 6 (Sáb)
@@ -4243,7 +4391,9 @@
             return { start: startOfWeek, end: endOfWeek };
         }
 
-        //Mostrar Alerta/Notificaicón
+        /**
+         * Comprueba si hay llamadas en la semana actual y muestra la alerta de resumen si corresponde.
+         */
         function checkAndShowSummaryAlert() {
             if (summaryAlertShown) return;
 
@@ -4285,7 +4435,9 @@
             }
         }
 
-        //Determina el tiempo que dura la notificación
+        /**
+         * Inicia un temporizador para cerrar automáticamente la alerta de resumen.
+         */
         function startSummaryAlertTimeout() {
             clearTimeout(summaryAlertTimeout);
             summaryAlertTimeout = setTimeout(() => {
@@ -4294,7 +4446,9 @@
             }, 15000); // 15 segundos
         }
 
-        //Reconoce el clic en la notificación para aplicar filtro
+        /**
+         * Configura los listeners para la alerta de resumen (cerrar, ver detalle, pausar al pasar el ratón).
+         */
         function setupSummaryAlertListeners() {
             document.body.addEventListener('click', (e) => {
                 if (e.target && e.target.id === 'view-summary-btn') {
@@ -4317,8 +4471,13 @@
 
         // =============================================
         // MÓDULO: Migración de datos
+        // Descripción: Funciones para migrar datos entre la colección de 'Registro' y la de 'Histórico'.
         // =============================================
 
+        /**
+         * Migra las llamadas seleccionadas desde 'Registro y Control' hacia 'Histórico'.
+         * @returns {Promise<void>}
+         */
         async function migrateSelectedCallsToHistorical() {
             try {
                 if (state.ui.selectedCallIdsToMigrate.size === 0) {
@@ -4358,7 +4517,10 @@
             }
         }
 
-        // Añadir función showLoader si no existe
+        /**
+         * Muestra u oculta el spinner de carga global.
+         * @param {boolean} show - `true` para mostrar, `false` para ocultar.
+         */
         function showLoader(show) {
             const loader = DOM.loader;
             if (loader) {
@@ -4366,6 +4528,10 @@
             }
         }
 
+        /**
+         * Activa o desactiva el modo de migración de 'Registro' a 'Histórico'.
+         * @param {boolean} activate - `true` para activar, `false` para desactivar.
+         */
         function toggleMigrationMode(activate) {
             state.ui.isMigrationModeActive = activate;
             state.ui.selectedCallIdsToMigrate.clear();
@@ -4390,8 +4556,13 @@
 
         // =============================================
         // MÓDULO: Migración Inversa (Histórico -> Registro)
+        // Descripción: Funciones para la migración de datos desde 'Histórico' de vuelta a 'Registro'.
         // =============================================
 
+        /**
+         * Activa o desactiva el modo de migración inversa (de 'Histórico' a 'Registro').
+         * @param {boolean} activate - `true` para activar, `false` para desactivar.
+         */
         function toggleReverseMigrationMode(activate) {
             state.ui.isReverseMigrationModeActive = activate;
             state.ui.selectedHistoricalCallIdsToMigrate.clear();
@@ -4414,6 +4585,10 @@
             sortAndRenderTable(DOM.historicalTableBody, state.historicalCalls, true);
         }
 
+        /**
+         * Migra las llamadas seleccionadas desde 'Histórico' hacia 'Registro y Control'.
+         * @returns {Promise<void>}
+         */
         async function migrateSelectedCallsToRegistry() {
             try {
                 if (state.ui.selectedHistoricalCallIdsToMigrate.size === 0) {
@@ -4454,8 +4629,13 @@
 
         // =============================================
         // MÓDULO: Panel de Historial Rápido
+        // Descripción: Funcionalidad para el panel flotante que muestra el historial de llamadas
+        // de una institución seleccionada. Incluye la lógica para arrastrar y minimizar ventanas.
         // =============================================
 
+        /**
+         * Configura la funcionalidad del panel de historial rápido (cerrar, minimizar, arrastrar).
+         */
         function setupQuickHistoryPanel() {
             const panel = DOM.quickHistoryPanel;
             const header = panel.querySelector('.quick-history-header');
@@ -4593,7 +4773,12 @@
             };
         }
 
-        //Función para minimizar ventana
+        /**
+         * Minimiza un modal o panel a una barra en la parte inferior de la pantalla.
+         * @param {string} elementId - El ID del elemento a minimizar.
+         * @param {string} title - El título a mostrar en la ventana minimizada.
+         * @param {string} minimizedId - El ID para la nueva ventana minimizada.
+         */
         function minimizeWindow(elementId, title, minimizedId) {
             const element = document.getElementById(elementId);
             if (!element || element.classList.contains('hidden')) return;
@@ -4649,7 +4834,10 @@
             }
         }
 
-        //Función para restaurar ventana minimizada
+        /**
+         * Restaura una ventana que fue minimizada.
+         * @param {string} minimizedId - El ID de la ventana minimizada.
+         */
         function restoreWindow(minimizedId) {
             const minimizedWindow = document.getElementById(minimizedId);
             if (!minimizedWindow) return;
@@ -4669,6 +4857,9 @@
             }
         }, 1000);
 
+        /**
+         * Actualiza el contenido del panel de historial rápido basándose en la institución seleccionada en el formulario.
+         */
         function updateQuickHistoryPanel() {
             const selectedInstitution = $('#caller-institution').val();
             const panel = DOM.quickHistoryPanel;
@@ -4719,9 +4910,13 @@
 
         // =============================================
         // MÓDULO: Configuración de eventos 
+        // Descripción: Punto central donde se asignan todos los manejadores de eventos
+        // principales de la aplicación.
         // =============================================
         
-        //Función de eventos
+        /**
+         * Configura todos los `event listeners` principales de la aplicación.
+         */
         function setupEventListeners() {
             setupTabs();
             // Modificación: El dataProvider para los filtros de columna ahora puede ser dinámico.
@@ -4922,28 +5117,76 @@
                     closeModal(DOM.confirmModal);
                 }
             });
+            
+            // Importar histórico — actualizarado para ocultar el label cuando haya archivo seleccionado
 
-            // Importar histórico
+            // Obtener una referencia al label visible (trigger) una vez
+            const uploadLabel = document.querySelector('label[for="historical-file-input"]');
+
+            //Boton de selección de archivo, muestra botones si se selecciona archivo
             DOM.historicalFileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
+
                 if (file) {
-                    DOM.importHistoricalBtn.classList.remove('hidden');
-                    DOM.importHistoricalBtn.disabled = false;
+                    // Ocultar el label visible (botón "Subir Excel")
+                    if (uploadLabel) uploadLabel.classList.add('hidden');
+
+                    //Ocultar y desactivar botón de migración             
+                    DOM.startReverseMigrationBtn.classList.remove('hidden');
+                    DOM.startReverseMigrationBtn.disabled = true;
+
+                    // Mostrar botones de confirmar y cancelar
+                    DOM.confirmImportHistoricalBtn.classList.remove('hidden');
+                    DOM.confirmImportHistoricalBtn.disabled = false;
+                    DOM.cancelImportHistoricalBtn.classList.remove('hidden');
+                    DOM.cancelImportHistoricalBtn.disabled = false;
                 } else {
-                    DOM.importHistoricalBtn.classList.add('hidden');
-                    DOM.importHistoricalBtn.disabled = true;
+                    // Si no hay archivo seleccionado, asegurarse de mostrar el label
+                    if (uploadLabel) uploadLabel.classList.remove('hidden');
+                    
+                    //Mostrar y activar botón de migración
+                    DOM.startReverseMigrationBtn.classList.add('hidden');
+                    DOM.startReverseMigrationBtn.disabled = false;
+                    
+                    // Ocultar botones de confirmar y cancelar
+                    DOM.confirmImportHistoricalBtn.classList.add('hidden');
+                    DOM.confirmImportHistoricalBtn.disabled = true;
+                    DOM.cancelImportHistoricalBtn.classList.add('hidden');
+                    DOM.cancelImportHistoricalBtn.disabled = true;
                 }
             });
 
-            // Importar histórico
-            DOM.importHistoricalBtn.addEventListener('click', () => {
+            // Cancelar la Importación del archivo histórico seleccionado — restaura el label y limpia el input
+            DOM.cancelImportHistoricalBtn.addEventListener('click', () => {
+                if (uploadLabel) uploadLabel.classList.remove('hidden');
+
+                // Limpiar selección para permitir volver a elegir el mismo archivo
+                DOM.historicalFileInput.value = '';
+
+                //habilitar botón de migración inversa
+                DOM.startReverseMigrationBtn.disabled = false;
+
+                // Ocultar y deshabilitar botones
+                DOM.confirmImportHistoricalBtn.classList.add('hidden');
+                DOM.confirmImportHistoricalBtn.disabled = true;
+                DOM.cancelImportHistoricalBtn.classList.add('hidden');
+                DOM.cancelImportHistoricalBtn.disabled = true;
+            });
+
+            // Confirmar la Importación del archivo histórico seleccionado
+            DOM.confirmImportHistoricalBtn.addEventListener('click', () => {
                 requirePassword(async () => {
                     const file = DOM.historicalFileInput.files[0];
                     if (!file) {
                         showAlert("Por favor, selecciona un archivo Excel primero.", "warning");
                         return;
                     }
+
+                    showLoader(true); // Mostrar el loader al iniciar el proceso
                     
+                    // Ocultar el label visible (botón "Subir Excel")
+                    if (uploadLabel) uploadLabel.classList.add('hidden');
+
                     const reader = new FileReader();
                     reader.onload = async (e) => {  // Hacer onload async para permitir await dentro
                         try {
@@ -5048,39 +5291,36 @@
 
                             if (processedData.length === 0) return showAlert("El archivo Excel está vacío o no es válido.", "warning");
                             
-                            let replace = false;
+                            // Si hay datos existentes, los va a reemplazar
                             if (state.historicalCalls.length > 0) {
-                                openModal(DOM.replaceHistoricalModal);
-                                await new Promise(resolve => {
-                                    DOM.confirmReplaceBtn.onclick = () => {
-                                        replace = true;
-                                        closeModal(DOM.replaceHistoricalModal);
-                                        resolve();
-                                    };
-                                    DOM.cancelReplaceBtn.onclick = () => {
-                                        replace = false;
-                                        closeModal(DOM.replaceHistoricalModal);
-                                        resolve();
-                                    };
-                                });
-                                if (replace) {
-                                    await deleteAllHistorical();
-                                }
+                                await deleteAllHistorical();
                             }
-                            await importHistoricalData(processedData);
+
+                            await importHistoricalData(processedData)
+
+                            //Despues de subir el excel, se restauran los botones.
                             DOM.historicalFileInput.value = '';
-                            DOM.importHistoricalBtn.disabled = true;
-                            DOM.importHistoricalBtn.classList.add('hidden');                        
+                            if (uploadLabel) uploadLabel.classList.remove('hidden');
+                            //habilitar botón de migración inversa
+                            DOM.startReverseMigrationBtn.disabled = false;
+                            // Ocultar y deshabilitar botones
+                            DOM.confirmImportHistoricalBtn.classList.add('hidden')
+                            DOM.confirmImportHistoricalBtn.disabled = true
+                            DOM.cancelImportHistoricalBtn.classList.add('hidden')
+                            DOM.cancelImportHistoricalBtn.disabled = true;
                         
                         } catch (error) {
                             console.error("Error al procesar el archivo:", error);
                             showAlert("Error al procesar el archivo. Asegúrese de que es un Excel válido.", "error");
+                        } finally {
+                            // Ocultar el loader sin importar si hubo éxito o error
+                            showLoader(false);
                         }
                     };
                     reader.readAsArrayBuffer(file);
                 });
             });
-
+            
             // Registro de llamadas descargar
             DOM.downloadExcelBtn.addEventListener('click', () => {
                 if (state.calls.length === 0) return showAlert("No hay datos para descargar.", "warning");
@@ -5351,9 +5591,14 @@
             });
         }
 
-        //Configuración del tooltip de vista rápida
+        /**
+         * Configura la funcionalidad del tooltip de vista rápida que aparece al pasar el ratón
+         * sobre las filas de las tablas.
+         */
         function setupQuickViewTooltip() {
             const tooltip = DOM.quickViewTooltip;
+
+            // Muestra el tooltip con la información de la fila.
             const showTooltip = (e) => { 
                 const row = e.target.closest('tr[data-quickview="true"]');
                 if (!row) return; // Si no estamos sobre una fila válida, no hacer nada.
@@ -5377,10 +5622,12 @@
                 tooltip.classList.add('visible');
             };
             
+            // Oculta el tooltip.
             const hideTooltip = () => {
                 tooltip.classList.remove('visible');
             };
 
+            // Mueve el tooltip para que siga al cursor.
             const moveTooltip = (e) => {
                 if (tooltip.classList.contains('visible')) {
                     // Posiciona el tooltip con un desfase para no tapar el cursor
@@ -5396,7 +5643,9 @@
             });
         }
 
-        //Funcionalidad del grafico de consulta...        
+        /**
+         * Añade un botón para alternar la visibilidad de las etiquetas en el gráfico de "Llamadas por Consulta".
+         */
         function setupConsultaChartLabelToggle() {
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded ml-2';
@@ -5416,8 +5665,12 @@
 
         // =============================================
         // MÓDULO: Inicialización
+        // Descripción: Función principal que arranca la aplicación.
         // ============================================= 
 
+        /**
+         * Función de inicialización principal. Llama a todas las funciones de configuración.
+         */
         function initialize() {
             initializeAppWithAuth();
             setupEventListeners();
@@ -5445,4 +5698,4 @@
 
     </script>
 </body> 
-</html> 
+</html>   
