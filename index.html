@@ -1556,7 +1556,7 @@
             alertContainer.textContent = message;
             document.body.appendChild(alertContainer);
             // La alerta se elimina automáticamente después de 3 segundos.
-            setTimeout(() => { alertContainer.remove(); }, 3000);
+            setTimeout(() => { alertContainer.remove(); }, 6000);
         }
 
         /**
@@ -5128,6 +5128,9 @@
                 const file = e.target.files[0];
 
                 if (file) {
+                    // Notificación de advertencia al seleccionar un archivo
+                    showAlert("⚠️ Atención: Al subir un archivo, se reemplazarán los datos del histórico existente.", "warning");
+
                     // Ocultar el label visible (botón "Subir Excel")
                     if (uploadLabel) uploadLabel.classList.add('hidden');
 
