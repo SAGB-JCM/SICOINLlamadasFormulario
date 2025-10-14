@@ -1443,6 +1443,9 @@
         // Referencias a las colecciones de Firestore.
         const callsCollectionRef = collection(db, "calls");
         const historicalCallsCollectionRef = collection(db, "historicalCalls");
+
+        // UID especial para el modo de solo lectura.
+        const READ_ONLY_UID = 'UCmz5As1BMXeq6dIIsKjG2L25Xw2';
         
         /**
          * Objeto `DOM` que centraliza todas las referencias a elementos del DOM.
@@ -1574,6 +1577,7 @@
          * Mantiene los datos de llamadas, opciones de campos, estado de la UI y filtros.
          */
         const state = {
+            isReadOnly: false, // Nuevo estado para el modo de solo lectura
             user: null,
             listeners: { calls: null, historical: null }, // Para manejar las suscripciones de Firestore
             userId: null,
@@ -1822,6 +1826,22 @@
             }
         }
 
+        /**
+         * Activa o desactiva el modo de solo lectura, ocultando elementos sensibles.
+         * @param {boolean} isReadOnly - True para activar el modo, false para desactivar.
+         */
+        function toggleReadOnlyMode(isReadOnly) {
+            state.isReadOnly = isReadOnly;
+
+            // Ocultar botones en la pestaña de Registro
+            DOM.startCallBtn.classList.toggle('hidden', isReadOnly);
+            DOM.startMigrationBtn.classList.toggle('hidden', isReadOnly);
+
+            // Ocultar botones en la pestaña de Histórico
+            document.querySelector('label[for="historical-file-input"]').classList.toggle('hidden', isReadOnly);
+            DOM.startReverseMigrationBtn.classList.toggle('hidden', isReadOnly);
+        }
+
         // =============================================
         // MÓDULO: Interfaz de usuario
         // Descripción: Funciones relacionadas con la manipulación y actualización de la interfaz,
@@ -1941,10 +1961,13 @@
                 }
                 // --- FIN: Lógica para añadir el checkbox de migración ---
 
-                const actionsCell = `<td class="py-4 px-6 flex space-x-2">
+                const actionsCell = state.isReadOnly ? '' : `<td class="py-4 px-6 flex space-x-2">
                         <button data-id="${call.id}" data-is-historical="${isHistorical}" class="edit-btn text-blue-500 hover:text-blue-700"><i class="fa-solid fa-edit"></i></button>
                         <button data-id="${call.id}" data-is-historical="${isHistorical}" class="delete-btn text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-alt"></i></button>
                     </td>`;
+
+                // Ocultar el encabezado de la columna de acciones si estamos en modo solo lectura
+                document.querySelectorAll('.table-container th:last-child').forEach(th => th.classList.toggle('hidden', state.isReadOnly));
 
                 row.innerHTML = migrationCell + reverseMigrationCell + cells + actionsCell;
                 tableBody.appendChild(row);
@@ -2533,6 +2556,7 @@
          * @param {HTMLElement} button - El botón que fue presionado.
          */
         function handleEditClick(button) {
+            if (state.isReadOnly) return; // No permitir edición en modo solo lectura
             requirePassword(() => {
                 const callId = button.getAttribute('data-id');
                 const isHistorical = button.getAttribute('data-is-historical') === 'true';
@@ -2655,6 +2679,7 @@
          * @param {HTMLElement} button - El botón de estatus que fue presionado.
          */
         async function handleStatusToggle(button) {
+            if (state.isReadOnly) return; // No permitir cambio de estatus en modo solo lectura
             try {
                 const callId = button.getAttribute('data-id');
                 const isHistorical = button.getAttribute('data-is-historical') === 'true';
@@ -2678,6 +2703,7 @@
          * @param {HTMLElement} button - El botón que fue presionado.
          */
         function handleDeleteClick(button) {
+            if (state.isReadOnly) return; // No permitir eliminación en modo solo lectura
             requirePassword(() => {
                 callToDeleteId = button.getAttribute('data-id');
                 state.ui.callToDeleteIsHistorical = button.getAttribute('data-is-historical') === 'true';
@@ -3393,6 +3419,7 @@
          * @param {string} activeFormId - El ID del formulario activo para restaurar su estado.
          * @param {Object} formStateBeforeEdit - El estado del formulario antes de la edición.
          */
+
         async function findAndReplaceInDatabase(field, oldValue, newValue, activeFormId, formStateBeforeEdit) {
             const fieldToDbFieldMap = {
                 'instituciones': 'institucion', 
@@ -3476,6 +3503,8 @@
                  const button = document.getElementById(buttonId);
                  if (!button) return;
  
+                 // Ocultar los botones de lápiz en modo solo lectura
+                 button.classList.toggle('hidden', state.isReadOnly);
                  button.addEventListener('click', (e) => {
                      activeSelectElement = e.currentTarget.parentElement.querySelector('select');
                      const currentValue = $(activeSelectElement).val();
@@ -3602,12 +3631,19 @@
                     // se cierra su sesión para forzar el nuevo login.
                     if (user.isAnonymous) {
                         signOut(auth);
+                        toggleReadOnlyMode(false); // Asegurarse de que el modo lectura esté desactivado
                         // onAuthStateChanged se volverá a ejecutar con user=null,
                         // mostrando la pantalla de login.
                     } else {
                         // Si es un usuario normal (con email/contraseña), se le da acceso.
                         state.user = user;
                         DOM.userEmail.textContent = user.email;
+
+                        // Comprobar si el usuario es de solo lectura
+                        const isReadOnly = user.uid === READ_ONLY_UID;
+                        toggleReadOnlyMode(isReadOnly);
+                        showAlert(isReadOnly ? "Modo de solo lectura activado." : "Sesión iniciada con éxito.", "info");
+
                         showApp(); // Muestra la aplicación principal
                         setupRealtimeListeners();
                     }
@@ -3615,6 +3651,7 @@
                     // Usuario no ha iniciado sesión o ha cerrado sesión
                     state.user = null;
                     detachRealtimeListeners(); // Detiene los listeners para no consumir recursos
+                    toggleReadOnlyMode(false); // Desactivar el modo lectura al cerrar sesión
                     showLoginScreen(); // Muestra la pantalla de inicio de sesión
                 }
             });
@@ -3637,6 +3674,7 @@
             state.calls = [];
             state.historicalCalls = [];
             sortAndRenderTable(DOM.callLogTableBody, [], false);
+            document.querySelectorAll('.table-container th:last-child').forEach(th => th.classList.remove('hidden'));
             sortAndRenderTable(DOM.historicalTableBody, [], true);
             updateAllDashboards();
             updateCharts();
@@ -5169,6 +5207,7 @@
             let callToDeleteIsHistorical = false;
 
             function handleDeleteClick(e) {
+                if (state.isReadOnly) return;
                 const button = e.currentTarget;
                 if (button.disabled) return; // Evitar acción si el botón está deshabilitado
                 requirePassword(() => {
@@ -5180,6 +5219,7 @@
 
             // Reemplazar la función handleEditClick con esta versión corregida
             function handleEditClick(event) {
+                if (state.isReadOnly) return;
                 const button = event.currentTarget;
                 if (button.disabled) return; // Evitar acción si el botón está deshabilitado
                 requirePassword(() => {
@@ -5230,6 +5270,7 @@
 
             // Funcion para actualizar estatus
             async function handleStatusToggle(e) {
+                if (state.isReadOnly) return;
                 if (e.currentTarget.disabled) return; // Evitar acción si el botón está deshabilitado
                 const button = e.currentTarget;
                 const callId = button.dataset.id;
@@ -5714,6 +5755,7 @@
 
             //Edición de orarios con doble clic
             function handleRowDoubleClick(e, isHistorical) {
+                if (state.isReadOnly) return; // No permitir doble clic en modo solo lectura
                 const row = e.target.closest('tr');
                 // IMPORTANTE: No abrir si se hace clic en un botón (editar, borrar, estatus)
                 if (!row || e.target.closest('button')) {
