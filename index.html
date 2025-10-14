@@ -560,6 +560,45 @@
             }
         }
     </script>
+
+    <!-- Estilos para la pantalla de inicio de sesión -->
+    <style>
+        #login-screen {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e6e9ed 100%);
+        }
+        .login-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+            display: flex;
+            max-width: 900px;
+            width: 100%;
+        }
+        .login-art {
+            background-color: #9C2348;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            width: 45%;
+        }
+        .login-form-container {
+            padding: 3rem;
+            width: 55%;
+        }
+        @media (max-width: 768px) {
+            .login-card { flex-direction: column; }
+            .login-art, .login-form-container { width: 100%; }
+            .login-art { padding: 2rem 1rem; }
+            .login-form-container { padding: 2rem 1.5rem; }
+        }
+    </style>
 </head>
 <body class="antialiased text-slate-700">
 
@@ -567,6 +606,42 @@
     <div id="loader" class="loader">
         <div class="spinner"></div>
         <p class="mt-4 text-sm text-slate-600">Cargando datos, por favor espera...</p>
+    </div>
+
+    <!----------------- PANTALLA DE INICIO DE SESIÓN ---------------->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="login-card">
+            <!-- Columna de Arte y Logo -->
+            <div class="login-art">
+                <img src="https://github.com/SAGB-JCM/SICOINLlamadasFormulario/blob/main/SICOINLlamadasFormulario%20-%20LOGO.png?raw=true" alt="Logo SICOIN" class="h-32 w-auto mb-6">
+                <h2 class="text-2xl font-bold text-center mb-2">Sistema de Registro de Llamadas</h2>
+                <p class="text-center text-sm opacity-80">Bienvenido. Por favor, inicie sesión para continuar.</p>
+            </div>
+            <!-- Columna del Formulario -->
+            <div class="login-form-container">
+                <h3 class="text-2xl font-bold text-primary mb-2">Iniciar Sesión</h3>
+                <p class="text-slate-500 mb-6">Ingrese sus credenciales de acceso.</p>
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-sm font-medium text-slate-600 mb-1">Correo Electrónico</label>
+                        <input type="email" id="login-email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="usuario@dominio.com">
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-sm font-medium text-slate-600 mb-1">Contraseña</label>
+                        <div class="relative">
+                            <input type="password" id="login-password" required class="w-full px-4 py-2 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••">
+                            <button type="button" id="toggle-password-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="login-error" class="text-red-500 text-sm text-center mb-4 hidden"></p>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-300">
+                        Acceder
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!----------------- INICIO DE LA APP ---------------->
@@ -579,7 +654,12 @@
                     <img src="https://github.com/SAGB-JCM/SICOINLlamadasFormulario/blob/main/SICOINLlamadasFormulario%20-%20LOGO.png?raw=true" alt="Logo Teléfono" class="h-16 w-auto">
                     <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Formulario en Línea de Registro de Llamadas</h1>
                 </div>
-                <div id="user-info" class="text-white text-sm font-mono"></div>
+                <div id="user-info-container" class="flex items-center space-x-4 hidden">
+                    <span id="user-email" class="text-white text-sm font-medium"></span>
+                    <button id="logout-btn" class="bg-white/20 hover:bg-white/30 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-right-from-bracket mr-2"></i>Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -1329,7 +1409,7 @@
         // MÓDULO: Configuración de Firebase
         // =============================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; // Autenticación
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; // Autenticación
         import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, serverTimestamp, writeBatch, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         /**
@@ -1371,7 +1451,13 @@
         const DOM = {
             loader: document.getElementById('loader'),
             appContainer: document.getElementById('app'),
-            userInfo: document.getElementById('user-info'),
+            // Elementos de Login/Logout
+            loginScreen: document.getElementById('login-screen'),
+            loginForm: document.getElementById('login-form'),
+            loginError: document.getElementById('login-error'),
+            userInfoContainer: document.getElementById('user-info-container'),
+            userEmail: document.getElementById('user-email'),
+            logoutBtn: document.getElementById('logout-btn'),
             tabsContainer: document.getElementById('tabs'),
             tabContents: document.querySelectorAll('.tab-content'),
             dashboardDataSourceHistorico: document.getElementById('dashboard-data-source-historico'),
@@ -1488,6 +1574,8 @@
          * Mantiene los datos de llamadas, opciones de campos, estado de la UI y filtros.
          */
         const state = {
+            user: null,
+            listeners: { calls: null, historical: null }, // Para manejar las suscripciones de Firestore
             userId: null,
             calls: [],
             historicalCalls: [],
@@ -1540,10 +1628,21 @@
          * Oculta el loader inicial y muestra el contenido principal de la aplicación.
          */
         function showApp() {
-            DOM.loader.classList.add('hidden');
+            DOM.loader.classList.add('hidden'); // Oculta el loader
+            DOM.loginScreen.classList.add('hidden'); // Oculta la pantalla de login
             DOM.appContainer.classList.remove('hidden');
+            DOM.userInfoContainer.classList.remove('hidden');
         }
 
+        /**
+         * Muestra la pantalla de inicio de sesión y oculta el resto de la aplicación.
+         */
+        function showLoginScreen() {
+            DOM.loader.classList.add('hidden'); // Oculta el loader
+            DOM.appContainer.classList.add('hidden'); // Oculta la app principal
+            DOM.userInfoContainer.classList.add('hidden');
+            DOM.loginScreen.classList.remove('hidden'); // Muestra la pantalla de login
+        }
         /**
          * Muestra una notificación flotante (toast) en la esquina inferior derecha.
          * @param {string} message - El mensaje a mostrar.
@@ -3493,39 +3592,79 @@
         }
 
         /**
-         * Inicializa la autenticación anónima de Firebase.
+         * Inicializa la autenticación de Firebase.
          * Una vez autenticado, configura los listeners en tiempo real.
          */
-        async function initializeAppWithAuth() {
-            onAuthStateChanged(auth, async (user) => {
+        function initializeAuth() {
+            onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    state.userId = user.uid;
-                    DOM.userInfo.textContent = `Usuario Anónimo: ${state.userId.substring(0, 8)}...`;
-                    setupRealtimeListeners();
-                    showApp();
+                    // Si el usuario tiene una sesión anónima (del sistema antiguo),
+                    // se cierra su sesión para forzar el nuevo login.
+                    if (user.isAnonymous) {
+                        signOut(auth);
+                        // onAuthStateChanged se volverá a ejecutar con user=null,
+                        // mostrando la pantalla de login.
+                    } else {
+                        // Si es un usuario normal (con email/contraseña), se le da acceso.
+                        state.user = user;
+                        DOM.userEmail.textContent = user.email;
+                        showApp(); // Muestra la aplicación principal
+                        setupRealtimeListeners();
+                    }
                 } else {
-                    await signInAnonymously(auth);
+                    // Usuario no ha iniciado sesión o ha cerrado sesión
+                    state.user = null;
+                    detachRealtimeListeners(); // Detiene los listeners para no consumir recursos
+                    showLoginScreen(); // Muestra la pantalla de inicio de sesión
                 }
             });
         }
         
         /**
+         * Desconecta los listeners de Firestore para evitar fugas de memoria y consumo innecesario
+         * cuando el usuario no ha iniciado sesión.
+         */
+        function detachRealtimeListeners() {
+            if (state.listeners.calls) {
+                state.listeners.calls(); // Llama a la función de desuscripción
+                state.listeners.calls = null;
+            }
+            if (state.listeners.historical) {
+                state.listeners.historical();
+                state.listeners.historical = null;
+            }
+            // Limpiar los datos locales al cerrar sesión
+            state.calls = [];
+            state.historicalCalls = [];
+            sortAndRenderTable(DOM.callLogTableBody, [], false);
+            sortAndRenderTable(DOM.historicalTableBody, [], true);
+            updateAllDashboards();
+            updateCharts();
+        }
+
+        /**
          * Configura los listeners de Firestore (`onSnapshot`) para recibir actualizaciones
          * en tiempo real de las colecciones 'calls' y 'historicalCalls'.
          */
         function setupRealtimeListeners() {
-            onSnapshot(query(callsCollectionRef), (snapshot) => {
+            // Si ya hay un listener, no crear otro
+            if (state.listeners.calls) return;
+
+            showLoader(true); // Mostrar loader mientras se cargan los datos iniciales
+
+            state.listeners.calls = onSnapshot(query(callsCollectionRef), (snapshot) => {
                 state.calls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 sortAndRenderTable(DOM.callLogTableBody, state.calls, false);
                 updateAllDashboards();
                 updateCharts();
                 updateDynamicSelectOptions();
+                showLoader(false); // Ocultar loader después de la primera carga
 
                 // Llamar a la función de la alerta después de que los datos se carguen
                 setTimeout(checkAndShowSummaryAlert, 1000);
             }, (error) => console.error("Error en listener de llamadas:", error));
             
-            onSnapshot(query(historicalCallsCollectionRef), (snapshot) => {
+            state.listeners.historical = onSnapshot(query(historicalCallsCollectionRef), (snapshot) => {
                 state.historicalCalls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 sortAndRenderTable(DOM.historicalTableBody, state.historicalCalls, true);
                 updateAllDashboards();
@@ -4918,6 +5057,54 @@
          * Configura todos los `event listeners` principales de la aplicación.
          */
         function setupEventListeners() {
+            // --- Evento para el ojo de la contraseña ---
+            const togglePasswordBtn = document.getElementById('toggle-password-visibility');
+            if (togglePasswordBtn) {
+                togglePasswordBtn.addEventListener('click', function() {
+                    const passwordInput = document.getElementById('login-password');
+                    const icon = this.querySelector('i');
+                    const isPassword = passwordInput.type === 'password';
+                    
+                    passwordInput.type = isPassword ? 'text' : 'password';
+                    icon.classList.toggle('fa-eye', !isPassword);
+                    icon.classList.toggle('fa-eye-slash', isPassword);
+                });
+            }
+
+
+            // --- Eventos de Login/Logout ---
+            DOM.loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                DOM.loginError.classList.add('hidden');
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                try {
+                    showLoader(true); // Mostrar loader durante el intento de login
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // onAuthStateChanged se encargará de mostrar la app
+                } catch (error) {
+                    showLoader(false); // Ocultar loader si hay error
+                    let message = "Error al iniciar sesión. Inténtalo de nuevo.";
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                        message = "Credenciales incorrectas. Verifica tu correo y contraseña.";
+                    }
+                    DOM.loginError.textContent = message;
+                    DOM.loginError.classList.remove('hidden');
+                    console.error("Error de inicio de sesión:", error.code, error.message);
+                }
+            });
+
+            DOM.logoutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    // onAuthStateChanged se encargará de mostrar la pantalla de login
+                } catch (error) {
+                    console.error("Error al cerrar sesión:", error);
+                    showAlert("Error al cerrar sesión.", "error");
+                }
+            });
+
             setupTabs();
             // Modificación: El dataProvider para los filtros de columna ahora puede ser dinámico.
             setupColumnFilters('main-table-header', () => {
@@ -5675,7 +5862,7 @@
          * Función de inicialización principal. Llama a todas las funciones de configuración.
          */
         function initialize() {
-            initializeAppWithAuth();
+            initializeAuth();
             setupEventListeners();
             setupAddEditButtons();
             setupPasswordVerification();
