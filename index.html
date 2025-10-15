@@ -639,6 +639,9 @@
                     <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-300">
                         Acceder
                     </button>
+                    <button type="button" id="back-to-app-btn" class="hidden w-full text-center text-sm text-slate-500 hover:text-primary mt-4">
+                        Volver a la aplicación
+                    </button>
                 </form>
             </div>
         </div>
@@ -5095,18 +5098,29 @@
          * Configura todos los `event listeners` principales de la aplicación.
          */
         function setupEventListeners() {
-            // --- Evento para el ojo de la contraseña ---
+            // --- Evento para el ojo de la contraseña (mejorado a press-and-hold) ---
             const togglePasswordBtn = document.getElementById('toggle-password-visibility');
             if (togglePasswordBtn) {
-                togglePasswordBtn.addEventListener('click', function() {
-                    const passwordInput = document.getElementById('login-password');
-                    const icon = this.querySelector('i');
-                    const isPassword = passwordInput.type === 'password';
-                    
-                    passwordInput.type = isPassword ? 'text' : 'password';
-                    icon.classList.toggle('fa-eye', !isPassword);
-                    icon.classList.toggle('fa-eye-slash', isPassword);
+                const passwordInput = document.getElementById('login-password');
+                const icon = togglePasswordBtn.querySelector('i');
+
+                const showPassword = () => {
+                    passwordInput.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                };
+
+                const hidePassword = () => {
+                    passwordInput.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                };
+
+                togglePasswordBtn.addEventListener('mousedown', showPassword);
+                togglePasswordBtn.addEventListener('mouseup', hidePassword);
+                togglePasswordBtn.addEventListener('mouseleave', hidePassword); // Si el mouse se sale del botón
+                togglePasswordBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); showPassword();
                 });
+                togglePasswordBtn.addEventListener('touchend', hidePassword);
             }
 
 
@@ -5131,6 +5145,12 @@
                     DOM.loginError.classList.remove('hidden');
                     console.error("Error de inicio de sesión:", error.code, error.message);
                 }
+            });
+
+            // Botón para volver a la app desde la pantalla de login
+            document.getElementById('back-to-app-btn').addEventListener('click', () => {
+                DOM.loginScreen.classList.add('hidden');
+                showApp();
             });
 
             DOM.logoutBtn.addEventListener('click', async () => {
