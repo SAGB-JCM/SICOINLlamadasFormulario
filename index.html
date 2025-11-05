@@ -232,8 +232,9 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 6px;
             z-index: 20;
-            max-height: 250px;
-            overflow-y: auto;
+            max-height: 300px; /* Aumentamos un poco la altura máxima */
+            max-width: 450px; /* Ancho máximo para que no se extienda demasiado */
+            overflow: auto;   /* Habilita ambos scrolls (vertical y horizontal) si es necesario */
             min-width: 200px;
         }
 
