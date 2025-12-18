@@ -146,6 +146,16 @@
         /* Clase para bloquear el scroll del body cuando un modal está abierto */
         body.modal-open { overflow: hidden; }
 
+        /* Overlay para bloquear la interacción con un modal durante una operación */
+        .modal-block-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.5); /* Fondo blanco semitransparente */
+            z-index: 10; /* Por encima del contenido del modal, pero debajo del loader global */
+            cursor: wait; /* Cambia el cursor para indicar que se está procesando algo */
+            border-radius: 0.5rem; /* Hereda el borde redondeado del modal */
+        }
+
         /* Ancho para modales grandes (Nueva/Editar llamada, Ver Detalles) */
         .wide-modal .relative { max-width: 76rem !important; }
 
@@ -1655,15 +1665,26 @@
          * Muestra una notificación flotante (toast) en la esquina inferior derecha.
          * @param {string} message - El mensaje a mostrar.
          * @param {'info'|'success'|'warning'|'error'} [type='info'] - El tipo de alerta, que determina su color.
+         * @returns {Promise<void>} Una promesa que se resuelve cuando la animación de entrada de la alerta ha terminado.
          */
         function showAlert(message, type = 'info') {
-            const alertContainer = document.createElement('div');
-            const colors = { success: 'bg-green-500', error: 'bg-red-500', warning: 'bg-yellow-500', info: 'bg-gray-500' };
-            alertContainer.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 z-[100] ${colors[type]}`;
-            alertContainer.textContent = message;
-            document.body.appendChild(alertContainer);
-            // La alerta se elimina automáticamente después de 3 segundos.
-            setTimeout(() => { alertContainer.remove(); }, 6000);
+            return new Promise(resolve => {
+                const alertContainer = document.createElement('div');
+                const colors = { success: 'bg-green-500', error: 'bg-red-500', warning: 'bg-yellow-500', info: 'bg-gray-500' };
+                alertContainer.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 z-[100] ${colors[type]}`;
+                alertContainer.textContent = message;
+                document.body.appendChild(alertContainer);
+
+                // La animación de entrada dura 300ms. La promesa se resuelve después de ese tiempo.
+                setTimeout(() => {
+                    resolve();
+                }, 300);
+
+                // La alerta se elimina automáticamente después de 6 segundos.
+                setTimeout(() => {
+                    alertContainer.remove();
+                }, 6000);
+            });
         }
 
         /**
@@ -3075,6 +3096,19 @@
          * Extrae valores únicos de los datos existentes y los fusiona con catálogos base.
          */
         function updateDynamicSelectOptions() {
+            // --- INICIO: Lógica mejorada para actualizar selects sin perder datos ---
+            // 1. Determinar si un modal de formulario está activo y cuál es.
+            const isCallModalOpen = !DOM.callModal.classList.contains('hidden');
+            const isEditModalOpen = !DOM.editModal.classList.contains('hidden');
+            const activeFormId = isCallModalOpen ? DOM.callForm.id : (isEditModalOpen ? DOM.editForm.id : null);
+            let formState = null;
+
+            // 2. Si un formulario está abierto, capturamos su estado actual ANTES de actualizar los selects.
+            if (activeFormId) {
+                formState = getFormState(activeFormId);
+            }
+            // --- FIN: Lógica mejorada ---
+
             const allData = [...state.calls, ...state.historicalCalls];
             // 1. Extraer todas las instituciones existentes en los registros.
             const historicalInstitutions = allData.map(c => c.institucion).filter(Boolean).map(i => i.trim());
@@ -3107,6 +3141,11 @@
             updateSelectOptions('atendioUsers', state.fieldOptions.atendioUsers);
             updateSelectOptions('telefonos', state.fieldOptions.telefonos);
             updateSelectOptions('comentarios', state.fieldOptions.comentarios);
+
+            // 3. Si capturamos un estado de formulario, lo restauramos AHORA que los selects tienen las opciones actualizadas.
+            if (formState && activeFormId) {
+                restoreFormState(activeFormId, formState);
+            }
         }
         
         /**
@@ -3438,47 +3477,13 @@
          */
 
         /**
-         * Busca y reemplaza un valor en un campo específico en todos los registros de la base de datos.
-         * Esta función ahora solo se enfoca en la base de datos y devuelve el conteo de registros actualizados.
-         * @returns {Promise<number>} El número total de registros actualizados.
-         */
-        async function findAndReplaceInDatabase(field, oldValue, newValue) {
-            const fieldToDbFieldMap = {
-                'instituciones': 'institucion', 
-                'areas': 'area', 
-                'asuntos': 'asunto',
-                'consultas': 'consulta', 
-                'nombres': 'nombre', 
-                'cargos': 'cargo',
-                'correos': 'correo', 
-                'telefonos': 'telefono', 
-                'comentarios': 'comentarios',
-                'atendioUsers': 'atendio'
-            };
-
-            const dbField = fieldToDbFieldMap[field];
-            if (!dbField) throw new Error("Campo de base de datos no válido para la edición.");
-
-            const batch = writeBatch(db);
-            const callsQuery = query(callsCollectionRef, where(dbField, '==', oldValue));
-            const callsSnapshot = await getDocs(callsQuery);
-            callsSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
-            const historicalQuery = query(historicalCallsCollectionRef, where(dbField, '==', oldValue));
-            const historicalSnapshot = await getDocs(historicalQuery);
-            historicalSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
-            await batch.commit();
-            return callsSnapshot.size + historicalSnapshot.size;
-        }
-
-        // Variable global para mantener el contexto del <select> que está siendo modificado.
-        // Se gestiona su ciclo de vida: se establece al iniciar y se limpia al finalizar o cancelar.
-        let activeSelectElement = null;
-
-        /**
          * Configura los manejadores de eventos para los botones de edición (lápiz)
          * asociados a cada campo de tipo Select2 en los formularios.
          */
         function setupAddEditButtons() {
+            // Variable para mantener el contexto del <select> que está siendo modificado.
+            let activeSelectElement = null;
+
              const buttonToFieldMap = {
                  'edit-institution-btn': 'instituciones',
                  'edit-area-btn': 'areas',
@@ -3501,95 +3506,138 @@
                  'edit-comments-edit-btn': 'comentarios',
                  'edit-atendio-edit-btn': 'atendioUsers'
              };
-            
-             // 1. ASIGNACIÓN DE EVENTOS A LOS BOTONES (lápiz)
-             Object.entries(buttonToFieldMap).forEach(([buttonId, field]) => {
-                 const button = document.getElementById(buttonId);
-                 if (!button) return;
  
-                 // Ocultar los botones de lápiz en modo solo lectura
-                 button.addEventListener('click', (e) => {
-                     if (state.isReadOnly) return; // No hacer nada en modo solo lectura
+            async function findAndReplaceInDatabase(field, oldValue, newValue) {
+                const fieldToDbFieldMap = {
+                    'instituciones': 'institucion', 'areas': 'area', 'asuntos': 'asunto',
+                    'consultas': 'consulta', 'nombres': 'nombre', 'cargos': 'cargo',
+                    'correos': 'correo', 'telefonos': 'telefono', 'comentarios': 'comentarios',
+                    'atendioUsers': 'atendio'
+                };
+                const dbField = fieldToDbFieldMap[field];
+                if (!dbField) throw new Error("Campo de base de datos no válido para la edición.");
 
-                     activeSelectElement = e.currentTarget.parentElement.querySelector('select');
-                     const currentValue = $(activeSelectElement).val();
-                         
-                     if (!currentValue) {
-                         return showAlert("Por favor, seleccione una opción para editar.", "warning");
-                     }
-                     
-                     // <<-- SOLUCIÓN 1: Capturar el estado del formulario activo ANTES de abrir el modal de edición.
-                     const activeFormId = !DOM.callModal.classList.contains('hidden') ? DOM.callForm.id : 
-                                          !DOM.editModal.classList.contains('hidden') ? DOM.editForm.id : null;
-                     state.ui.formStateBeforeEdit = activeFormId ? getFormState(activeFormId) : null;
-                     state.ui.activeFormIdBeforeEdit = activeFormId;
+                const batch = writeBatch(db);
+                const queries = [
+                    query(callsCollectionRef, where(dbField, '==', oldValue)),
+                    query(historicalCallsCollectionRef, where(dbField, '==', oldValue))
+                ];
 
-                     state.ui.currentEditingField = field;
-                     state.ui.currentEditingValue = currentValue;
-                     DOM.editOptionInput.value = currentValue;
-                     DOM.editOptionInput.placeholder = `Edite la opción para ${field}`;
-                     openModal(DOM.editOptionModal);
-                 });
+                let updatedCount = 0;
+                for (const q of queries) {
+                    const snapshot = await getDocs(q);
+                    snapshot.forEach(doc => {
+                        batch.update(doc.ref, { [dbField]: newValue });
+                        updatedCount++;
+                    });
+                }
 
-                 // Ocultar el botón si estamos en modo solo lectura
-                 button.classList.toggle('hidden', state.isReadOnly);
-             });
+                if (updatedCount > 0) {
+                    await batch.commit();
+                }
+                return updatedCount;
+            }
 
-             // 2. LÓGICA DE CONFIRMACIÓN PARA EDITAR OPCIÓN EXISTENTE
-             DOM.confirmEditOptionBtn.addEventListener('click', () => {
-                 const newValue = DOM.editOptionInput.value.trim();
- 
-                 if (!newValue || !state.ui.currentEditingField || !state.ui.currentEditingValue) {
-                     return;
-                 }
- 
-                 closeModal(DOM.editOptionModal);
+            Object.entries(buttonToFieldMap).forEach(([buttonId, field]) => {
+                const button = document.getElementById(buttonId);
+                if (!button) return;
 
-                 requirePassword(async () => { // La función de contraseña ahora envuelve toda la lógica asíncrona.
-                     showLoader(true); // <<-- SOLUCIÓN: Bloquear UI al inicio de la operación.
-                     try {
-                         // 1. Actualizar la base de datos. La función ahora solo hace eso y devuelve el conteo.
-                         const updatedCount = await findAndReplaceInDatabase(state.ui.currentEditingField, state.ui.currentEditingValue, newValue);
-                         
-                         // 2. Actualizar las opciones de los selects en toda la aplicación.
-                         // Esto es lo que limpia visualmente los campos.
-                         await updateDynamicSelectOptions(); // Esperamos a que los selects se actualicen
+                button.addEventListener('click', (e) => {
+                    if (state.isReadOnly) return;
 
-                         // 3. Restaurar el estado del formulario que guardamos.
-                         // Esto se hace DESPUÉS de que los selects se han reconstruido.
-                         if (state.ui.activeFormIdBeforeEdit && state.ui.formStateBeforeEdit) {
-                             await restoreFormState(state.ui.activeFormIdBeforeEdit, state.ui.formStateBeforeEdit);
-                         }
- 
-                         // 4. Asegurarse de que el select que originó la edición tenga el nuevo valor.
-                         if (activeSelectElement) {
-                             $(activeSelectElement).val(newValue).trigger('change');
-                         }
+                    activeSelectElement = e.currentTarget.parentElement.querySelector('select');
+                    const currentValue = $(activeSelectElement).val();
 
-                         // 5. <<-- SOLUCIÓN: Mostrar el mensaje de éxito AL FINAL de todo el proceso.
-                         showAlert(`Se actualizaron ${updatedCount} registros con éxito.`, "success");
+                    if (!currentValue) {
+                        return showAlert("Por favor, seleccione una opción para editar.", "warning");
+                    }
 
-                     } catch (dbErr) {
-                         console.error('Error al actualizar la base de datos:', dbErr);
-                         showAlert("Error al actualizar la opción en la base de datos", "error");
-                     } finally {
-                         showLoader(false); // <<-- SOLUCIÓN: Desbloquear UI al final, tanto en éxito como en error.
-                         activeSelectElement = null;
-                     }
-                 }, () => {
-                    // Limpiar estado si se cancela la contraseña
-                    state.ui.formStateBeforeEdit = null;
-                    state.ui.activeFormIdBeforeEdit = null;
-                 });
-             });
-             
-             // 3. LIMPIEZA DE ESTADO EN CASO DE CANCELACIÓN
-             DOM.cancelEditOptionBtn.addEventListener('click', () => {
-                 closeModal(DOM.editOptionModal);
-                 activeSelectElement = null;
-                 state.ui.formStateBeforeEdit = null;
-                 state.ui.activeFormIdBeforeEdit = null;
-             });
+                    state.ui.currentEditingField = field;
+                    state.ui.currentEditingValue = currentValue;
+                    DOM.editOptionInput.value = currentValue;
+                    DOM.editOptionInput.placeholder = `Edite la opción para ${field}`;
+                    openModal(DOM.editOptionModal);
+                });
+
+                button.classList.toggle('hidden', state.isReadOnly);
+            });
+
+            DOM.confirmEditOptionBtn.addEventListener('click', () => {
+                const newValue = DOM.editOptionInput.value.trim();
+                const oldValue = state.ui.currentEditingValue;
+                const field = state.ui.currentEditingField;
+
+                if (!newValue || !field || !oldValue || newValue === oldValue) {
+                    closeModal(DOM.editOptionModal);
+                    return;
+                }
+
+                closeModal(DOM.editOptionModal);
+
+                requirePassword(async () => {
+                    // --- INICIO: Lógica de bloqueo del modal ---
+                    let activeModalContent = null;
+                    if (!DOM.callModal.classList.contains('hidden')) {
+                        activeModalContent = DOM.callModal.querySelector('.relative');
+                    } else if (!DOM.editModal.classList.contains('hidden')) {
+                        activeModalContent = DOM.editModal.querySelector('.relative');
+                    }
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'modal-block-overlay';
+                    if (activeModalContent) {
+                        activeModalContent.style.position = 'relative'; // Asegurar que el posicionamiento absoluto del overlay funcione
+                        activeModalContent.appendChild(overlay);
+                    }
+                    // --- FIN: Lógica de bloqueo del modal ---
+
+                    showLoader(true);
+                    try {
+                        const updatedCount = await findAndReplaceInDatabase(field, oldValue, newValue);
+
+                        // Esperamos un momento para que el listener de Firestore actualice el estado y los selects.
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+                        if (activeSelectElement) {
+                            // Asegurarse de que la nueva opción exista y seleccionarla.
+                            const newOption = new Option(newValue, newValue, true, true);
+                            if (!$(activeSelectElement).find(`option[value="${newValue}"]`).length) {
+                                $(activeSelectElement).append(newOption);
+                            }
+                            $(activeSelectElement).val(newValue).trigger('change');
+                        }
+
+                        // --- INICIO: Cierre del loader sincronizado con la alerta (CORREGIDO) ---
+                        // Se muestra la notificación y se espera a que sea visible antes de ocultar el loader.
+                        if (updatedCount > 0) {
+                            await showAlert(`Se actualizaron ${updatedCount} registros con el nuevo valor.`, "success");
+                        } else {
+                            await showAlert("La opción se ha renombrado en el formulario. No se encontraron registros en la base de datos para actualizar.", "info");
+                        }
+                        // Ahora que la notificación es visible, ocultamos el loader.
+                        showLoader(false);
+                        // --- FIN: Cierre del loader sincronizado con la alerta (CORREGIDO) ---
+
+                    } catch (dbErr) {
+                        console.error('Error al actualizar la base de datos:', dbErr);
+                        showLoader(false); // Asegurarse de ocultar el loader también en caso de error.
+                        showAlert("Error al actualizar la opción en la base de datos.", "error");
+                    } finally {
+                        activeSelectElement = null;
+                        // --- INICIO: Eliminar el bloqueo del modal ---
+                        if (activeModalContent && overlay) {
+                            activeModalContent.removeChild(overlay);
+                        }
+                        state.ui.currentEditingField = null;
+                        state.ui.currentEditingValue = null;
+                    }
+                });
+            });
+
+            DOM.cancelEditOptionBtn.addEventListener('click', () => {
+                closeModal(DOM.editOptionModal);
+                activeSelectElement = null;
+            });
         }
 
         // =============================================
