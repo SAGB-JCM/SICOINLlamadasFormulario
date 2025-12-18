@@ -3391,26 +3391,33 @@
          * @param {string} formId - El ID del formulario a restaurar.
          * @param {Object} state - El objeto de estado previamente guardado con `getFormState`.
          */
-        function restoreFormState(formId, state) {
-            const form = document.getElementById(formId);
-            if (!form || !state) return;
-            
-            Object.entries(state).forEach(([fieldName, fieldState]) => {
-                const select = $(form).find(`[name="${fieldName}"]`);
-                if (select.length > 0) {
-                    // Restaurar etiquetas temporales primero para que estén disponibles para la selección
-                    if (fieldState.tags) {
-                        fieldState.tags.forEach(tag => {
-                            if (!select.find(`option[value="${tag.id}"]`).length) {
-                                const newOption = new Option(tag.text, tag.id);
-                                $(newOption).attr('data-select2-tag', 'true'); // Marcar como etiqueta para la siguiente captura de estado.
-                                select.append(newOption);
-                            }
-                        });
-                    }
-                    // Restaurar valor seleccionado
-                    select.val(fieldState.value).trigger('change.select2');
+        async function restoreFormState(formId, state) {
+            return new Promise(resolve => {
+                const form = document.getElementById(formId);
+                if (!form || !state) {
+                    resolve();
+                    return;
                 }
+                
+                Object.entries(state).forEach(([fieldName, fieldState]) => {
+                    const select = $(form).find(`[name="${fieldName}"]`);
+                    if (select.length > 0) {
+                        // Restaurar etiquetas temporales primero para que estén disponibles para la selección
+                        if (fieldState.tags) {
+                            fieldState.tags.forEach(tag => {
+                                if (!select.find(`option[value="${tag.id}"]`).length) {
+                                    const newOption = new Option(tag.text, tag.id);
+                                    $(newOption).attr('data-select2-tag', 'true'); // Marcar como etiqueta para la siguiente captura de estado.
+                                    select.append(newOption);
+                                }
+                            });
+                        }
+                        // Restaurar valor seleccionado
+                        select.val(fieldState.value).trigger('change.select2');
+                    }
+                });
+                // Damos un pequeño respiro para que el DOM y Select2 se actualicen completamente
+                setTimeout(() => resolve(), 100);
             });
         }
 
@@ -3424,7 +3431,12 @@
          * @param {Object} formStateBeforeEdit - El estado del formulario antes de la edición.
          */
 
-        async function findAndReplaceInDatabase(field, oldValue, newValue, activeFormId, formStateBeforeEdit) {
+        /**
+         * Busca y reemplaza un valor en un campo específico en todos los registros de la base de datos.
+         * Esta función ahora solo se enfoca en la base de datos y devuelve el conteo de registros actualizados.
+         * @returns {Promise<number>} El número total de registros actualizados.
+         */
+        async function findAndReplaceInDatabase(field, oldValue, newValue) {
             const fieldToDbFieldMap = {
                 'instituciones': 'institucion', 
                 'areas': 'area', 
@@ -3437,37 +3449,19 @@
                 'comentarios': 'comentarios',
                 'atendioUsers': 'atendio'
             };
-            
-            const dbField = fieldToDbFieldMap[field];
-            if (!dbField) return;
-            
-            try {
-                // Actualización de registros (existente)
-                const callsQuery = query(callsCollectionRef, where(dbField, '==', oldValue));
-                const callsSnapshot = await getDocs(callsQuery);
-                
-                const batch = writeBatch(db);
-                callsSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
-                const historicalQuery = query(historicalCallsCollectionRef, where(dbField, '==', oldValue));
-                const historicalSnapshot = await getDocs(historicalQuery);
-                historicalSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
-                await batch.commit();
-                
-                // Actualizar las opciones globales en fieldOptions
-                state.fieldOptions[field] = [...new Set([...state.fieldOptions[field].filter(opt => opt !== oldValue), newValue])].sort();
-                // Redibujar los selects con la lista actualizada, preservando el estado del formulario
-                updateSelectOptions(field, state.fieldOptions[field]);
 
-                // Restaurar el estado del formulario para mantener los valores no guardados
-                if (formStateBeforeEdit) {
-                    restoreFormState(activeFormId, formStateBeforeEdit);
-                }
-                
-                showAlert(`Se actualizaron ${callsSnapshot.size + historicalSnapshot.size} registros.`, "success");
-            } catch (error) {
-                console.error("Error al actualizar registros:", error);
-                showAlert("Error al actualizar registros existentes", "error");
-            }
+            const dbField = fieldToDbFieldMap[field];
+            if (!dbField) throw new Error("Campo de base de datos no válido para la edición.");
+
+            const batch = writeBatch(db);
+            const callsQuery = query(callsCollectionRef, where(dbField, '==', oldValue));
+            const callsSnapshot = await getDocs(callsQuery);
+            callsSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
+            const historicalQuery = query(historicalCallsCollectionRef, where(dbField, '==', oldValue));
+            const historicalSnapshot = await getDocs(historicalQuery);
+            historicalSnapshot.forEach(doc => batch.update(doc.ref, { [dbField]: newValue }));
+            await batch.commit();
+            return callsSnapshot.size + historicalSnapshot.size;
         }
 
         // Variable global para mantener el contexto del <select> que está siendo modificado.
@@ -3508,23 +3502,33 @@
                  if (!button) return;
  
                  // Ocultar los botones de lápiz en modo solo lectura
-                 button.classList.toggle('hidden', state.isReadOnly);
                  button.addEventListener('click', (e) => {
+                     if (state.isReadOnly) return; // No hacer nada en modo solo lectura
+
                      activeSelectElement = e.currentTarget.parentElement.querySelector('select');
                      const currentValue = $(activeSelectElement).val();
                          
                      if (!currentValue) {
                          return showAlert("Por favor, seleccione una opción para editar.", "warning");
                      }
-                        
+                     
+                     // <<-- SOLUCIÓN 1: Capturar el estado del formulario activo ANTES de abrir el modal de edición.
+                     const activeFormId = !DOM.callModal.classList.contains('hidden') ? DOM.callForm.id : 
+                                          !DOM.editModal.classList.contains('hidden') ? DOM.editForm.id : null;
+                     state.ui.formStateBeforeEdit = activeFormId ? getFormState(activeFormId) : null;
+                     state.ui.activeFormIdBeforeEdit = activeFormId;
+
                      state.ui.currentEditingField = field;
                      state.ui.currentEditingValue = currentValue;
                      DOM.editOptionInput.value = currentValue;
                      DOM.editOptionInput.placeholder = `Edite la opción para ${field}`;
                      openModal(DOM.editOptionModal);
                  });
+
+                 // Ocultar el botón si estamos en modo solo lectura
+                 button.classList.toggle('hidden', state.isReadOnly);
              });
-            
+
              // 2. LÓGICA DE CONFIRMACIÓN PARA EDITAR OPCIÓN EXISTENTE
              DOM.confirmEditOptionBtn.addEventListener('click', () => {
                  const newValue = DOM.editOptionInput.value.trim();
@@ -3534,29 +3538,42 @@
                  }
  
                  closeModal(DOM.editOptionModal);
-                 
-                 const activeFormId = !DOM.callModal.classList.contains('hidden') ? DOM.callForm.id : 
-                                      !DOM.editModal.classList.contains('hidden') ? DOM.editForm.id : null;
-                 
-                 const formStateBeforeEdit = activeFormId ? getFormState(activeFormId) : null;
- 
-                 requirePassword(async () => {
+
+                 requirePassword(async () => { // La función de contraseña ahora envuelve toda la lógica asíncrona.
+                     showLoader(true); // <<-- SOLUCIÓN: Bloquear UI al inicio de la operación.
                      try {
-                         await findAndReplaceInDatabase(state.ui.currentEditingField, state.ui.currentEditingValue, newValue, activeFormId, formStateBeforeEdit);
+                         // 1. Actualizar la base de datos. La función ahora solo hace eso y devuelve el conteo.
+                         const updatedCount = await findAndReplaceInDatabase(state.ui.currentEditingField, state.ui.currentEditingValue, newValue);
                          
-                         if (formStateBeforeEdit) {
-                             restoreFormState(activeFormId, formStateBeforeEdit);
+                         // 2. Actualizar las opciones de los selects en toda la aplicación.
+                         // Esto es lo que limpia visualmente los campos.
+                         await updateDynamicSelectOptions(); // Esperamos a que los selects se actualicen
+
+                         // 3. Restaurar el estado del formulario que guardamos.
+                         // Esto se hace DESPUÉS de que los selects se han reconstruido.
+                         if (state.ui.activeFormIdBeforeEdit && state.ui.formStateBeforeEdit) {
+                             await restoreFormState(state.ui.activeFormIdBeforeEdit, state.ui.formStateBeforeEdit);
                          }
  
+                         // 4. Asegurarse de que el select que originó la edición tenga el nuevo valor.
                          if (activeSelectElement) {
-                             $(activeSelectElement).val(newValue).trigger('change.select2');
+                             $(activeSelectElement).val(newValue).trigger('change');
                          }
+
+                         // 5. <<-- SOLUCIÓN: Mostrar el mensaje de éxito AL FINAL de todo el proceso.
+                         showAlert(`Se actualizaron ${updatedCount} registros con éxito.`, "success");
+
                      } catch (dbErr) {
                          console.error('Error al actualizar la base de datos:', dbErr);
                          showAlert("Error al actualizar la opción en la base de datos", "error");
                      } finally {
+                         showLoader(false); // <<-- SOLUCIÓN: Desbloquear UI al final, tanto en éxito como en error.
                          activeSelectElement = null;
                      }
+                 }, () => {
+                    // Limpiar estado si se cancela la contraseña
+                    state.ui.formStateBeforeEdit = null;
+                    state.ui.activeFormIdBeforeEdit = null;
                  });
              });
              
@@ -3564,6 +3581,8 @@
              DOM.cancelEditOptionBtn.addEventListener('click', () => {
                  closeModal(DOM.editOptionModal);
                  activeSelectElement = null;
+                 state.ui.formStateBeforeEdit = null;
+                 state.ui.activeFormIdBeforeEdit = null;
              });
         }
 
@@ -3587,6 +3606,7 @@
                 if (state.ui.pendingAction) {
                     state.ui.pendingAction();
                     state.ui.pendingAction = null;
+                    state.ui.cancelPendingAction = null;
                 }
             } else {
                 showAlert("Contraseña incorrecta", "error");
@@ -3602,6 +3622,10 @@
             DOM.cancelPasswordBtn.addEventListener('click', () => {
                 closeModal(DOM.passwordModal);
                 state.ui.pendingAction = null;
+                if (state.ui.cancelPendingAction) {
+                    state.ui.cancelPendingAction();
+                    state.ui.cancelPendingAction = null;
+                }
             });
             
             // Usar el elemento correcto del DOM para el evento keypress
@@ -3619,8 +3643,9 @@
          * Muestra el modal de contraseña y guarda la acción a ejecutar tras una verificación exitosa.
          * @param {Function} action - La función a ejecutar si la contraseña es correcta.
          */
-        function requirePassword(action) {
+        function requirePassword(action, onCancel) {
             state.ui.pendingAction = action;
+            state.ui.cancelPendingAction = onCancel;
             openModal(DOM.passwordModal);
         }
 
