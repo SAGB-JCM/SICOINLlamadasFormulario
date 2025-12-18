@@ -2383,10 +2383,16 @@
          * Inicia una nueva llamada: abre el modal, resetea el formulario y comienza el temporizador.
          */
         function startTimer() {
+            // Desactivar temporalmente los eventos de autocompletado
+            state.ui.isProgrammaticChange = true;
+
             DOM.callForm.reset();
             toggleCallActiveState(true); // Activar el estado de llamada activa
             // Reset all select2 fields
             $('#call-form select').val(null).trigger('change');
+
+            // Reactivar los eventos de autocompletado
+            state.ui.isProgrammaticChange = false;
             openModal(DOM.callModal);
 
             const atendioSelect = $('#call-atendio');
